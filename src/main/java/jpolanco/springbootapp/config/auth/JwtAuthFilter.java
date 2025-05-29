@@ -4,7 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jpolanco.springbootapp.user.domain.model.TokenStatus;
+import jpolanco.springbootapp.shared.domain.TokenStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.mysql.UserRepositoryMySQL;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;

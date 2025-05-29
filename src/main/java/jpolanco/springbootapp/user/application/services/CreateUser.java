@@ -5,7 +5,7 @@ import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
-import jpolanco.springbootapp.user.application.uc.CreateUserUc;
+import jpolanco.springbootapp.user.application.uc.CreateUserUC;
 import jpolanco.springbootapp.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class CreateUser implements CreateUserUc {
+public class CreateUser implements CreateUserUC {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final QRProvider qrProvider;

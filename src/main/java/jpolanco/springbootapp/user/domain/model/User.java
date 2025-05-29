@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.user.domain.model;
 
 
+import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.events.UserRegistered;
 import jpolanco.springbootapp.user.domain.model.valueobjects.*;
@@ -137,7 +138,7 @@ public class User {
         private Result<Status> status;
         private Result<QRFileName> qrFileName;
         private Instant createdAt;
-        private Result<Void> isValid = Result.success(null);
+        private Result<Void> isValid = Result.success();
         private DomainEvent domainEvent;
 
         private void checker(Result<?> result) {

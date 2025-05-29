@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.persistence;
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.user.domain.model.TokenStatus;
-import jpolanco.springbootapp.user.domain.model.TokenType;
+import jpolanco.springbootapp.shared.domain.TokenStatus;
+import jpolanco.springbootapp.shared.domain.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

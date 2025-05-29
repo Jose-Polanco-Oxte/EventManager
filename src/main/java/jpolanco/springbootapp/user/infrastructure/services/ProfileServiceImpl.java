@@ -2,15 +2,15 @@ package jpolanco.springbootapp.user.infrastructure.services;
 import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
+import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.uc.DeleteUserByIdUC;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
 import jpolanco.springbootapp.user.application.uc.UpdateUserUC;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.dto.SimpleResponseCreator;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.dto.UserDtoCreator;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.SimpleResponseCreator;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdatePasswordRequest;
-import jpolanco.springbootapp.user.infrastructure.components.AuxTokenManagerImpl;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final DeleteUserByIdUC deleteUserByIdUC;
     private final UpdateUserUC updateUserUC;
     private final UserValidation userValidation;
-    private final AuxTokenManagerImpl auxTokenManagerImpl;
+    private final AuxTokenManager auxTokenManager;
 
     @Override
     public Result<Dto> get(String userId) {
@@ -69,7 +69,7 @@ public class ProfileServiceImpl implements ProfileService {
             return Result.failure(result.getError());
         }
         var updatedUser = result.getValue();
-        auxTokenManagerImpl.revokeAllUserTokens(updatedUser.getId());
+        auxTokenManager.revokeAllUserTokens(updatedUser.getId());
         return Result.success(simpleResponseCreator.create("Email updated successfully"));
     }
 
@@ -95,7 +95,7 @@ public class ProfileServiceImpl implements ProfileService {
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
-        auxTokenManagerImpl.revokeAllUserTokens(validUser.getId());
+        auxTokenManager.revokeAllUserTokens(validUser.getId());
         return Result.success(simpleResponseCreator.create("Password updated successfully"));
     }
 }

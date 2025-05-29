@@ -2,8 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
 import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
 import jpolanco.springbootapp.user.domain.model.Token;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.entity.TokenEntityMapper;
-import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.TokenEntityMapper;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

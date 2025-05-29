@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.publisher;
 
-import jpolanco.springbootapp.user.domain.model.DomainEvent;
+import jpolanco.springbootapp.shared.domain.DomainEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;

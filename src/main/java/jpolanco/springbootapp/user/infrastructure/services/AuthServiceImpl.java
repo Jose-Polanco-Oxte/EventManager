@@ -3,14 +3,14 @@ package jpolanco.springbootapp.user.infrastructure.services;
 import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
+import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.ports.input.JwtProvider;
-import jpolanco.springbootapp.user.application.uc.CreateUserUc;
+import jpolanco.springbootapp.user.application.uc.CreateUserUC;
 import jpolanco.springbootapp.user.application.uc.GetUserByEmailUC;
 import jpolanco.springbootapp.user.application.uc.LoginUC;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
-import jpolanco.springbootapp.user.infrastructure.components.AuxTokenManagerImpl;
 import jpolanco.springbootapp.user.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthServiceImpl implements AuthService {
     private final LoginUC loginUC;
-    private final CreateUserUc createUserUc;
+    private final CreateUserUC createUserUc;
     private final GetUserByEmailUC getUserByEmailUC;
     private final JwtProvider jwtService;
     private final AuthenticationManager authentication;
-    private final AuxTokenManagerImpl auxTokenManagerImpl;
+    private final AuxTokenManager auxTokenManager;
     private final DomainEventsPublisher publisher;
 
     @Transactional
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         var user = verifiedUser.getValue();
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-        auxTokenManagerImpl.saveToken(user, accessToken);
+        auxTokenManager.saveToken(user, accessToken);
         authentication.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
         var user = createdUser.getValue();
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
-        auxTokenManagerImpl.saveToken(user, accessToken);
+        auxTokenManager.saveToken(user, accessToken);
         user.pullEvents().forEach(publisher::publish);
         user.clearEvents();
         return Result.success(new UserTokenResponse(accessToken, refreshToken));
@@ -93,8 +93,8 @@ public class AuthServiceImpl implements AuthService {
             return Result.failure(UserAppError.INVALID_TOKEN);
         }
         var accessToken = jwtService.generateAccessToken(user);
-        auxTokenManagerImpl.revokeAllUserTokens(user.getEmail());
-        auxTokenManagerImpl.saveToken(user, accessToken);
+        auxTokenManager.revokeAllUserTokens(user.getEmail());
+        auxTokenManager.saveToken(user, accessToken);
         return Result.success(new UserTokenResponse(accessToken, refreshToken));
     }
 }

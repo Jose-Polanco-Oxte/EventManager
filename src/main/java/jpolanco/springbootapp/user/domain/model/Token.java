@@ -1,6 +1,8 @@
 package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.domain.TokenStatus;
+import jpolanco.springbootapp.shared.domain.TokenType;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
 import lombok.Getter;
 

@@ -4,9 +4,9 @@ import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.uc.*;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.dto.SimpleResponseCreator;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.SimpleResponseCreator;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.dto.UserDtoCreator;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllUserUpdateRequest;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final GetAllUsersUC getAllUsersUC;
     private final UpdateUserUC updateUser;
     private final DeleteUserByIdUC deleteUserByIdUC;
-    private final AuxTokenManager auxTokenManagerImpl;
+    private final AuxTokenManager auxTokenManager;
     private final UserValidation userValidation;
 
     @Override
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             return Result.failure(updatedUser.getError());
         }
         var user = updatedUser.getValue();
-        auxTokenManagerImpl.revokeAllUserTokens(user.getId());
+        auxTokenManager.revokeAllUserTokens(user.getId());
         return Result.success(simpleResponseDto.create("User updated successfully"));
     }
 

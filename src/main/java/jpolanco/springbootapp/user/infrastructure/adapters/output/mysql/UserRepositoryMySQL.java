@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.infrastructure.adapters.Mappers.entity.UserEntityMapper;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapper;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

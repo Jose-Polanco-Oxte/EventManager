@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.events;
 
-import jpolanco.springbootapp.user.domain.model.DomainEvent;
+import jpolanco.springbootapp.shared.domain.DomainEvent;
 import lombok.Getter;
 @Getter
 public class UserRegistered extends DomainEvent {

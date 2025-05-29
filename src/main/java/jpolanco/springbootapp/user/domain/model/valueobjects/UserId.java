@@ -1,15 +1,15 @@
 package jpolanco.springbootapp.user.domain.model.valueobjects;
 
 import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.UUID;
 
-public class UserId {
-    private final String value;
+public class UserId extends IdObject {
 
     private UserId(String value) {
-        this.value = value;
+        super(value);
     }
 
     public static Result<UserId> create(String value) {
@@ -19,12 +19,8 @@ public class UserId {
         try {
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {
-            return Result.failure(new Error("InvalidUUID", "The provided UUID is invalid."));
+            return Result.failure(new Error("INVALID_UUID", "The provided UUID is invalid."));
         }
         return Result.success(new UserId(value));
-    }
-
-    public String getValue() {
-        return value;
     }
 }
