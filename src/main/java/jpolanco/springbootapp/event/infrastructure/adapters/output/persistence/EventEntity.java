@@ -38,7 +38,7 @@ public class EventEntity {
     @Column(nullable = false)
     private Instant createdAt;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     private UserEntity creator;
 
     @Column(nullable = false)
@@ -48,7 +48,10 @@ public class EventEntity {
     @Column(nullable = false)
     private String picture_path;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {
+            CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.REFRESH
+    })
     @JoinTable(
             name = "event_categories",
             joinColumns = @JoinColumn(name = "event_id"),
@@ -56,14 +59,15 @@ public class EventEntity {
     )
     private Set<CategoryEntity> categories;
 
-
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "preferences_id", referencedColumnName = "id", nullable = false, unique = true)
     private PreferencesEntity preferences;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", referencedColumnName = "id", nullable = false, unique = true)
     private LocationEntity location;
 
-    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StaffEntity> staff = new ArrayList<>();
 
 }

@@ -14,6 +14,7 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.Upd
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,6 +39,7 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success(userDtoCreator.create(user));
     }
 
+    @Transactional
     @Override
     public Result<Dto> changeName(String userId, UpdateNameRequest request) {
         var valid = userValidation.basicValid(userId);
@@ -55,6 +57,7 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success(simpleResponseCreator.create("Name updated successfully"));
     }
 
+    @Transactional
     @Override
     public Result<Dto> changeEmail(String userId, UpdateEmailRequest dto) {
         var valid = userValidation.basicValid(userId);
@@ -82,6 +85,7 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success(simpleResponseCreator.create("User deleted successfully"));
     }
 
+    @Transactional
     @Override
     public Result<Dto> changePassword(String userId, UpdatePasswordRequest dto) {
         var valid = userValidation.onUpdatePasswordIsValid(dto.newPassword(), dto.oldPassword(), userId);

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "event_locations")
 @Data
@@ -13,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class LocationEntity {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -24,8 +27,6 @@ public class LocationEntity {
     @Column(nullable = false)
     private double longitude;
 
-    @MapsId
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "event_id", nullable = false)
+    @OneToOne(mappedBy = "location")
     private EventEntity event;
 }

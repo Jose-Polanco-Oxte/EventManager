@@ -16,7 +16,7 @@ public class UserRegisteredListener {
 
     @EventListener
     public void handleUserRegistered(UserRegistered event) {
-        logger.info("User registered: userId= {}, email= {}, registerDate= {}", event.getUserId(), event.getEmail(), event.getTimeStamp());
-        emailService.sendVerificationEmail(event.getEmail());
+//        logger.info("User registered: userId= {}, email= {}, registerDate= {}", event.getUserId(), event.getEmail(), event.getTimeStamp());
+//        emailService.sendVerificationEmail(event.getEmail());
     }
 }

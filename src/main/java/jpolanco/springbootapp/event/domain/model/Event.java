@@ -186,8 +186,8 @@ public class Event {
         return enableComments;
     }
 
-    public String getModality() {
-        return modality.name();
+    public Modality getModality() {
+        return modality;
     }
 
     public List<String> getStaffIds() {
@@ -217,8 +217,8 @@ public class Event {
         return creatorId.getValue();
     }
 
-    public String getCreatedAt() {
-        return createdAt.toString();
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
     public String getPictureFileName() {

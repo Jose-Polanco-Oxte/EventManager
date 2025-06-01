@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryEntity {
-    @Id
-    private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Id
     private String name;
 }

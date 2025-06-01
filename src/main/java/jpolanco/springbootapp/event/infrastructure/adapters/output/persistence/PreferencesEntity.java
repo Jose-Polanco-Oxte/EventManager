@@ -14,13 +14,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PreferencesEntity {
-    @Id
-    private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @MapsId
-    @JoinColumn(name = "event_id")
-    private EventEntity event;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @Column(nullable = false)
     private boolean isPublic;
@@ -32,4 +29,6 @@ public class PreferencesEntity {
     @Column(nullable = false)
     private boolean enableComments;
 
+    @OneToOne(mappedBy = "preferences")
+    private EventEntity event;
 }

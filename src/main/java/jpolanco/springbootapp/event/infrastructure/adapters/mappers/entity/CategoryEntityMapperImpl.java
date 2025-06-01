@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryEntityMapperImpl implements CategoryEntityMapper {
 
-    private JpaCategoryRepository jpaCategoryRepository;
+    private final JpaCategoryRepository jpaCategoryRepository;
 
     @Override
     public List<CategoryEntity> toEntity(Categories domain) {

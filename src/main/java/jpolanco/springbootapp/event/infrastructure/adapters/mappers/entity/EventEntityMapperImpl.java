@@ -5,6 +5,8 @@ import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.Modality;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.*;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.LocationEntity;
+import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
+import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRoleRepository;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,45 +22,66 @@ import java.util.stream.Collectors;
 public class EventEntityMapperImpl implements EventEntityMapper {
     private final JpaUserRepository jpaUserRepository;
     private final CategoryEntityMapper categoryEntityMapper;
+    private final JpaStaffRoleRepository jpaStaffRoleRepository;
 
     @Override
     public EventEntity toEntity(Event domain) {
-        EventEntity eventEntity = new EventEntity();
-        eventEntity.setId(UUID.fromString(domain.getEventId()));
+
+        var eventEntity = new EventEntity();
+        var eventId = UUID.fromString(domain.getEventId());
+        eventEntity.setId(eventId);
+
+        // Create LocationEntity and PreferencesEntity
+        var location = new LocationEntity(
+                null,
+                "Unknown Location",
+                domain.getLatitude(),
+                domain.getLongitude(),
+                eventEntity
+        );
+
+        var preferences = new PreferencesEntity(
+                null,
+                domain.isPublic(),
+                domain.getModality(),
+                domain.isEnableComments(),
+                eventEntity
+        );
+
+        // Map staff members to StaffEntity and set roles
+        var staffEntityList = domain.getStaff().stream()
+                .map(staff -> {
+                    var staffEntity = new StaffEntity();
+                    staffEntity.setEvent(eventEntity);
+
+                    staffEntity.setAssistanceClerk(staff.isAssistanceClerk());
+                    var role = jpaStaffRoleRepository.findById(staff.getRole())
+                            .orElseThrow(() -> new IllegalArgumentException("Role not found: " + staff.getRole()));
+                    staffEntity.setRole(role);
+
+                    var userEntity = jpaUserRepository.findById(UUID.fromString(staff.getUserId().getValue()));
+                    userEntity.ifPresent(staffEntity::setUser);
+
+                    return staffEntity;
+                })
+                .toList();
+        eventEntity.setStaff(staffEntityList);
+
+        // Set eventEntity properties
+        eventEntity.setId(eventId);
         eventEntity.setTitle(domain.getTitle());
         eventEntity.setDescription(domain.getDescription());
         eventEntity.setSchedule(domain.getSchedule());
         eventEntity.setDurationInSeconds(domain.getDurationInSeconds());
         eventEntity.setStatus(domain.getStatus());
         eventEntity.setPicture_path(domain.getPictureFileName());
-        eventEntity.setCategories(new HashSet<>(categoryEntityMapper.toEntity(domain.getCategories())));
         eventEntity.setCreator(jpaUserRepository.findById(UUID.fromString(domain.getCreatorId()))
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + domain.getCreatorId())));
-        var preferences = new PreferencesEntity();
-        var locationEntity = new LocationEntity();
-
-        preferences.setEvent(eventEntity);
-        preferences.setPublic(domain.isPublic());
-        preferences.setEnableComments(domain.isEnableComments());
-        preferences.setModality(Modality.create(domain.getModality()));
-
-        locationEntity.setName("Unknown Location");
-        locationEntity.setLatitude(domain.getLatitude());
-        locationEntity.setLongitude(domain.getLongitude());
-        locationEntity.setEvent(eventEntity);
-
-        var staffEntityList = domain.getStaff().stream()
-                .map(staff -> {
-                    var staffEntity = new StaffEntity();
-                    staffEntity.setEvent(eventEntity);
-                    var userEntity = jpaUserRepository.findById(UUID.fromString(staff.getUserId().getValue()));
-                    userEntity.ifPresent(staffEntity::setUser);
-                    return staffEntity;
-                })
-                .toList();
-        eventEntity.setStaff(staffEntityList);
+        eventEntity.setLocation(location);
         eventEntity.setPreferences(preferences);
-        eventEntity.setLocation(locationEntity);
+        eventEntity.setStaff(staffEntityList);
+        eventEntity.setCategories(new HashSet<>(categoryEntityMapper.toEntity(domain.getCategories())));
+        eventEntity.setCreatedAt(domain.getCreatedAt());
         return eventEntity;
     }
 

@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.event.infrastructure.adapters.input.dto;
+package jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request;
 
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 

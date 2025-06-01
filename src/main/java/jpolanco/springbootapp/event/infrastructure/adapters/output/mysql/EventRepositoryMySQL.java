@@ -7,6 +7,7 @@ import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.Jp
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class EventRepositoryMySQL implements EventRepository {
 
     private final JpaEventRepository jpaEventRepository;
-    private EventEntityMapper eventEntityMapper;
+    private final EventEntityMapper eventEntityMapper;
 
     @Override
     public void save(Event entity) {
@@ -34,5 +35,15 @@ public class EventRepositoryMySQL implements EventRepository {
     @Override
     public void update(Event entity) {
 
+    }
+
+    @Override
+    public boolean sameScheduleExists(Instant date, long duration) {
+        return false;
+    }
+
+    @Override
+    public boolean sameLocationExists(double latitude, double longitude) {
+        return false;
     }
 }
