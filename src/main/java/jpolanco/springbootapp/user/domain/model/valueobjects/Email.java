@@ -12,7 +12,7 @@ public class Email {
 
     public static Result<Email> create(String value) {
         if (value == null || value.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Email"));
         }
         String EMAIL_REGEX = "[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}";
         if (!value.matches(EMAIL_REGEX)) {

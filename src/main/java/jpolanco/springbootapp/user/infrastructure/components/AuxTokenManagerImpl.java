@@ -3,6 +3,7 @@ package jpolanco.springbootapp.user.infrastructure.components;
 import jpolanco.springbootapp.user.application.errors.IllegalUserOperation;
 import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.Token;
 import jpolanco.springbootapp.shared.domain.TokenStatus;
 import jpolanco.springbootapp.shared.domain.TokenType;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class AuxTokenManagerImpl implements AuxTokenManager {
 
     private final JwtRepository jwtRepository;
+    private final UserRepository userRepository;
 
     @Value("${jwt.expiration}")
     private long expiration;
@@ -35,6 +37,10 @@ public class AuxTokenManagerImpl implements AuxTokenManager {
         }
     }
 
+    public void deleteAllUserTokens(String userId) {
+        jwtRepository.deleteAllByUserId(userId);
+    }
+
     public void saveToken(User user, String jwtToken) {
         var maybeToken = Token.create (
                 user.getId(),
@@ -47,5 +53,29 @@ public class AuxTokenManagerImpl implements AuxTokenManager {
         }
         var token = maybeToken.getValue();
         jwtRepository.save(token);
+    }
+
+    public boolean invalidTokenInDB(String token) {
+        var maybeToken = jwtRepository.findByToken(token);
+        if (maybeToken.isEmpty()) {
+            return false;
+        }
+        var dbToken = maybeToken.get();
+        return dbToken.isRevoked() || dbToken.isExpired();
+    }
+
+    @Override
+    public void deleteExpiredTokensAndRevoke() {
+
+    }
+
+    public boolean sessionLimitReached(String email) {
+        var user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
+            throw new IllegalUserOperation("User not found with email: " + email);
+        }
+        var userId = user.get().getId();
+        var sessions = jwtRepository.countSessionsByUserId(userId);
+        return sessions >= 5; // Assuming a limit of 5 active sessions
     }
 }

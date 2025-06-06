@@ -1,6 +1,4 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
-
-import jpolanco.springbootapp.event.domain.model.categories.Category;
 import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
 
@@ -15,7 +13,7 @@ public class Categories {
 
     public static Result<Categories> create(List<String> values) {
         if (values == null || values.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Categories"));
         }
         for (String value : values) {
             if (value == null || value.isEmpty()) {

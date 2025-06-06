@@ -11,6 +11,14 @@ public class Error {
         this.message = message;
     }
 
+    public Error() {
+        this.code = Strings.EMPTY;
+        this.message = Strings.EMPTY;
+    }
+
     public static Error NONE = new Error(Strings.EMPTY, Strings.EMPTY);
     public static Error NULL_VALUE = new Error("NULL_VALUE", "cannot be null");
+    public Error field(String fieldName) {
+        return new Error("NULL_VALUE", fieldName + " cannot be null");
+    }
 }

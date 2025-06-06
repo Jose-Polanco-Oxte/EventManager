@@ -38,7 +38,8 @@ public class EventEntity {
     @Column(nullable = false)
     private Instant createdAt;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "creator_id", nullable = false)
     private UserEntity creator;
 
     @Column(nullable = false)
@@ -69,5 +70,4 @@ public class EventEntity {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StaffEntity> staff = new ArrayList<>();
-
 }

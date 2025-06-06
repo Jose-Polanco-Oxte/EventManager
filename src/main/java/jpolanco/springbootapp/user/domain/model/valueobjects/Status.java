@@ -15,7 +15,7 @@ public class Status {
 
     public static Result<Status> create(String value) {
         if (value == null || value.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Status"));
         }
         if (!validValues.contains(value)) {
             return Result.failure(new Error("StatusNotValid", "Status is not valid"));

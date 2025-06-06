@@ -14,7 +14,7 @@ public class UserId extends IdObject {
 
     public static Result<UserId> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("User id"));
         }
         try {
             UUID.fromString(value);

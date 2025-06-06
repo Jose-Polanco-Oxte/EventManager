@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.user.application.events;
+package jpolanco.springbootapp.user.domain.domainevents;
 
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import lombok.Getter;

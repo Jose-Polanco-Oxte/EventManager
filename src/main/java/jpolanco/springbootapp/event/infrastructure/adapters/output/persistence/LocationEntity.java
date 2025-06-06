@@ -15,18 +15,20 @@ import java.util.UUID;
 public class LocationEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column()
     private String name;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String country;
 
     @Column(nullable = false)
     private double latitude;
 
     @Column(nullable = false)
     private double longitude;
-
-    @OneToOne(mappedBy = "location")
-    private EventEntity event;
 }

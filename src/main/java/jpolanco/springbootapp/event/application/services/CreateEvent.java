@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.event.application.services;
 
-import jpolanco.springbootapp.event.application.ports.input.ImageStorageProvider;
 import jpolanco.springbootapp.event.application.ports.output.EventRepository;
 import jpolanco.springbootapp.event.application.uc.CreateEventUC;
 import jpolanco.springbootapp.event.application.utils.EventValidation;
@@ -18,11 +17,11 @@ public class CreateEvent implements CreateEventUC {
 
     private final EventRepository eventRepository;
     private final EventValidation eventValidation;
-    private final ImageStorageProvider imageStorageProvider;
 
     @Override
      public Result<Event> create(EventCreationDto event, String creatorId, String imageFileName) {
         var valid = eventValidation.validate(
+                creatorId,
                 Instant.parse(event.schedule()),
                 event.durationInSeconds(),
                 event.latitude(),
@@ -36,6 +35,9 @@ public class CreateEvent implements CreateEventUC {
                 event.description(),
                 event.schedule(),
                 event.durationInSeconds(),
+                event.locationName(),
+                event.locationCity(),
+                event.locationCountry(),
                 event.latitude(),
                 event.longitude(),
                 event.categories(),

@@ -22,4 +22,5 @@ public class UserAppError extends Error {
     public final static UserAppError EMAILS_DO_NOT_MATCH = new UserAppError("EMAILS_DO_NOT_MATCH", "On change email is not the same as confirm email");
     public final static UserAppError PASSWORDS_ARE_SAME = new UserAppError("PASSWORDS_ARE_SAME", "On change password is the same as old password");
     public final static UserAppError OLD_PASSWORD_IS_INCORRECT = new UserAppError("OLD_PASSWORD_IS_INCORRECT", "Old password is incorrect");
+    public final static UserAppError SESSION_LIMIT_REACHED = new UserAppError("SESSION_LIMIT_REACHED", "Session limit reached for user");
 }

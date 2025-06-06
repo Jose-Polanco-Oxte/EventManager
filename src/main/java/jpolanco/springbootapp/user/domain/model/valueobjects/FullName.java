@@ -24,7 +24,7 @@ public class FullName {
 
     private static Result<String> ensureValueIsValid(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Names"));
         }
         if (value.length() < 2) {
             return Result.failure(NameError.TOO_SHORT);

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.listeners;
 
-import jpolanco.springbootapp.user.application.events.UserRegistered;
+import jpolanco.springbootapp.user.domain.domainevents.UserRegistered;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

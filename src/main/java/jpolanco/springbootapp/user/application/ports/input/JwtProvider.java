@@ -7,4 +7,5 @@ public interface JwtProvider {
     String generateRefreshToken(User user);
     String extractUsername(String token);
     boolean isTokenValid(String token, String email);
+    boolean isTokenExpired(String token);
 }

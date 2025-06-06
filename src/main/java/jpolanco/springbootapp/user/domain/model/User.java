@@ -3,7 +3,7 @@ package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.application.events.UserRegistered;
+import jpolanco.springbootapp.user.domain.domainevents.UserRegistered;
 import jpolanco.springbootapp.user.domain.model.valueobjects.*;
 
 import java.time.Instant;

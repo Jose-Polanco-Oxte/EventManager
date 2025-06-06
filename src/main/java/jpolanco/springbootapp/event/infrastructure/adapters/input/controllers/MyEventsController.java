@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 
+import jakarta.validation.Valid;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationDto;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventService;
@@ -19,8 +20,8 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/events")
-public class EventController  {
+@RequestMapping("/my-events")
+public class MyEventsController {
 
     private final EventService eventService;
     @Value("${IMAGEPATH}")
@@ -28,18 +29,37 @@ public class EventController  {
 
     @PostMapping("/create")
     public ResponseEntity<Object> createEvent(
-            @RequestBody EventCreationDto eventCreationDto,
-//            @RequestPart("image")MultipartFile image,
+            @Valid @RequestPart("data") EventCreationDto eventCreationDto,
+            @RequestPart("image")MultipartFile image,
             @AuthenticationPrincipal MyUserDetails myUserDetails
             ) throws IOException {
-        String imageFileName = UUID.randomUUID() + "-"; // + image.getOriginalFilename();
-//        Path path = Paths.get(IMAGE_DIRECTORY).resolve(imageFileName);
-//        Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        System.out.println("schedule: " + eventCreationDto.schedule());
+        String imageFileName = UUID.randomUUID() + "-" + image.getOriginalFilename();
         var response = eventService.createEvent(eventCreationDto, myUserDetails.getId(), imageFileName);
         if (response.isFailure()) {
             return ResponseEntity.badRequest().body(response.getMessage());
         }
+        Path path = Paths.get(IMAGE_DIRECTORY).resolve(imageFileName);
+        Files.copy(image.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         return ResponseEntity.ok(response.getValue());
+    }
+
+    @PutMapping("/update/{eventId}")
+    public ResponseEntity<Object> updateEvent(@PathVariable String eventId){
+        return null;
+    }
+
+    @GetMapping("/get/{eventId}")
+    public ResponseEntity<Object> getEvent(@PathVariable String eventId) {
+        return null;
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<Object> getAllEvents(@AuthenticationPrincipal MyUserDetails myUserDetails) {
+        return null;
+    }
+
+    @DeleteMapping("/delete/{eventId}")
+    public ResponseEntity<Object> deleteEvent(@PathVariable String eventId) {
+        return null;
     }
 }

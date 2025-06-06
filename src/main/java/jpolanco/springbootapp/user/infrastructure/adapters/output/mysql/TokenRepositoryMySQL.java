@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
+import jpolanco.springbootapp.shared.domain.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
 import jpolanco.springbootapp.user.domain.model.Token;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.TokenEntityMapper;
@@ -48,5 +49,23 @@ public class TokenRepositoryMySQL implements JwtRepository {
                 .map(tokenEntityMapper::toEntity)
                 .toList();
         jpaTokenRepository.saveAll(tokenEntities);
+    }
+
+    @Override
+    public int countSessionsByUserId(String userId) {
+        return jpaTokenRepository.countByUserIdAndStatusIsActive(UUID.fromString(userId));
+    }
+
+    @Override
+    public void deleteAllByStatus(TokenStatus status) {
+        jpaTokenRepository.deleteAllByStatus(status);
+    }
+
+    @Override
+    public List<Token> findAll() {
+        return jpaTokenRepository.findAll()
+                .stream()
+                .map(tokenEntityMapper::toDomain)
+                .toList();
     }
 }

@@ -12,7 +12,7 @@ public class PictureFileName {
 
     public static Result<PictureFileName> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("PictureFileName"));
         }
         return Result.success(new PictureFileName(value));
     }

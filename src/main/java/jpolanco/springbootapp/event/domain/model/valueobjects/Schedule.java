@@ -15,7 +15,7 @@ public class Schedule {
 
     public static Result<Schedule> create(String dateUTC) {
         if (dateUTC == null || dateUTC.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("DateUTC"));
         }
         try {
             Instant.parse(dateUTC);

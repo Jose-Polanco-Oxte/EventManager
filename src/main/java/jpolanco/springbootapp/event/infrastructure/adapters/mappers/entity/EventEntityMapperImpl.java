@@ -3,17 +3,18 @@ package jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity;
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.Modality;
+import jpolanco.springbootapp.event.domain.model.valueobjects.Staff;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.*;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.LocationEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
+import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRepository;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRoleRepository;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -23,6 +24,35 @@ public class EventEntityMapperImpl implements EventEntityMapper {
     private final JpaUserRepository jpaUserRepository;
     private final CategoryEntityMapper categoryEntityMapper;
     private final JpaStaffRoleRepository jpaStaffRoleRepository;
+    private final JpaStaffRepository jpaStaffRepository;
+
+
+    private int validScheduleForStaff(String eventId, Staff staff, Instant date, long duration) {
+        var basic = jpaStaffRepository.findByUserIdAndEventId(UUID.fromString(staff.getUserId().getValue()), UUID.fromString(eventId));
+        if (basic.isEmpty()) {
+            return 0; // No staff found for the user in this event
+        }
+        var eventsForStaff = jpaStaffRepository.findAllByUserId(UUID.fromString(staff.getUserId().getValue()));
+        if (eventsForStaff.isEmpty()) {
+            return 0; // No events found for the staff member
+        }
+        for (StaffEntity staffEntity : eventsForStaff) {
+            if (staffEntity.getEvent().getId().equals(UUID.fromString(eventId))) {
+                continue; // Skip the current event
+            }
+            Instant eventStart = staffEntity.getEvent().getSchedule();
+            Instant eventEnd = eventStart.plusSeconds(staffEntity.getEvent().getDurationInSeconds());
+            Instant newEventEnd = date.plusSeconds(duration);
+
+            if (eventStart.equals(date)) {
+                return 1; // Staff member already has an event at the same schedule
+            }
+            if (eventStart.isBefore(newEventEnd) && eventEnd.isAfter(date)) {
+                return 2; // Overlapping schedules
+            }
+        }
+        return 0; // No conflicts found
+    }
 
     @Override
     public EventEntity toEntity(Event domain) {
@@ -32,43 +62,62 @@ public class EventEntityMapperImpl implements EventEntityMapper {
         eventEntity.setId(eventId);
 
         // Create LocationEntity and PreferencesEntity
-        var location = new LocationEntity(
-                null,
-                "Unknown Location",
-                domain.getLatitude(),
-                domain.getLongitude(),
-                eventEntity
-        );
+        var location = new LocationEntity();
+        location.setId(UUID.randomUUID());
+        location.setName(domain.getLocationName());
+        location.setCity(domain.getLocationCity());
+        location.setCountry(domain.getLocationCountry());
+        location.setLatitude(domain.getLatitude());
+        location.setLongitude(domain.getLongitude());
 
-        var preferences = new PreferencesEntity(
-                null,
-                domain.isPublic(),
-                domain.getModality(),
-                domain.isEnableComments(),
-                eventEntity
-        );
+        var preferences = new PreferencesEntity();
+        preferences.setId(UUID.randomUUID()); // Assuming ID is auto-generated
+        preferences.setPublic(domain.isPublic());
+        preferences.setEnableComments(domain.isEnableComments());
+        preferences.setModality(domain.getModality());
 
         // Map staff members to StaffEntity and set roles
-        var staffEntityList = domain.getStaff().stream()
-                .map(staff -> {
-                    var staffEntity = new StaffEntity();
-                    staffEntity.setEvent(eventEntity);
+        List<StaffEntity> staffEntityList;
+        if (domain.getStaff().isEmpty() || domain.getStaff() == null) {
+            eventEntity.setStaff(null);
+        } else {
+            staffEntityList = domain.getStaff().stream()
+                    .map(staff -> {
+                        if (staff == null || staff.getUserId() == null || staff.getRole() == null) {
+                            throw new IllegalArgumentException("Staff member or required fields are null");
+                        }
+                        switch (validScheduleForStaff(domain.getEventId(), staff, domain.getSchedule(), domain.getDurationInSeconds())) {
+                            case 1:
+                                throw new IllegalArgumentException("Staff member already has an event at the same schedule: " + staff.getUserId().getValue());
+                            case 2:
+                                throw new IllegalArgumentException("Overlapping schedules for staff member: " + staff.getUserId().getValue());
+                            case 0:
+                                // No conflicts found, proceed
+                                break;
+                        }
+                        var staffEntity = new StaffEntity();
+                        staffEntity.setEvent(eventEntity);
 
-                    staffEntity.setAssistanceClerk(staff.isAssistanceClerk());
-                    var role = jpaStaffRoleRepository.findById(staff.getRole())
-                            .orElseThrow(() -> new IllegalArgumentException("Role not found: " + staff.getRole()));
-                    staffEntity.setRole(role);
+                        staffEntity.setAssistanceClerk(staff.isAssistanceClerk());
+                        var role = jpaStaffRoleRepository.findById(staff.getRole());
+                        if (role.isEmpty()) {
+                            return null;
+                        }
+                        staffEntity.setRole(role.get());
 
-                    var userEntity = jpaUserRepository.findById(UUID.fromString(staff.getUserId().getValue()));
-                    userEntity.ifPresent(staffEntity::setUser);
+                        var userEntity = jpaUserRepository.findById(UUID.fromString(staff.getUserId().getValue()));
+                        userEntity.ifPresent(staffEntity::setUser);
 
-                    return staffEntity;
-                })
-                .toList();
-        eventEntity.setStaff(staffEntityList);
+                        return staffEntity;
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+            if (staffEntityList.isEmpty()) {
+                eventEntity.setStaff(null);
+            }
+        }
 
         // Set eventEntity properties
-        eventEntity.setId(eventId);
         eventEntity.setTitle(domain.getTitle());
         eventEntity.setDescription(domain.getDescription());
         eventEntity.setSchedule(domain.getSchedule());
@@ -79,7 +128,6 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + domain.getCreatorId())));
         eventEntity.setLocation(location);
         eventEntity.setPreferences(preferences);
-        eventEntity.setStaff(staffEntityList);
         eventEntity.setCategories(new HashSet<>(categoryEntityMapper.toEntity(domain.getCategories())));
         eventEntity.setCreatedAt(domain.getCreatedAt());
         return eventEntity;
@@ -95,6 +143,9 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getSchedule().toString(),
                 entity.getDurationInSeconds(),
                 entity.getStatus(),
+                entity.getLocation().getName(),
+                entity.getLocation().getCity(),
+                entity.getLocation().getCountry(),
                 entity.getLocation().getLatitude(),
                 entity.getLocation().getLongitude(),
                 categories.getValues(),
@@ -114,7 +165,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getCreatedAt()
         );
         if (maybeEvent.isFailure()) {
-            throw new IllegalArgumentException("Error converting EventEntity to Event: " + maybeEvent.getError());
+            throw new IllegalArgumentException("Error converting EventEntity to Event: " + maybeEvent.getMessage());
         }
         return maybeEvent.getValue();
     }

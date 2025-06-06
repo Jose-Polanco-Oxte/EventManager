@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.user.infrastructure.publisher;
+package jpolanco.springbootapp.shared.infrastructure.publisher;
 
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import lombok.RequiredArgsConstructor;

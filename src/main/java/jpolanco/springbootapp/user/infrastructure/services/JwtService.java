@@ -75,7 +75,7 @@ public class JwtService implements JwtProvider {
         return (username.equals(email) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

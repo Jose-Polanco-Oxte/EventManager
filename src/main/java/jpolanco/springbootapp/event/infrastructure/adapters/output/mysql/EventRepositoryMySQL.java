@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Repository
@@ -24,26 +26,42 @@ public class EventRepositoryMySQL implements EventRepository {
 
     @Override
     public Optional<Event> findById(String s) {
-        return Optional.empty();
+        return jpaEventRepository.findById(UUID.fromString(s)).map(eventEntityMapper::toDomain);
     }
 
     @Override
     public void deleteById(String s) {
-
+        jpaEventRepository.deleteById(UUID.fromString(s));
     }
 
     @Override
     public void update(Event entity) {
-
+        jpaEventRepository.save(eventEntityMapper.toEntity(entity));
     }
 
     @Override
     public boolean sameScheduleExists(Instant date, long duration) {
-        return false;
+        return jpaEventRepository.existEventWithSameSchedule(date, duration);
     }
 
     @Override
-    public boolean sameLocationExists(double latitude, double longitude) {
-        return false;
+    public boolean sameLocationExistsAndIsNotVirtual(double latitude, double longitude) {
+        return jpaEventRepository.existEventWithSameLocationAndIsNotVirtual(latitude, longitude);
+    }
+
+    @Override
+    public List<Event> findByCreatorIdAndSchedule(String creatorId, Instant date) {
+        return jpaEventRepository.findByCreatorIdAndSchedule(UUID.fromString(creatorId), date)
+                .stream()
+                .map(eventEntityMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Event> findByCreatorId(String creatorId, Instant date) {
+        return jpaEventRepository.findByCreator_Id(UUID.fromString(creatorId))
+                .stream()
+                .map(eventEntityMapper::toDomain)
+                .toList();
     }
 }

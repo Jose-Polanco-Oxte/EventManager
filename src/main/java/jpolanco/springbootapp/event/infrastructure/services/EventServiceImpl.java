@@ -6,6 +6,7 @@ import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDto
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventService;
 import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ public class EventServiceImpl implements EventService {
 
     private final CreateEventUC createEventUC;
     private final EventDtoCreator eventDtoCreator;
+    private final DomainEventsPublisher publisher;
 
     @Transactional
     @Override
@@ -24,6 +26,8 @@ public class EventServiceImpl implements EventService {
         if (createdEvent.isFailure()) {
             return Result.failure(createdEvent.getError());
         }
+        var event = createdEvent.getValue();
+        event.pullEvents().forEach(publisher::publish);
         return Result.success(eventDtoCreator.create(createdEvent.getValue()));
     }
 }

@@ -16,7 +16,6 @@ import java.util.UUID;
 public class PreferencesEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(nullable = false)
@@ -28,7 +27,4 @@ public class PreferencesEntity {
 
     @Column(nullable = false)
     private boolean enableComments;
-
-    @OneToOne(mappedBy = "preferences")
-    private EventEntity event;
 }

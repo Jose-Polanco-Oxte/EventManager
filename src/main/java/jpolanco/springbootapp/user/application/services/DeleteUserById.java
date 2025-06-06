@@ -27,11 +27,7 @@ public class DeleteUserById implements DeleteUserByIdUC {
         }
         var user = validUser.getValue();
         // Check if the user has any tokens associated with them
-        var tokens = jpaTokenRepository.findAllByUserId(UUID.fromString(user.getId()));
-        if (!tokens.isEmpty()) {
-            // If tokens exist, delete them first
-            jpaTokenRepository.deleteAll(tokens);
-        }
+        jpaTokenRepository.deleteAllByUserId(UUID.fromString(userId));
         qrProvider.delete(user.getQRFileName());
         // Delete the user
         userRepository.deleteById(userId);

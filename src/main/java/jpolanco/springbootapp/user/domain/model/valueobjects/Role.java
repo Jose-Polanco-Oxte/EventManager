@@ -20,7 +20,7 @@ public class Role {
 
     private static Result<Role> ensureIsValidRole(String value) {
         if (value == null || value.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Role"));
         }
         if (value.contains(".")) {
             return Result.failure(RoleError.CONTAIN_DOTS);

@@ -12,7 +12,7 @@ public class QRFileName {
 
     public static Result<QRFileName> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("QR file name"));
         }
         return Result.success(new QRFileName(value));
     }

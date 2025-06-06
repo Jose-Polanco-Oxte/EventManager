@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.user.application.ports.output;
 
+import jpolanco.springbootapp.shared.domain.TokenStatus;
 import jpolanco.springbootapp.user.domain.model.Token;
 
 import java.util.List;
@@ -11,4 +12,7 @@ public interface JwtRepository {
     List<Token> findAllByUserId(String userId);
     void save(Token token);
     void saveAll(List<Token> tokens);
+    int countSessionsByUserId(String userId);
+    void deleteAllByStatus(TokenStatus status);
+    List<Token> findAll();
 }

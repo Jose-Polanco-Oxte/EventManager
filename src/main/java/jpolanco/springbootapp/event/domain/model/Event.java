@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.event.domain.model;
 
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
+import jpolanco.springbootapp.event.domain.model.domainevents.EventCreated;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Error;
@@ -55,6 +56,9 @@ public class Event {
             String description,
             String schedule,
             long durationInSeconds,
+            String locationName,
+            String locationCity,
+            String locationCountry,
             double latitude,
             double longitude,
             List<String> categories,
@@ -65,13 +69,14 @@ public class Event {
             List<StaffHolder> staffs,
             String creatorId
                                        ) {
+        var id = UUID.randomUUID().toString();
         var maybeEventId = builder()
-                .eventId(UUID.randomUUID().toString())
+                .eventId(id)
                 .header(title, description)
                 .schedule(schedule)
                 .duration(durationInSeconds)
                 .status(EventStatus.SCHEDULED)
-                .location(latitude, longitude)
+                .location(latitude, longitude, locationName, locationCity, locationCountry)
                 .categories(categories)
                 .isPublic(isPublic)
                 .isEnableComments(enableComments)
@@ -80,12 +85,19 @@ public class Event {
                 .pictureFileName(pictureFileName)
                 .creatorId(creatorId)
                 .createdAt(Instant.now())
+                .addDomainEvent(new EventCreated(
+                        id,title,
+                        description,
+                        durationInSeconds,
+                        locationName + ", "
+                                + locationCity + ", "
+                                + locationCountry,
+                        creatorId))
                 .build();
         if (maybeEventId.isFailure()) {
             return Result.failure(maybeEventId.getError());
         }
         var event = maybeEventId.getValue();
-
         return Result.success(event);
     }
 
@@ -96,6 +108,9 @@ public class Event {
             String schedule,
             long durationInSeconds,
             EventStatus status,
+            String locationName,
+            String locationCity,
+            String locationCountry,
             double latitude,
             double longitude,
             List<String> categories,
@@ -113,7 +128,7 @@ public class Event {
                 .schedule(schedule)
                 .duration(durationInSeconds)
                 .status(status)
-                .location(latitude, longitude)
+                .location(latitude, longitude, locationName, locationCity, locationCountry)
                 .categories(categories)
                 .isPublic(isPublic)
                 .isEnableComments(enableComments)
@@ -156,6 +171,18 @@ public class Event {
 
     public EventStatus getStatus() {
         return status;
+    }
+
+    public String getLocationName() {
+        return location.getName();
+    }
+
+    public String getLocationCity() {
+        return location.getCity();
+    }
+
+    public String getLocationCountry() {
+        return location.getCountry();
     }
 
     public double getLatitude() {
@@ -251,8 +278,8 @@ public class Event {
         return Result.success();
     }
 
-    public Result<Void> changeLocation(double latitude, double longitude) {
-        var maybeLocation = Location.create(latitude, longitude);
+    public Result<Void> changeLocation(double latitude, double longitude, String locationName, String locationCity, String locationCountry) {
+        var maybeLocation = Location.create(latitude, longitude, locationName, locationCity, locationCountry);
         if (maybeLocation.isFailure()) {
             return Result.failure(maybeLocation.getError());
         }
@@ -343,6 +370,10 @@ public class Event {
         this.isPublic = false;
     }
     // Domain events
+
+    public List<DomainEvent> pullEvents() {
+        return this.events;
+    }
 
     public void recordEvent(DomainEvent event) {
         if (event != null) {

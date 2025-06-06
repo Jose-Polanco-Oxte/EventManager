@@ -30,30 +30,32 @@ public class EventBuilder {
     private DomainEvent domainEvent;
     private Result<?> isValid = Result.success();
 
-    private void checker(Result<?> result) {
+    private <T> T checker(Result<T> result) {
         if (result.isFailure() && !isValid.isFailure()) {
             isValid = Result.failure(result.getError());
+            return null;
+        } else if (result.isFailure()){
+            return null;
+        } else {
+            return result.getValue();
         }
     }
 
     public EventBuilder eventId(String eventId) {
         var maybeId = EventId.create(eventId);
-        checker(maybeId);
-        this.eventId = maybeId.getValue();
+        this.eventId = checker(maybeId);
         return this;
     }
 
     public EventBuilder header(String title, String description) {
         var maybeHeader = Header.create(title, description);
-        checker(maybeHeader);
-        this.header = maybeHeader.getValue();
+        this.header = checker(maybeHeader);
         return this;
     }
 
     public EventBuilder schedule(String date) {
         var maybeSchedule = Schedule.create(date);
-        checker(maybeSchedule);
-        this.schedule = maybeSchedule.getValue();
+        this.schedule = checker(maybeSchedule);
         return this;
     }
 
@@ -67,17 +69,15 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder location(double latitude, double longitude) {
-        var maybeLocation = Location.create(latitude, longitude);
-        checker(maybeLocation);
-        this.location = maybeLocation.getValue();
+    public EventBuilder location(double latitude, double longitude, String name, String city, String country) {
+        var maybeLocation = Location.create(latitude, longitude, name, city, country);
+        this.location = checker(maybeLocation);
         return this;
     }
 
     public EventBuilder categories(List<String> categories) {
         var maybeCategories = Categories.create(categories);
-        checker(maybeCategories);
-        this.categories = maybeCategories.getValue();
+        this.categories = checker(maybeCategories);
         return this;
     }
 
@@ -97,28 +97,35 @@ public class EventBuilder {
     }
 
     public EventBuilder staffs(List<StaffHolder> staffs) {
+        if (staffs == null || staffs.isEmpty()) {
+            return this; // No staff to add, return early
+        }
+        System.out.println("Adding staffs: " + staffs.size());
         for (StaffHolder staffHolder : staffs) {
+            if (staffHolder == null || staffHolder.staffId() == null) {
+                continue; // Skip null staff holders
+            }
             var maybeStaff = Staff.create(
                     staffHolder.staffId(),
                     staffHolder.role(),
                     staffHolder.isAssistanceClerk());
-            checker(maybeStaff);
-            this.staff.add(maybeStaff.getValue());
+            var result = checker(maybeStaff);
+            if (result != null) {
+                this.staff.add(result);
+            }
         }
         return this;
     }
 
     public EventBuilder pictureFileName(String fileName) {
         var maybePictureFileName = PictureFileName.create(fileName);
-        checker(maybePictureFileName);
-        this.pictureFileName = maybePictureFileName.getValue();
+        this.pictureFileName = checker(maybePictureFileName);
         return this;
     }
 
     public EventBuilder creatorId(String creatorId) {
         var maybeId = UserId.create(creatorId);
-        checker(maybeId);
-        this.creatorId = maybeId.getValue();
+        this.creatorId = checker(maybeId);
         return this;
     }
 

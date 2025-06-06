@@ -34,7 +34,7 @@ public class Roles {
 
     private static Result<Role> isValidRole(Role role) {
         if (role == null || role.getValue().isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Role"));
         }
         if (!validRoles.contains(role.getValue())) {
             return Result.failure(new Error("InvalidRole", "Role is not valid"));

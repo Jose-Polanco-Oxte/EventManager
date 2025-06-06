@@ -17,10 +17,10 @@ public class Header {
 
     public static Result<Header> create(String title, String description) {
         if (title == null || title.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("title"));
         }
         if (description == null || description.isBlank()) {
-            return Result.failure(Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("description"));
         }
         if (title.length() > 100) {
             return Result.failure(HeaderError.TITLE_TOO_LONG);

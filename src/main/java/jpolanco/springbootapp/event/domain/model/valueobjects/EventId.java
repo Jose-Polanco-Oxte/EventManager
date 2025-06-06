@@ -13,7 +13,7 @@ public class EventId extends IdObject {
 
     public static Result<EventId> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(jpolanco.springbootapp.shared.domain.Error.NULL_VALUE);
+            return Result.failure(Error.NULL_VALUE.field("Event id"));
         }
         try {
             UUID.fromString(value);
