@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc;
 
-import jpolanco.springbootapp.user.application.utils.UserUpdateBuilder;
+import jpolanco.springbootapp.user.application.utils.UserUpdater;
 
 public interface UpdateProfileUC {
     /**
@@ -9,5 +9,5 @@ public interface UpdateProfileUC {
      * @param userId the ID of the user to update
      * @return a Result containing the builder for update user and can be use like an api
      */
-    UserUpdateBuilder setChanges(String userId);
+    UserUpdater setChanges(String userId);
 }

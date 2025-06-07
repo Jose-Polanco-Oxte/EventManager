@@ -15,5 +15,9 @@ public interface EventRepository extends CRUDRepository<Event, String> {
 
     List<Event> findByCreatorIdAndSchedule(String creatorId, Instant date);
 
-    List<Event> findByCreatorId(String creatorId, Instant date);
+    List<Event> findByCreatorId(String creatorId);
+
+    List<Event> findAll();
+
+    void deleteByIdAndCreatorId(String id, String creatorId);
 }

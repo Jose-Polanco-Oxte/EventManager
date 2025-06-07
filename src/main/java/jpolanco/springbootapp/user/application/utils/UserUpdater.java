@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class UserUpdateBuilder {
+public class UserUpdater {
 
     private final User user;
     private final UserRepository userRepository;
@@ -30,7 +30,7 @@ public class UserUpdateBuilder {
         return value == null || value.isBlank();
     }
 
-    public UserUpdateBuilder firstName(String firstName) {
+    public UserUpdater firstName(String firstName) {
         if (nullable(firstName)) return this;
         if (!user.getFirstName().equals(firstName)) {
             var result = user.changeFirstName(firstName);
@@ -39,7 +39,7 @@ public class UserUpdateBuilder {
         return this;
     }
 
-    public UserUpdateBuilder lastName(String lastName) {
+    public UserUpdater lastName(String lastName) {
         if (nullable(lastName)) return this;
         if (!user.getLastName().equals(lastName)) {
             var result = user.changeLastName(lastName);
@@ -48,7 +48,7 @@ public class UserUpdateBuilder {
         return this;
     }
 
-    public UserUpdateBuilder email(String email) {
+    public UserUpdater email(String email) {
         if (nullable(email)) return this;
         var valid = userValidation.onUpdateEmailIsValid(email, user.getId());
         check(valid);
@@ -64,7 +64,7 @@ public class UserUpdateBuilder {
         return this;
     }
 
-    public UserUpdateBuilder password(String password) {
+    public UserUpdater password(String password) {
         if (nullable(password)) return this;
         var newEncodedPassword = passwordEncoder.encode(password);
         if (!user.getEncodedPassword().equals(newEncodedPassword)) {
@@ -74,7 +74,7 @@ public class UserUpdateBuilder {
         return this;
     }
 
-    public UserUpdateBuilder status(String status) {
+    public UserUpdater status(String status) {
         if (nullable(status)) return this;
         if (!user.getStatus().equals(status)) {
             var result = user.changeStatus(status);
@@ -83,7 +83,7 @@ public class UserUpdateBuilder {
         return this;
     }
 
-    public UserUpdateBuilder roles(List<String> roles) {
+    public UserUpdater roles(List<String> roles) {
         if (roles == null || roles.isEmpty()) return this;
         var result = user.changeAllRoles(roles);
         check(result);

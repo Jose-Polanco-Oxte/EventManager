@@ -20,8 +20,9 @@ public class EventRepositoryMySQL implements EventRepository {
     private final EventEntityMapper eventEntityMapper;
 
     @Override
-    public void save(Event entity) {
-        jpaEventRepository.save(eventEntityMapper.toEntity(entity));
+    public Event save(Event entity) {
+        var event = jpaEventRepository.save(eventEntityMapper.toEntity(entity));
+        return eventEntityMapper.toDomain(event);
     }
 
     @Override
@@ -35,8 +36,9 @@ public class EventRepositoryMySQL implements EventRepository {
     }
 
     @Override
-    public void update(Event entity) {
-        jpaEventRepository.save(eventEntityMapper.toEntity(entity));
+    public Event update(Event entity) {
+        var event = jpaEventRepository.save(eventEntityMapper.toEntity(entity));
+        return eventEntityMapper.toDomain(event);
     }
 
     @Override
@@ -58,10 +60,23 @@ public class EventRepositoryMySQL implements EventRepository {
     }
 
     @Override
-    public List<Event> findByCreatorId(String creatorId, Instant date) {
+    public List<Event> findByCreatorId(String creatorId) {
         return jpaEventRepository.findByCreator_Id(UUID.fromString(creatorId))
                 .stream()
                 .map(eventEntityMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public List<Event> findAll() {
+        return jpaEventRepository.findAll()
+                .stream()
+                .map(eventEntityMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public void deleteByIdAndCreatorId(String id, String creatorId) {
+        jpaEventRepository.deleteByIdIsAndCreatorId(UUID.fromString(id), UUID.fromString(creatorId));
     }
 }

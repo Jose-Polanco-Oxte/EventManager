@@ -41,6 +41,12 @@ public class UserRepositoryMySQL implements UserRepository {
     }
 
     @Override
+    public User update(User entity) {
+        var user = jpaUserRepository.save(mapper.toEntity(entity));
+        return mapper.toDomain(user);
+    }
+
+    @Override
     public List<User> findAll() {
         return jpaUserRepository.findAll()
                 .stream()

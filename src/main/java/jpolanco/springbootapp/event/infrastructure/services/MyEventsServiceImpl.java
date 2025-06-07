@@ -1,15 +1,15 @@
 package jpolanco.springbootapp.event.infrastructure.services;
 
-import jpolanco.springbootapp.event.application.uc.*;
+import jpolanco.springbootapp.event.application.uc.DeleteMyEventByIdUC;
+import jpolanco.springbootapp.event.application.uc.GetMyEventsUC;
+import jpolanco.springbootapp.event.application.uc.UpdateMyEventUC;
 import jpolanco.springbootapp.event.domain.model.Modality;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationDto;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventDto;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
-import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventService;
+import jpolanco.springbootapp.event.infrastructure.services.interfaces.MyEventsService;
 import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
-import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.SimpleResponseCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,34 +18,28 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class EventServiceImpl implements EventService {
+public class MyEventsServiceImpl implements MyEventsService {
 
-    private final CreateEventUC createEventUC;
-    private final UpdateEventUC updateEventUC;
-    private final DeleteEventByIdUC deleteEventByIdUC;
-    private final GetEventByIdUC getEventByIdUC;
-    private final GetAllEventsUC getAllEventsUC;
+    private final DeleteMyEventByIdUC deleteMyEventByIdUC;
+    private final GetMyEventsUC getMyEventsUC;
+    private final UpdateMyEventUC updateMyEventUC;
     private final EventDtoCreator eventDtoCreator;
-    private final SimpleResponseCreator simpleResponseCreator;
     private final DomainEventsPublisher publisher;
-
 
     @Override
     @Transactional
-    public Result<Dto> createEvent(EventCreationDto eventDto, String creatorId, String imageFileName) {
-        var createdEvent = createEventUC.create(eventDto, creatorId, imageFileName);
-        if (createdEvent.isFailure()) {
-            return Result.failure(createdEvent.getError());
+    public Result<Void> deleteMyEvent(String userId, String eventId) {
+        var result = deleteMyEventByIdUC.delete(userId, eventId);
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
         }
-        var event = createdEvent.getValue();
-        event.pullEvents().forEach(publisher::publish);
-        return Result.success(eventDtoCreator.create(createdEvent.getValue()));
+        return Result.success();
     }
 
     @Override
     @Transactional
-    public Result<Dto> updateEvent(String eventId, UpdateEventDto eventDto, String imageFileName) {
-        var eventUpdated = updateEventUC.setChanges(eventId)
+    public Result<Dto> updateMyEvent(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+        var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
                 .schedule(eventDto.schedule())
@@ -74,9 +68,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
-    public Result<Dto> updateEventClearStaff(String eventId, UpdateEventDto eventDto, String imageFileName) {
-        var eventUpdated = updateEventUC.setChanges(eventId)
+@Transactional
+    public Result<Dto> updateMyEventClearStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+        var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
                 .schedule(eventDto.schedule())
@@ -105,9 +99,9 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional
-    public Result<Dto> updateEventAddStaff(String eventId, UpdateEventDto eventDto, String imageFileName) {
-        var eventUpdated = updateEventUC.setChanges(eventId)
+@Transactional
+    public Result<Dto> updateMyEventAddStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+        var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
                 .schedule(eventDto.schedule())
@@ -136,35 +130,30 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public Result<Dto> getEventById(String eventId) {
-        var maybeEvent = getEventByIdUC.getById(eventId);
-        if (maybeEvent.isFailure()) {
-            return Result.failure(maybeEvent.getError());
-        }
-        var event = maybeEvent.getValue();
-        return Result.success(eventDtoCreator.create(event));
-    }
-
-    @Override
-    public Result<List<Dto>> getAllEvents(String userId) {
-        var maybeEvents = getAllEventsUC.getAllEvents(userId);
-        if (maybeEvents.isFailure()) {
-            return Result.failure(maybeEvents.getError());
-        }
-        var events = maybeEvents.getValue();
-        var eventDtos = events.stream()
-                .map(eventDtoCreator::create)
-                .toList();
-        return Result.success(eventDtos);
-    }
-
-    @Override
-    @Transactional
-    public Result<Dto> deleteEventById(String eventId) {
-        var result = deleteEventByIdUC.deleteById(eventId);
+    public Result<List<Dto>> getMyEvents(String userId, int page, int size) {
+        var result = getMyEventsUC.getMyEvents(userId);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
-        return Result.success(simpleResponseCreator.create("Event deleted successfully"));
+        return Result.success(
+                result.getValue().stream()
+                        .map(eventDtoCreator::create)
+                        .toList()
+        );
+    }
+
+    @Override
+    public Result<List<Dto>> getMyEventsByCategory(String userId, String category, String modality, int page, int size) {
+        return null;
+    }
+
+    @Override
+    public Result<List<Dto>> getMyEventsByTitle(String userId, String title, String modality, int page, int size) {
+        return null;
+    }
+
+    @Override
+    public Result<List<Dto>> getMyEventsByLocation(String userId, String locationName, String modality, int page, int size) {
+        return null;
     }
 }

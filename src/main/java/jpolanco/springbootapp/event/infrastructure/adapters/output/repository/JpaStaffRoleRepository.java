@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.output.repository;
 
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.StaffRoleEntity;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JpaStaffRoleRepository extends CrudRepository<StaffRoleEntity, String> {
+public interface JpaStaffRoleRepository extends JpaRepository<StaffRoleEntity, String> {
 }

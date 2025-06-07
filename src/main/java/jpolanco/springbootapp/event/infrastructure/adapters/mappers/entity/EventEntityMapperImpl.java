@@ -2,11 +2,9 @@ package jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity;
 
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.event.domain.model.Modality;
 import jpolanco.springbootapp.event.domain.model.valueobjects.Staff;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.*;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.LocationEntity;
-import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRepository;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRoleRepository;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
@@ -130,6 +128,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
         eventEntity.setPreferences(preferences);
         eventEntity.setCategories(new HashSet<>(categoryEntityMapper.toEntity(domain.getCategories())));
         eventEntity.setCreatedAt(domain.getCreatedAt());
+        eventEntity.setMaxInvitees(domain.getMaxAssistanceCount());
         return eventEntity;
     }
 
@@ -162,7 +161,8 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                         .collect(Collectors.toList()),
                 entity.getPicture_path(),
                 entity.getCreator().getId().toString(),
-                entity.getCreatedAt()
+                entity.getCreatedAt(),
+                entity.getMaxInvitees()
         );
         if (maybeEvent.isFailure()) {
             throw new IllegalArgumentException("Error converting EventEntity to Event: " + maybeEvent.getMessage());

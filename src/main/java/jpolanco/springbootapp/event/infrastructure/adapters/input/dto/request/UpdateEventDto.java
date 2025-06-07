@@ -6,7 +6,7 @@ import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 
 import java.util.List;
 
-public record EventCreationDto(
+public record UpdateEventDto(
         @NotBlank(message = "Title cannot be blank")
         String title,
         String description,
@@ -31,7 +31,6 @@ public record EventCreationDto(
         @NotBlank(message = "Modality cannot be blank")
         String modality,
         List<StaffHolder> staffs,
-        @NotNull(message = "Max assistance count cannot be null")
         int maxAttendees
 ) {
 }

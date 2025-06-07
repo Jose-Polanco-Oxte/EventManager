@@ -30,11 +30,12 @@ public class Event {
     private UserId creatorId;
     private final Instant createdAt;
     private List<DomainEvent> events = new ArrayList<>();
+    private int maxAssistanceCount;
 
     protected Event(EventId eventId, Header header, Schedule schedule, long durationInSeconds, EventStatus status,
                     Location location, Categories category, boolean isPublic, boolean enableComments,
                     Modality modality, List<Staff> staff, PictureFileName pictureFileName, UserId creatorId,
-                    Instant createdAt) {
+                    Instant createdAt, int maxAssistanceCount) {
         this.eventId = eventId;
         this.header = header;
         this.schedule = schedule;
@@ -49,6 +50,7 @@ public class Event {
         this.pictureFileName = pictureFileName;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
+        this.maxAssistanceCount = maxAssistanceCount;
     }
 
     public static Result<Event> create(
@@ -67,7 +69,8 @@ public class Event {
             String modality,
             String pictureFileName,
             List<StaffHolder> staffs,
-            String creatorId
+            String creatorId,
+            int maxInvitees
                                        ) {
         var id = UUID.randomUUID().toString();
         var maybeEventId = builder()
@@ -85,6 +88,7 @@ public class Event {
                 .pictureFileName(pictureFileName)
                 .creatorId(creatorId)
                 .createdAt(Instant.now())
+                .maxInvitees(maxInvitees)
                 .addDomainEvent(new EventCreated(
                         id,title,
                         description,
@@ -120,7 +124,8 @@ public class Event {
             List<StaffHolder> staffs,
             String pictureFileName,
             String creatorId,
-            Instant createdAt
+            Instant createdAt,
+            int maxInvitees
     ) {
         var maybeEvent = builder()
                 .eventId(eventId)
@@ -137,6 +142,7 @@ public class Event {
                 .pictureFileName(pictureFileName)
                 .creatorId(creatorId)
                 .createdAt(createdAt)
+                .maxInvitees(maxInvitees)
                 .build();
         if (maybeEvent.isFailure()) {
             return Result.failure(maybeEvent.getError());
@@ -236,6 +242,14 @@ public class Event {
                 .toList();
     }
 
+    public void setStaff(List<StaffHolder> staff) {
+        this.staff = staff.stream()
+                .map(staffHolder -> Staff.create(staffHolder.staffId(), staffHolder.role(), staffHolder.isAssistanceClerk()))
+                .filter(Result::isSuccess)
+                .map(Result::getValue)
+                .toList();
+    }
+
     public List<Staff> getStaff() {
         return staff;
     }
@@ -252,8 +266,29 @@ public class Event {
         return pictureFileName.getValue();
     }
 
+    public int getMaxAssistanceCount() {
+        return maxAssistanceCount;
+    }
+
 
     // Domain methods
+
+    public Result<Void> changeTitle(String title) {
+        var maybeTitle = Header.create(title, this.header.getDescription());
+        if (maybeTitle.isFailure()) {
+            return Result.failure(maybeTitle.getError());
+        }
+        return Result.success();
+    }
+
+    public Result<Void> changeDescription(String description) {
+        var maybeDescription = Header.create(this.header.getTitle(), description);
+        if (maybeDescription.isFailure()) {
+            return Result.failure(maybeDescription.getError());
+        }
+        this.header = maybeDescription.getValue();
+        return Result.success();
+    }
 
     public Result<Void> changeHeader(String title, String description) {
         var maybeHeader = Header.create(title, description);
@@ -320,13 +355,15 @@ public class Event {
         if (maybeStaff.isFailure()) {
             return Result.failure(maybeStaff.getError());
         }
-        this.staff.add(maybeStaff.getValue());
+        if (this.staff.stream().noneMatch(staffMember -> staffMember.getUserId().equals(maybeStaff.getValue().getUserId()))) {
+            this.staff.add(maybeStaff.getValue());
+        }
         return Result.success();
     }
 
-    public Result<Void> removeStaff(UserId userId) {
+    public Result<Void> removeStaff(String userId) {
         var staffToRemove = this.staff.stream()
-                .filter(staffMember -> staffMember.getUserId().equals(userId))
+                .filter(staffMember -> staffMember.getUserId().getValue().equals(userId))
                 .findFirst();
 
         if (staffToRemove.isPresent()) {
@@ -335,6 +372,11 @@ public class Event {
         } else {
             return Result.failure(new Error("STAFF_NOT_FOUND", "Staff member not found"));
         }
+    }
+
+    public Result<Void> clearStaff() {
+        this.staff.clear();
+        return Result.success();
     }
 
     public Result<Void> changePictureFileName(String fileName) {
@@ -368,6 +410,19 @@ public class Event {
 
     public void disableComments() {
         this.isPublic = false;
+    }
+
+    public Result<Void> setMaxAttendees(int maxInvitees) {
+        if (maxInvitees < 0) {
+            return Result.failure(new Error("MAX_INVITEES_NEGATIVE", "Max invitees cannot be negative"));
+        } else if (maxInvitees == 0) {
+            return Result.failure(new Error("MAX_INVITEES_ZERO", "Max invitees cannot be zero"));
+        } else if(maxInvitees > 1000) {
+            return Result.failure(new Error("MAX_INVITEES_EXCEEDED", "Max invitees cannot exceed 1000"));
+        } else {
+            this.maxAssistanceCount = maxInvitees;
+            return Result.success();
+        }
     }
     // Domain events
 

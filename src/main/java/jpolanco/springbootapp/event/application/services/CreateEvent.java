@@ -46,7 +46,8 @@ public class CreateEvent implements CreateEventUC {
                 event.modality(),
                 imageFileName,
                 event.staffs(),
-                creatorId
+                creatorId,
+                event.maxAttendees()
         );
         // Check if event creation was successful
         if (maybeEvent.isFailure()) {

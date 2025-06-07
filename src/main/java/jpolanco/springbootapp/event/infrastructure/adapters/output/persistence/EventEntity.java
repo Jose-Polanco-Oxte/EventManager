@@ -49,6 +49,9 @@ public class EventEntity {
     @Column(nullable = false)
     private String picture_path;
 
+    @Column(nullable = false)
+    private int maxInvitees;
+
     @ManyToMany(cascade = {
             CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH

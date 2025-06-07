@@ -3,6 +3,7 @@ package jpolanco.springbootapp.event.domain.model;
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
 import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.domain.ResultBuilder;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
@@ -27,6 +28,7 @@ public class EventBuilder {
     private PictureFileName pictureFileName;
     private UserId creatorId;
     private Instant createdAt;
+    private int maxInvitees;
     private DomainEvent domainEvent;
     private Result<?> isValid = Result.success();
 
@@ -134,6 +136,19 @@ public class EventBuilder {
         return this;
     }
 
+    public EventBuilder maxInvitees(int maxInvitees) {
+        if (maxInvitees < 0) {
+            isValid = Result.failure(new Error("MAX_INVITEES_NEGATIVE", "Max invitees cannot be negative"));
+        } else if (maxInvitees == 0) {
+            isValid = Result.failure(new Error("MAX_INVITEES_ZERO", "Max invitees cannot be zero"));
+        } else if(maxInvitees > 1000) {
+            isValid = Result.failure(new Error("MAX_INVITEES_EXCEEDED", "Max invitees cannot exceed 1000"));
+        } else {
+            this.maxInvitees = maxInvitees;
+        }
+        return this;
+    }
+
     public EventBuilder addDomainEvent(DomainEvent domainEvent) {
         this.domainEvent = domainEvent;
         return this;
@@ -157,7 +172,8 @@ public class EventBuilder {
                 staff.stream().toList(),
                 pictureFileName,
                 creatorId,
-                createdAt
+                createdAt,
+                maxInvitees
         );
         if (domainEvent != null) {
             event.recordEvent(domainEvent);
