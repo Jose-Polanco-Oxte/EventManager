@@ -1,5 +1,7 @@
 package jpolanco.springbootapp.shared.infrastructure.advisors;
 
+import jpolanco.springbootapp.event.application.errors.EventPersistenceFailure;
+import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import jpolanco.springbootapp.user.application.errors.IllegalUserOperation;
 import jpolanco.springbootapp.user.application.errors.UserDataNotFound;
 import jpolanco.springbootapp.user.infrastructure.errors.DataFailure;
@@ -25,6 +27,20 @@ public class GlobalAdviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
 
+
+    @ExceptionHandler(EventPersistenceFailure.class)
+    public ResponseEntity<String> handleEventPersistenceFailure(EventPersistenceFailure e) {
+        logger.error("Event persistence failure: {}", e.getMessage(), e);
+        String response = "Event persistence failure: " + e.getMessage();
+        return ResponseEntity.status(500).body(response);
+    }
+
+    @ExceptionHandler(EventIntegrity.class)
+    public ResponseEntity<String> handleEventIntegrity(EventIntegrity e) {
+        logger.error("Event integrity error: {}", e.getMessage(), e);
+        String response = "Event integrity error: " + e.getMessage();
+        return ResponseEntity.badRequest().body(response);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {

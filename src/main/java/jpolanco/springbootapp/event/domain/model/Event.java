@@ -309,6 +309,15 @@ public class Event {
     }
 
     public Result<Void> changeDuration(long durationInSeconds) {
+        if (durationInSeconds < 0) {
+            return Result.failure(new Error("DURATION_NEGATIVE", "Duration cannot be negative"));
+        } else if (durationInSeconds == 0) {
+            return Result.failure(new Error("DURATION_ZERO", "Duration cannot be zero"));
+        } else if (durationInSeconds > 24 * 60 * 60) { // More than 24 hours
+            return Result.failure(new Error("DURATION_EXCEEDED", "Duration cannot exceed 24 hours"));
+        } else if (durationInSeconds < 60 * 10) { // Less than 10 minutes
+            return Result.failure(new Error("DURATION_TOO_SHORT", "Duration cannot be less than 10 minutes"));
+        }
         this.durationInSeconds = durationInSeconds;
         return Result.success();
     }

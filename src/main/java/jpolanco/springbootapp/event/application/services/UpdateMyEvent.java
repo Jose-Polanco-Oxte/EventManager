@@ -3,6 +3,7 @@ package jpolanco.springbootapp.event.application.services;
 import jpolanco.springbootapp.event.application.uc.UpdateMyEventUC;
 import jpolanco.springbootapp.event.application.utils.EventUpdater;
 import jpolanco.springbootapp.event.application.utils.EventValidation;
+import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class UpdateMyEvent implements UpdateMyEventUC {
     public EventUpdater setChanges(String eventId, String creatorId) {
         var result = eventValidation.validatePropietary(eventId, creatorId);
         if (result.isFailure()) {
-            throw new IllegalArgumentException(result.getMessage());
+            throw new EventIntegrity(result.getMessage());
         }
         var event = result.getValue();
         return new EventUpdater(event, eventValidation);

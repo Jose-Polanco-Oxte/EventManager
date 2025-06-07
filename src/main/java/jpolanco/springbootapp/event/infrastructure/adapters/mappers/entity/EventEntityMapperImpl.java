@@ -7,6 +7,7 @@ import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.*
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.LocationEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRepository;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaStaffRoleRepository;
+import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -82,13 +83,13 @@ public class EventEntityMapperImpl implements EventEntityMapper {
             staffEntityList = domain.getStaff().stream()
                     .map(staff -> {
                         if (staff == null || staff.getUserId() == null || staff.getRole() == null) {
-                            throw new IllegalArgumentException("Staff member or required fields are null");
+                            throw new EventIntegrity("Staff member or required fields are null");
                         }
                         switch (validScheduleForStaff(domain.getEventId(), staff, domain.getSchedule(), domain.getDurationInSeconds())) {
                             case 1:
-                                throw new IllegalArgumentException("Staff member already has an event at the same schedule: " + staff.getUserId().getValue());
+                                throw new EventIntegrity("Staff member already has an event at the same schedule: " + staff.getUserId().getValue());
                             case 2:
-                                throw new IllegalArgumentException("Overlapping schedules for staff member: " + staff.getUserId().getValue());
+                                throw new EventIntegrity("Overlapping schedules for staff member: " + staff.getUserId().getValue());
                             case 0:
                                 // No conflicts found, proceed
                                 break;
@@ -165,7 +166,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getMaxInvitees()
         );
         if (maybeEvent.isFailure()) {
-            throw new IllegalArgumentException("Error converting EventEntity to Event: " + maybeEvent.getMessage());
+            throw new EventIntegrity("Error converting EventEntity to Event: " + maybeEvent.getMessage());
         }
         return maybeEvent.getValue();
     }

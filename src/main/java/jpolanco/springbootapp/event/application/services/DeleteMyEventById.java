@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.event.application.services;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
+import jpolanco.springbootapp.event.application.errors.EventPersistenceFailure;
 import jpolanco.springbootapp.event.application.ports.output.EventRepository;
 import jpolanco.springbootapp.event.application.uc.DeleteMyEventByIdUC;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.ImageStorageService;
@@ -24,7 +25,7 @@ public class DeleteMyEventById implements DeleteMyEventByIdUC {
         }
         eventRepository.deleteByIdAndCreatorId(eventId, creatorId);
         if (!imageStorageService.deleteImage(event.get().getPictureFileName()))
-            throw new RuntimeException("Failed to delete event image: " + event.get().getPictureFileName());
+            throw new EventPersistenceFailure("Failed to delete event image: " + event.get().getPictureFileName());
         return Result.success();
     }
 }

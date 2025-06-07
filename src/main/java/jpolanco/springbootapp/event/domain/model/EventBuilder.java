@@ -62,6 +62,19 @@ public class EventBuilder {
     }
 
     public EventBuilder duration(long durationInSeconds) {
+        if (durationInSeconds < 0) {
+            isValid = Result.failure(new Error("DURATION_NEGATIVE", "Duration cannot be negative"));
+            return this;
+        } else if (durationInSeconds == 0) {
+            isValid = Result.failure(new Error("DURATION_ZERO", "Duration cannot be zero"));
+            return this;
+        } else if (durationInSeconds > 24 * 60 * 60) { // More than 24 hours
+            isValid = Result.failure(new Error("DURATION_EXCEEDED", "Duration cannot exceed 24 hours"));
+            return this;
+        } else if (durationInSeconds < 60 * 10) { // Less than 10 minutes
+            isValid = Result.failure(new Error("DURATION_TOO_SHORT", "Duration cannot be less than 10 minutes"));
+            return this;
+        }
         this.duration = durationInSeconds;
         return this;
     }

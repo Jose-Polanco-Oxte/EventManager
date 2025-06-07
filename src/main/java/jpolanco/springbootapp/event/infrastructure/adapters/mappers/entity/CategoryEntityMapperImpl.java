@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.event.application.ports.output.CategoriesRepository;
 import jpolanco.springbootapp.event.domain.model.valueobjects.Categories;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.CategoryEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaCategoryRepository;
+import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +26,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
             entity.ifPresent(categoriesEntities::add);
         }
         if (categoriesEntities.isEmpty()) {
-            throw new IllegalArgumentException("No categories found for the provided domain values.");
+            throw new EventIntegrity("No categories found for the provided domain values.");
         }
         return categoriesEntities;
     }
@@ -39,7 +39,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
         }
         var maybeCategories = Categories.create(categories);
         if (maybeCategories.isFailure()) {
-            throw new IllegalArgumentException("Invalid categories provided.");
+            throw new EventIntegrity("Invalid categories provided.");
         }
         return maybeCategories.getValue();
     }
