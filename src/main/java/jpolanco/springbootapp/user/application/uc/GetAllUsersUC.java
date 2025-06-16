@@ -11,5 +11,5 @@ public interface GetAllUsersUC {
      *
      * @return a Result containing a list of User objects.
      */
-    Result<List<User>> getAll();
+    List<User> getAll();
 }

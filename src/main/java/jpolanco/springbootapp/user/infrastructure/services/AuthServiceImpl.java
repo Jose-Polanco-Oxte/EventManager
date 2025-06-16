@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public Result<Dto> login(LoginRequest request) {
+    public Result<UserTokenResponse> login(LoginRequest request) {
         if (auxTokenManager.sessionLimitReached(request.email())) {
             return Result.failure(UserAppError.SESSION_LIMIT_REACHED);
         }
@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public Result<Dto> register(RegisterRequest request) {
+    public Result<UserTokenResponse> register(RegisterRequest request) {
         var createdUser = createUserUc.create(
                 request.firstName(),
                 request.lastName(),
@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public Result<Dto> refresh(String authHeader) {
+    public Result<UserTokenResponse> refresh(String authHeader) {
         if (auxTokenManager.invalidTokenInDB(authHeader)) {
             return Result.failure(UserAppError.INVALID_TOKEN);
         }

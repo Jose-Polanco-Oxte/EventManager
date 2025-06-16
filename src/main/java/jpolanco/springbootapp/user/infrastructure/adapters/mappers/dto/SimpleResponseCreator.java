@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SimpleResponseCreator {
-    public Dto create(String message) {
+    public SimpleResponseDto create(String message) {
         return new SimpleResponseDto(message);
     }
 }

@@ -1,26 +1,34 @@
 package jpolanco.springbootapp.event.infrastructure.services.interfaces;
 
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventDto;
-import jpolanco.springbootapp.shared.application.Dto;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponseDto;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.SimpleResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.SlicePageResponseDto;
 
+import java.io.InputStream;
 import java.util.List;
 
 public interface MyEventsService {
 
-    Result<Void> deleteMyEvent(String userId, String eventId);
+    Result<SimpleResponseDto> deleteMyEvent(String userId, String eventId);
 
-    Result<Dto> updateMyEvent(String userId, String eventId, String imageFileName, UpdateEventDto eventDto);
+    Result<EventResponseDto> updateMyEvent(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto);
 
-    Result<Dto> updateMyEventClearStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto);
+    Result<EventResponseDto> updateMyEventClearStaff(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto);
 
-    Result<Dto> updateMyEventAddStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto);
+    Result<EventResponseDto> updateMyEventAddStaff(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto);
 
-    Result<List<Dto>> getMyEvents(String userId, int page, int size);
+    SlicePageResponseDto<EventResponseDto> getMyEvents(String userId, int page, int size, String sortBy, String sortOrder);
 
-    Result<List<Dto>> getMyEventsByCategory(String userId, String category, String modality, int page, int size);
+    CursorPageResponseDto<EventResponseDto, String> getMyEvents(String userId, String cursor, int size, String sortBy, String sortOrder);
 
-    Result<List<Dto>> getMyEventsByTitle(String userId, String title, String modality, int page, int size);
+    List<EventResponseDto> getMyEventsByCategory(String userId, String category, String modality, int page, int size);
 
-    Result<List<Dto>> getMyEventsByLocation(String userId, String locationName, String modality, int page, int size);
+    List<EventResponseDto> getMyEventsByTitle(String userId, String title, String modality, int page, int size);
+
+    List<EventResponseDto> getMyEventsByLocation(String userId, String locationName, String modality, int page, int size);
+
+    Result<SimpleResponseDto> myEventCancelation(String userId, String eventId, String reason);
 }

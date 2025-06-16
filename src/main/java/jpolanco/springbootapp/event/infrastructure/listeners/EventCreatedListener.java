@@ -12,6 +12,5 @@ public class EventCreatedListener {
     public void handleEventCreated(EventCreated event) {
         log.info("Event created: eventId= {}, name= {}, timeStamp= {}, creatorId= {}",
                  event.getEventId(), event.getName(), event.getTimeStamp(), event.getCreatorId());
-        // Additional logic to handle the event can be added here
     }
 }

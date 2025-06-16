@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.event.application.services;
 
+import jpolanco.springbootapp.event.application.ports.input.FileStorageProvider;
 import jpolanco.springbootapp.event.application.uc.UpdateMyEventUC;
 import jpolanco.springbootapp.event.application.utils.EventUpdater;
 import jpolanco.springbootapp.event.application.utils.EventValidation;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class UpdateMyEvent implements UpdateMyEventUC {
 
     private final EventValidation eventValidation;
+    private final FileStorageProvider fileStorageProvider;
 
     @Override
     public EventUpdater setChanges(String eventId, String creatorId) {
@@ -20,6 +22,6 @@ public class UpdateMyEvent implements UpdateMyEventUC {
             throw new EventIntegrity(result.getMessage());
         }
         var event = result.getValue();
-        return new EventUpdater(event, eventValidation);
+        return new EventUpdater(event, fileStorageProvider, eventValidation);
     }
 }

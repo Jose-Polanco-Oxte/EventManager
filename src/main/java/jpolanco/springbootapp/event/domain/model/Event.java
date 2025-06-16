@@ -30,12 +30,12 @@ public class Event {
     private UserId creatorId;
     private final Instant createdAt;
     private List<DomainEvent> events = new ArrayList<>();
-    private int maxAssistanceCount;
+    private int maxAttendees;
 
     protected Event(EventId eventId, Header header, Schedule schedule, long durationInSeconds, EventStatus status,
                     Location location, Categories category, boolean isPublic, boolean enableComments,
                     Modality modality, List<Staff> staff, PictureFileName pictureFileName, UserId creatorId,
-                    Instant createdAt, int maxAssistanceCount) {
+                    Instant createdAt, int maxAttendees) {
         this.eventId = eventId;
         this.header = header;
         this.schedule = schedule;
@@ -50,7 +50,7 @@ public class Event {
         this.pictureFileName = pictureFileName;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
-        this.maxAssistanceCount = maxAssistanceCount;
+        this.maxAttendees = maxAttendees;
     }
 
     public static Result<Event> create(
@@ -266,8 +266,8 @@ public class Event {
         return pictureFileName.getValue();
     }
 
-    public int getMaxAssistanceCount() {
-        return maxAssistanceCount;
+    public int getMaxAttendees() {
+        return maxAttendees;
     }
 
 
@@ -429,7 +429,7 @@ public class Event {
         } else if(maxInvitees > 1000) {
             return Result.failure(new Error("MAX_INVITEES_EXCEEDED", "Max invitees cannot exceed 1000"));
         } else {
-            this.maxAssistanceCount = maxInvitees;
+            this.maxAttendees = maxInvitees;
             return Result.success();
         }
     }

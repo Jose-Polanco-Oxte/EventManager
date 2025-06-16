@@ -50,7 +50,10 @@ public class EventEntity {
     private String picture_path;
 
     @Column(nullable = false)
-    private int maxInvitees;
+    private int maxAttendees;
+
+    @Column(nullable = false)
+    private Long countAttendees = 0L;
 
     @ManyToMany(cascade = {
             CascadeType.DETACH, CascadeType.MERGE,

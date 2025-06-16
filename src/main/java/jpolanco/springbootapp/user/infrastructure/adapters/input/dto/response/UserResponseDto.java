@@ -4,7 +4,7 @@ import jpolanco.springbootapp.shared.application.Dto;
 
 import java.util.List;
 
-public record UserDataResponseDto(
+public record UserResponseDto(
         String id,
         String firstName,
         String lastName,

@@ -9,8 +9,7 @@ public interface GetAllEventsUC {
     /**
      * Retrieves all events for a specific user.
      *
-     * @param userId the ID of the user whose events are to be retrieved
-     * @return a Result containing a list of events or an error if the retrieval fails
+     * @return A list of all events.
      */
-    Result<List<Event>> getAllEvents(String userId);
+    List<Event> getAllEvents();
 }

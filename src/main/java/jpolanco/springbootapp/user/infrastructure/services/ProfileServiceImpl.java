@@ -1,11 +1,12 @@
 package jpolanco.springbootapp.user.infrastructure.services;
-import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.SimpleResponseDto;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.uc.DeleteUserByIdUC;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
 import jpolanco.springbootapp.user.application.uc.UpdateUserUC;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponseDto;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.SimpleResponseCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
@@ -27,7 +28,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final AuxTokenManager auxTokenManager;
 
     @Override
-    public Result<Dto> get(String userId) {
+    public Result<UserResponseDto> get(String userId) {
         var valid = userValidation.basicValid(userId);
         if (valid.isFailure()) {
             return Result.failure(valid.getError());
@@ -41,7 +42,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Dto> changeName(String userId, UpdateNameRequest request) {
+    public Result<SimpleResponseDto> changeName(String userId, UpdateNameRequest request) {
         var valid = userValidation.basicValid(userId);
         if (valid.isFailure()) {
             return Result.failure(valid.getError());
@@ -59,7 +60,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Dto> changeEmail(String userId, UpdateEmailRequest dto) {
+    public Result<SimpleResponseDto> changeEmail(String userId, UpdateEmailRequest dto) {
         var valid = userValidation.basicValid(userId);
         if (valid.isFailure()) {
             return Result.failure(valid.getError());
@@ -76,8 +77,9 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success(simpleResponseCreator.create("Email updated successfully"));
     }
 
+    @Transactional
     @Override
-    public Result<Dto> deleteMe(String userId) {
+    public Result<SimpleResponseDto> deleteMe(String userId) {
         var result = deleteUserByIdUC.delete(userId);
         if (result.isFailure()) {
             return Result.failure(result.getError());
@@ -87,7 +89,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Dto> changePassword(String userId, UpdatePasswordRequest dto) {
+    public Result<SimpleResponseDto> changePassword(String userId, UpdatePasswordRequest dto) {
         var valid = userValidation.onUpdatePasswordIsValid(dto.newPassword(), dto.oldPassword(), userId);
         if (valid.isFailure()) {
             return Result.failure(valid.getError());

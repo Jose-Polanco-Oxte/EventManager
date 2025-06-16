@@ -1,19 +1,24 @@
 package jpolanco.springbootapp.event.infrastructure.services;
 
-import jpolanco.springbootapp.event.application.uc.DeleteMyEventByIdUC;
-import jpolanco.springbootapp.event.application.uc.GetMyEventsUC;
-import jpolanco.springbootapp.event.application.uc.UpdateMyEventUC;
+import jpolanco.springbootapp.event.application.uc.*;
+import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.Modality;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventDto;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponseDto;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.MyEventsService;
-import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.SimpleResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.SlicePageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.mappers.CursorPageCreator;
+import jpolanco.springbootapp.shared.infrastructure.mappers.SlicePageCreator;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,24 +26,28 @@ import java.util.List;
 public class MyEventsServiceImpl implements MyEventsService {
 
     private final DeleteMyEventByIdUC deleteMyEventByIdUC;
-    private final GetMyEventsUC getMyEventsUC;
+    private final PGetMyEventsUC PGetMyEventsUC;
+    private final CGetMyEventsUC CGetMyEventsUC;
     private final UpdateMyEventUC updateMyEventUC;
     private final EventDtoCreator eventDtoCreator;
+    private final CancelMyEventUC cancelMyEventUC;
     private final DomainEventsPublisher publisher;
+    private final SlicePageCreator<Event, EventResponseDto> slicePageCreator;
+    private final CursorPageCreator<Event, EventResponseDto, String> cursorPageCreator;
 
     @Override
     @Transactional
-    public Result<Void> deleteMyEvent(String userId, String eventId) {
+    public Result<SimpleResponseDto> deleteMyEvent(String userId, String eventId) {
         var result = deleteMyEventByIdUC.delete(userId, eventId);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
-        return Result.success();
+        return Result.success(new SimpleResponseDto("Event deleted successfully"));
     }
 
     @Override
     @Transactional
-    public Result<Dto> updateMyEvent(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+    public Result<EventResponseDto> updateMyEvent(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto) {
         var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
@@ -56,7 +65,7 @@ public class MyEventsServiceImpl implements MyEventsService {
                 .enableComments(eventDto.enableComments())
                 .modality(Modality.create(eventDto.modality()))
                 .staff(eventDto.staffs())
-                .pictureFileName(imageFileName)
+                .changePicture(imageStream)
                 .setMaxAttendees(eventDto.maxAttendees())
                 .update();
         if (eventUpdated.isFailure()) {
@@ -68,8 +77,8 @@ public class MyEventsServiceImpl implements MyEventsService {
     }
 
     @Override
-@Transactional
-    public Result<Dto> updateMyEventClearStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+    @Transactional
+    public Result<EventResponseDto> updateMyEventClearStaff(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto) {
         var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
@@ -87,7 +96,7 @@ public class MyEventsServiceImpl implements MyEventsService {
                 .enableComments(eventDto.enableComments())
                 .modality(Modality.create(eventDto.modality()))
                 .clearStaff()
-                .pictureFileName(imageFileName)
+                .changePicture(imageStream)
                 .setMaxAttendees(eventDto.maxAttendees())
                 .update();
         if (eventUpdated.isFailure()) {
@@ -99,8 +108,8 @@ public class MyEventsServiceImpl implements MyEventsService {
     }
 
     @Override
-@Transactional
-    public Result<Dto> updateMyEventAddStaff(String userId, String eventId, String imageFileName, UpdateEventDto eventDto) {
+    @Transactional
+    public Result<EventResponseDto> updateMyEventAddStaff(String userId, String eventId, InputStream imageStream, UpdateEventDto eventDto) {
         var eventUpdated = updateMyEventUC.setChanges(eventId, userId)
                 .title(eventDto.title())
                 .description(eventDto.description())
@@ -118,7 +127,7 @@ public class MyEventsServiceImpl implements MyEventsService {
                 .enableComments(eventDto.enableComments())
                 .modality(Modality.create(eventDto.modality()))
                 .addStaff(eventDto.staffs())
-                .pictureFileName(imageFileName)
+                .changePicture(imageStream)
                 .setMaxAttendees(eventDto.maxAttendees())
                 .update();
         if (eventUpdated.isFailure()) {
@@ -130,30 +139,46 @@ public class MyEventsServiceImpl implements MyEventsService {
     }
 
     @Override
-    public Result<List<Dto>> getMyEvents(String userId, int page, int size) {
-        var result = getMyEventsUC.getMyEvents(userId);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        return Result.success(
-                result.getValue().stream()
-                        .map(eventDtoCreator::create)
-                        .toList()
+    public SlicePageResponseDto<EventResponseDto> getMyEvents(String userId, int page, int size, String sortBy, String sortOrder) {
+        return slicePageCreator.create(
+                PGetMyEventsUC.getMyEvents(userId, page, size, sortBy, sortOrder),
+                eventDtoCreator
         );
     }
 
     @Override
-    public Result<List<Dto>> getMyEventsByCategory(String userId, String category, String modality, int page, int size) {
+    public CursorPageResponseDto<EventResponseDto, String> getMyEvents(String cursor, String userId, int size, String sortBy, String sortOrder) {
+        return cursorPageCreator.create(
+                CGetMyEventsUC.getMyEvents(cursor, userId, size, sortBy, sortOrder),
+                eventDtoCreator
+        );
+    }
+
+    @Override
+    public List<EventResponseDto> getMyEventsByCategory(String userId, String category, String modality, int page, int size) {
         return null;
     }
 
     @Override
-    public Result<List<Dto>> getMyEventsByTitle(String userId, String title, String modality, int page, int size) {
+    public List<EventResponseDto> getMyEventsByTitle(String userId, String title, String modality, int page, int size) {
         return null;
     }
 
     @Override
-    public Result<List<Dto>> getMyEventsByLocation(String userId, String locationName, String modality, int page, int size) {
+    public List<EventResponseDto> getMyEventsByLocation(String userId, String locationName, String modality, int page, int size) {
         return null;
+    }
+
+    @Override
+    @Transactional
+    public Result<SimpleResponseDto> myEventCancelation(String userId, String eventId, String reason) {
+        var result = cancelMyEventUC.cancelEvent(eventId, userId, reason);
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
+        }
+        var event = result.getValue();
+        event.pullEvents().forEach(publisher::publish);
+        event.clearEvents();
+        return Result.success(new SimpleResponseDto("Event canceled successfully"));
     }
 }

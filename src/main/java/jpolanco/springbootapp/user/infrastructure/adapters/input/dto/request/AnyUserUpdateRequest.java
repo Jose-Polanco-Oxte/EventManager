@@ -6,7 +6,7 @@ import jpolanco.springbootapp.shared.application.Dto;
 import java.util.List;
 
 
-public record AllUserUpdateRequest(
+public record AnyUserUpdateRequest(
         String firstName,
         String lastName,
         @Email(message = "Email should be valid")

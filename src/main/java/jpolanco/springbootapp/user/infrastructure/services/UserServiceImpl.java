@@ -1,13 +1,19 @@
 package jpolanco.springbootapp.user.infrastructure.services;
 
-import jpolanco.springbootapp.shared.application.Dto;
+import jpolanco.springbootapp.shared.infrastructure.SimpleResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.PageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.mappers.CursorPageCreator;
+import jpolanco.springbootapp.shared.infrastructure.mappers.PageCreator;
 import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
 import jpolanco.springbootapp.user.application.uc.*;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
+import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponseDto;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.SimpleResponseCreator;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllUserUpdateRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,9 +33,13 @@ public class UserServiceImpl implements UserService {
     private final DeleteUserByIdUC deleteUserByIdUC;
     private final AuxTokenManager auxTokenManager;
     private final UserValidation userValidation;
+    private final PGetUsersUC PGetUsersUC;
+    private final CGetUsersUC CGetUsersUC;
+    private final CursorPageCreator<User, UserResponseDto, String> cursorPageCreator;
+    private final PageCreator<User, UserResponseDto> pageCreator;
 
     @Override
-    public Result<Dto> getUserById(String userId) {
+    public Result<UserResponseDto> getUserById(String userId) {
         var maybeUser = getUserByIdUC.get(userId);
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
@@ -39,7 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<Dto> getUserByEmail(String email) {
+    public Result<UserResponseDto> getUserByEmail(String email) {
         var maybeUser = getUserByEmailUC.get(email);
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
@@ -49,23 +59,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Result<List<Dto>> getAll() {
-        var maybeUsers = getAllUsersUC.getAll();
-        if (maybeUsers.isFailure()) {
-            return Result.failure(maybeUsers.getError());
-        }
-        var users = maybeUsers.getValue();
-        return Result.success(users.stream().map(dtoCreator::create).toList());
+    public PageResponseDto<UserResponseDto> getUsers(int page, int size, String sortBy, String sortOrder) {
+        return pageCreator.create(PGetUsersUC.getUsers(page, size, sortBy, sortOrder), new UserDtoCreator());
     }
 
     @Override
-    public Result<List<Dto>> searchUsers(String searchTerm, int page, int size) {
-        return null;
+    public CursorPageResponseDto<UserResponseDto, String> getUsers(String cursor, int size, String sortBy, String sortOrder) {
+        return cursorPageCreator.create(CGetUsersUC.getUsers(cursor, size, sortBy, sortOrder), new UserDtoCreator());
+    }
+
+    @Override
+    public List<UserResponseDto> getAll() {
+        var maybeUsers = getAllUsersUC.getAll();
+        if (maybeUsers.isEmpty()) {
+            return List.of();
+        }
+        return maybeUsers.stream()
+                .map(dtoCreator::create)
+                .toList();
     }
 
     @Override
     @Transactional
-    public Result<Dto> updateUser(AllUserUpdateRequest dto, String userId) {
+    public Result<SimpleResponseDto> updateUser(AnyUserUpdateRequest dto, String userId) {
         var valid = userValidation.basicValid(userId);
         if (valid.isFailure()) {
             return Result.failure(valid.getError());
@@ -89,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Result<Dto> deleteUser(String userId) {
+    public Result<SimpleResponseDto> deleteUser(String userId) {
         var result = deleteUserByIdUC.delete(userId);
         if (result.isFailure()) {
             return Result.failure(result.getError());

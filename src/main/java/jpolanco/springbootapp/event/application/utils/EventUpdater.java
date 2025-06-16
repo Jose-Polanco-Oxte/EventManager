@@ -1,5 +1,7 @@
 package jpolanco.springbootapp.event.application.utils;
 
+import jpolanco.springbootapp.event.application.errors.EventAppError;
+import jpolanco.springbootapp.event.application.ports.input.FileStorageProvider;
 import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.EventStatus;
@@ -9,6 +11,7 @@ import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 
@@ -16,6 +19,7 @@ import java.util.List;
 public class EventUpdater {
 
     private final Event event;
+    private final FileStorageProvider fileStorage;
     private final EventValidation eventValidation;
     private Result<?> result = Result.success();
 
@@ -174,11 +178,11 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater pictureFileName(String pictureFileName) {
-        if (nullable(pictureFileName) > 0) return this;
-        if (!event.getPictureFileName().equals(pictureFileName)) {
-            var result = event.changePictureFileName(pictureFileName);
-            check(result);
+    public EventUpdater changePicture(InputStream imageStream) {
+        if (imageStream == null) return this;
+        var fileStored = fileStorage.storeImage(event.getPictureFileName(), imageStream);
+        if (fileStored == null) {
+            result = Result.failure(EventAppError.IMAGE_STORAGE_ERROR);
         }
         return this;
     }
@@ -191,7 +195,7 @@ public class EventUpdater {
 
     public EventUpdater setMaxAttendees(int maxInvitees) {
         if (maxInvitees < 0) return this;
-        if (event.getMaxAssistanceCount() != maxInvitees) {
+        if (event.getMaxAttendees() != maxInvitees) {
             // Validate that the new max invitees is not less than the number of accepted invitations
             eventValidation.validateEventMaxInviteesOnChange(maxInvitees, event.getEventId());
             var result = event.setMaxAttendees(maxInvitees);

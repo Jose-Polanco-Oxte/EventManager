@@ -13,8 +13,10 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Objects;
@@ -27,6 +29,19 @@ public class GlobalAdviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+        logger.error("Method argument type mismatch: {}", e.getMessage(), e);
+        String response = "Invalid value for parameter '" + e.getName() + "': " + e.getValue();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<String> handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
+        logger.error("Missing request parameter: {}", e.getMessage(), e);
+        String response = "Missing request parameter: " + e.getParameterName();
+        return ResponseEntity.badRequest().body(response);
+    }
 
     @ExceptionHandler(EventPersistenceFailure.class)
     public ResponseEntity<String> handleEventPersistenceFailure(EventPersistenceFailure e) {

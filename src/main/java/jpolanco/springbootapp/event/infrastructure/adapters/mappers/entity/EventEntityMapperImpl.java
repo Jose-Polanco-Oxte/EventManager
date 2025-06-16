@@ -129,7 +129,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
         eventEntity.setPreferences(preferences);
         eventEntity.setCategories(new HashSet<>(categoryEntityMapper.toEntity(domain.getCategories())));
         eventEntity.setCreatedAt(domain.getCreatedAt());
-        eventEntity.setMaxInvitees(domain.getMaxAssistanceCount());
+        eventEntity.setMaxAttendees(domain.getMaxAttendees());
         return eventEntity;
     }
 
@@ -163,7 +163,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getPicture_path(),
                 entity.getCreator().getId().toString(),
                 entity.getCreatedAt(),
-                entity.getMaxInvitees()
+                entity.getMaxAttendees()
         );
         if (maybeEvent.isFailure()) {
             throw new EventIntegrity("Error converting EventEntity to Event: " + maybeEvent.getMessage());
