@@ -28,9 +28,4 @@ public class InvitationRepositoryMySQL implements InvitationRepository {
     public void deleteById(String s) {
 
     }
-
-    @Override
-    public Invitation update(Invitation entity) {
-        return null;
-    }
 }

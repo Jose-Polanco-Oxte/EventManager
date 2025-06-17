@@ -39,13 +39,4 @@ public class CategoriesRepositoryMySQL implements CategoriesRepository {
     public void deleteById(String s) {
         jpaCategoryRepository.deleteById(s);
     }
-
-    @Override
-    public String update(String entity) {
-        CategoryEntity categoryEntity = jpaCategoryRepository.findById(entity)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found: " + entity));
-        categoryEntity.setName(entity);
-        jpaCategoryRepository.save(categoryEntity);
-        return categoryEntity.getName();
-    }
 }

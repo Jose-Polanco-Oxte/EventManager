@@ -5,8 +5,8 @@ import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity.EventEntityMapper;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.EventEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.application.utils.PageResult;
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -40,12 +40,6 @@ public class EventRepositoryMySQL implements EventRepository {
     @Override
     public void deleteById(String s) {
         jpaEventRepository.deleteById(UUID.fromString(s));
-    }
-
-    @Override
-    public Event update(Event entity) {
-        var event = jpaEventRepository.save(eventEntityMapper.toEntity(entity));
-        return eventEntityMapper.toDomain(event);
     }
 
     @Override

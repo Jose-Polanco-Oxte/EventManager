@@ -26,7 +26,7 @@ public class CancelMyEvent implements CancelMyEventUC {
         var event = maybeEvent.get();
         event.changeStatus(EventStatus.CANCELLED);
         event.recordEvent(new EventCanceled(event.getEventId(), reason));
-        eventRepository.update(event);
+        eventRepository.save(event);
         return Result.success(event);
     }
 }

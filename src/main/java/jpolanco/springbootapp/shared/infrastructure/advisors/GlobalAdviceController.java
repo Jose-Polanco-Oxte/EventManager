@@ -3,7 +3,6 @@ package jpolanco.springbootapp.shared.infrastructure.advisors;
 import jpolanco.springbootapp.event.application.errors.EventPersistenceFailure;
 import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import jpolanco.springbootapp.user.application.errors.IllegalUserOperation;
-import jpolanco.springbootapp.user.application.errors.UserDataNotFound;
 import jpolanco.springbootapp.user.infrastructure.errors.DataFailure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,12 +68,6 @@ public class GlobalAdviceController {
         logger.error(e.getMessage(), e);
         String response = e.getMessage();
         return ResponseEntity.badRequest().body(response);
-    }
-    @ExceptionHandler(UserDataNotFound.class)
-    public ResponseEntity<String> handleUserDataNotFound(UserDataNotFound e) {
-        logger.error(e.getMessage(), e);
-        String response = e.getMessage();
-        return ResponseEntity.status(404).body(response);
     }
 
     @ExceptionHandler(IllegalUserOperation.class)

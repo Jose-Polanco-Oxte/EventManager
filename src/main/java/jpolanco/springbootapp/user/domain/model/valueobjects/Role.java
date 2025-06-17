@@ -29,7 +29,7 @@ public class Role {
             return Result.failure(RoleError.TOO_LONG);
         }
         if (value.length() < 3) {
-            return Result.failure(RoleError.TOOSHORT);
+            return Result.failure(RoleError.TOO_SHORT);
         }
         return Result.success(new Role(value));
     }

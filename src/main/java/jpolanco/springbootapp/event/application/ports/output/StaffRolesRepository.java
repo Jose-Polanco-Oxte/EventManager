@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.application.ports.output;
 
-import jpolanco.springbootapp.shared.domain.CRUDRepository;
+import jpolanco.springbootapp.shared.application.adapters.output.CRUDRepository;
 
 import java.util.List;
 

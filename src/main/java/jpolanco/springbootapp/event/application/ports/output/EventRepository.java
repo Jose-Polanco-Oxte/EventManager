@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.event.application.ports.output;
 
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
-import jpolanco.springbootapp.shared.domain.CRUDRepository;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.application.adapters.output.CRUDRepository;
 import java.time.Instant;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.application.utils.PageResult;
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
@@ -44,12 +44,6 @@ public class UserRepositoryMySQL implements UserRepository {
     @Override
     public void deleteById(String userId) {
         jpaUserRepository.deleteById(UUID.fromString(userId));
-    }
-
-    @Override
-    public User update(User entity) {
-        var user = jpaUserRepository.save(mapper.toEntity(entity));
-        return mapper.toDomain(user);
     }
 
     @Override

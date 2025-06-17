@@ -1,10 +1,10 @@
 package jpolanco.springbootapp.user.application.uc;
 
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.utils.PageResult;
 import jpolanco.springbootapp.user.domain.model.User;
 
 
-public interface PGetUsersUC {
+public interface PageGetUsersUC {
     /**
      * Retrieves a paginated list of users.
      *
@@ -14,5 +14,5 @@ public interface PGetUsersUC {
      * @param sortOrder the order of sorting, either "asc" for ascending or "desc" for descending.
      * @return a PageResult containing a list of User objects and pagination information.
      */
-    PageResult<User> getUsers(int page, int size, String sortBy, String sortOrder);
+    PageResult<User> get(int page, int size, String sortBy, String sortOrder);
 }

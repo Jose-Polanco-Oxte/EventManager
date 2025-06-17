@@ -1,9 +1,11 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.user.domain.model.Roles;
 import jpolanco.springbootapp.user.domain.model.User;
 
 import jpolanco.springbootapp.user.domain.model.valueobjects.Role;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import org.springframework.stereotype.Component;
@@ -22,8 +24,7 @@ public class UserEntityMapperImpl implements UserEntityMapper {
                 userEntity.getPassword(),
                 userEntity.getRoles()
                         .stream()
-                        .map(RoleEntity -> Role.create(RoleEntity.getName())
-                                        .getValue())
+                        .map(RoleEntity::getName)
                         .collect(Collectors.toSet()),
                 userEntity.getStatus(),
                 userEntity.getQrFileName(),
@@ -42,10 +43,11 @@ public class UserEntityMapperImpl implements UserEntityMapper {
                 user.getLastName(),
                 user.getEmail(),
                 user.getEncodedPassword(),
-                user.getRoles().stream()
-                        .map(role -> new RoleEntity(role.getValue()))
+                user.getRoles()
+                        .stream()
+                        .map(RoleEntity::new)
                         .collect(Collectors.toSet()),
-                user.getStatus(),
+                UserStatus.valueOf(user.getStatus()),
                 user.getCreatedAt(),
                 user.getQRFileName()
         );

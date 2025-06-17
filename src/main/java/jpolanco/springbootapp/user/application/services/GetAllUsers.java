@@ -13,7 +13,7 @@ public class GetAllUsers implements GetAllUsersUC {
     private final UserRepository userRepository;
 
     @Override
-    public List<User> getAll() {
+    public List<User> get() {
         return userRepository.findAll();
     }
 }

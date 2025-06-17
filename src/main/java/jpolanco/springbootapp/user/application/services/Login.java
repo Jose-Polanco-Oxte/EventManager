@@ -22,8 +22,11 @@ public class Login implements LoginUC {
             return Result.failure(UserAppError.USER_NOT_FOUND);
         }
         var user = maybeUser.get();
-        if (!user.isActive()) {
+        if (user.isInactive()) {
             return Result.failure(UserAppError.USER_NOT_ACTIVE);
+        }
+        if (user.isSuspended()) {
+            return Result.failure(UserAppError.USER_SUSPENDED);
         }
         if (!passwordEncoder.matches(password, user.getEncodedPassword())) {
             return Result.failure(UserAppError.USER_NOT_AUTHORIZED);

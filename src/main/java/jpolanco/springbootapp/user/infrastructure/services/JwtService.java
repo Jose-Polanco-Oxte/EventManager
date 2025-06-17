@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -42,11 +44,8 @@ public class JwtService implements JwtProvider {
     private String buildToken(final User user, final long expirationTime) {
         return Jwts.builder()
                 .id(user.getId())
-                .claims(Map.of("Roles", user
-                        .getRoles()
-                        .stream()
-                        .map(Role::getValue)
-                        .toList()))
+                .claims(Map.of("Roles", new ArrayList<>(user
+                        .getRoles())))
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expirationTime))

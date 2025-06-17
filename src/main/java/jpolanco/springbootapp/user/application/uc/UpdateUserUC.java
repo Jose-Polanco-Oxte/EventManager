@@ -7,7 +7,7 @@ public interface UpdateUserUC {
     /**
      * Updates a user with the given ID and changes.
      *
-     * @param user the user to be updated
+     * @param user the user with changes to be updated
      * @return a Result containing the builder for update user and can be use like an api
      */
     UserUpdater setChanges(User user);

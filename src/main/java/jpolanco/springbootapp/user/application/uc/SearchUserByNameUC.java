@@ -9,8 +9,8 @@ public interface SearchUserByNameUC {
      * Searches for users by their name.
      *
      * @param name the name to search for
-     * @param numberOfResults the maximum number of results to return
+     * @param size the maximum number of results to return
      * @return a list of users whose names match the search criteria
      */
-    List<User> searchByName(String name, int numberOfResults);
+    List<User> search(String name, int size);
 }

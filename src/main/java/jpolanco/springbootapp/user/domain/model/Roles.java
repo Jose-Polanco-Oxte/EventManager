@@ -2,68 +2,58 @@ package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.valueobjects.Role;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Roles {
-    private final Set<Role> values;
+    private final Set<String> values;
     private final static Set<String> validRoles = Set.of(
             "USER",
             "ADMIN",
             "ORGANIZER"
     );
 
-    private Roles(Set<Role> values) {
+    private Roles(Set<String> values) {
         this.values = values;
     }
 
-    public static Result<Roles> create(Set<Role> values) {
+    public static Result<Roles> create(Set<String> values) {
         if (values == null || values.isEmpty()) {
             return Result.failure(Error.NULL_VALUE);
         }
-        for (Role role : values) {
-            Result<Role> result = isValidRole(role);
-            if (result.isFailure()) {
-                return Result.failure(result.getError());
-            }
+        var result = isValidRole(values);
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
         }
         return Result.success(new Roles(values));
     }
 
-    private static Result<Role> isValidRole(Role role) {
-        if (role == null || role.getValue().isBlank()) {
-            return Result.failure(Error.NULL_VALUE.field("Role"));
+    private static Result<Set<String>> isValidRole(Set<String> roles) {
+        Set<String> filter = roles
+                .stream()
+                .filter(validRoles::contains)
+                .collect(Collectors.toSet());
+        if (filter.isEmpty()) {
+            return Result.failure(new Error("INVALID_ROLES", "No valid roles provided"));
         }
-        if (!validRoles.contains(role.getValue())) {
-            return Result.failure(new Error("InvalidRole", "Role is not valid"));
-        }
-        return Result.success(role);
+        return Result.success(filter);
     }
 
-    public Set<Role> getValues() {
+    public Set<String> getValues() {
         return new HashSet<>(values);
     }
 
-    public Result<Role> addValue(Role role) {
-        Result<Role> result = isValidRole(role);
-        if (result.isFailure()) {
-            return result;
+    public void addValue(String role) {
+        if (!validRoles.contains(role)) {
+            return;
         }
         this.values.add(role);
-        return Result.success(role);
     }
 
-    public Result<Role> removeValue(Role role) {
-        Result<Role> result = isValidRole(role);
-        if (result.isFailure()) {
-            return result;
-        }
-        if (!this.values.remove(role)) {
-            throw new IllegalStateException();
-        }
-        return Result.success(role);
+    public void removeValue(String role) {
+        values.remove(role);
     }
 
     @Override

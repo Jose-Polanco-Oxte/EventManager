@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.user.infrastructure.services;
 
-import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.input.AuxTokenManager;
@@ -8,6 +7,7 @@ import jpolanco.springbootapp.user.application.ports.input.JwtProvider;
 import jpolanco.springbootapp.user.application.uc.CreateUserUC;
 import jpolanco.springbootapp.user.application.uc.GetUserByEmailUC;
 import jpolanco.springbootapp.user.application.uc.LoginUC;
+import jpolanco.springbootapp.user.infrastructure.components.UserValidator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
@@ -26,12 +26,13 @@ public class AuthServiceImpl implements AuthService {
     private final CreateUserUC createUserUc;
     private final GetUserByEmailUC getUserByEmailUC;
     private final JwtProvider jwtService;
+    private final UserValidator userValidator;
     private final AuthenticationManager authentication;
     private final AuxTokenManager auxTokenManager;
     private final DomainEventsPublisher publisher;
 
-    @Transactional
     @Override
+    @Transactional
     public Result<UserTokenResponse> login(LoginRequest request) {
         if (auxTokenManager.sessionLimitReached(request.email())) {
             return Result.failure(UserAppError.SESSION_LIMIT_REACHED);
@@ -53,9 +54,13 @@ public class AuthServiceImpl implements AuthService {
         return Result.success(new UserTokenResponse(accessToken, refreshToken));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Result<UserTokenResponse> register(RegisterRequest request) {
+        var valid = userValidator.onCreateUserIsValid(request.email());
+        if (valid.isFailure()) {
+            return Result.failure(valid.getError());
+        }
         var createdUser = createUserUc.create(
                 request.firstName(),
                 request.lastName(),
@@ -76,8 +81,8 @@ public class AuthServiceImpl implements AuthService {
         return Result.success(new UserTokenResponse(accessToken, refreshToken));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public Result<UserTokenResponse> refresh(String authHeader) {
         if (auxTokenManager.invalidTokenInDB(authHeader)) {
             return Result.failure(UserAppError.INVALID_TOKEN);

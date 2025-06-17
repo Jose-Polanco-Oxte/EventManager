@@ -31,7 +31,7 @@ public class SearchServiceImpl implements SearchService {
     private final EventDtoCreator eventDtoCreator;
     @Override
     public List<UserResponseDto> searchUsersByName(String name, int size) {
-        return searchUserByNameUC.searchByName(name, size)
+        return searchUserByNameUC.search(name, size)
                 .stream()
                 .map(userDtoCreator::create)
                 .toList();
@@ -39,7 +39,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public List<UserResponseDto> searchUsersByEmail(String email, int size) {
-        return searchUserByEmailUC.searchByEmail(email, size)
+        return searchUserByEmailUC.search(email, size)
                 .stream()
                 .map(userDtoCreator::create)
                 .toList();

@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.user.application.uc;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
 import jpolanco.springbootapp.user.domain.model.User;
 
-public interface CGetUsersUC {
+public interface CursorGetUsersUC {
     /**
      * Retrieves a paginated list of users using cursor-based pagination.
      *
@@ -13,5 +13,5 @@ public interface CGetUsersUC {
      * @param sortOrder the order of sorting, either "asc" for ascending or "desc" for descending.
      * @return a CursorPageResult containing a list of User objects and pagination information.
      */
-    CursorPageResult<User, String> getUsers(String cursor, int size, String sortBy, String sortOrder);
+    CursorPageResult<User, String> get(String cursor, int size, String sortBy, String sortOrder);
 }

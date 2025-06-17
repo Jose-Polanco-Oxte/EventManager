@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto;
 
-import jpolanco.springbootapp.shared.application.DtoCreator;
+import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponseDto;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.domain.model.valueobjects.Role;
@@ -16,9 +16,7 @@ public class UserDtoCreator implements DtoCreator<User, UserResponseDto> {
                 user.getLastName(),
                 user.getEmail(),
                 user.getStatus(),
-                user.getRoles().stream()
-                        .map(Role::getValue)
-                        .toList()
+                user.getRoles().stream().toList()
         );
     }
 }

@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.shared.application;
+package jpolanco.springbootapp.shared.application.utils;
 
 import java.util.List;
 

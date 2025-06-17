@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.application.uc;
 
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.utils.PageResult;
 
 public interface PGetMyEventsUC {
     /**

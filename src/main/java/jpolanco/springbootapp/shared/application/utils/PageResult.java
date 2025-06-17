@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.shared.application;
+package jpolanco.springbootapp.shared.application.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

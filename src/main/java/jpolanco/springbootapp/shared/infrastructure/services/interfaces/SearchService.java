@@ -3,7 +3,6 @@ package jpolanco.springbootapp.shared.infrastructure.services.interfaces;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.CategoriesResponseDto;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponseDto;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.StaffRolesResponseDto;
-import jpolanco.springbootapp.shared.application.Dto;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponseDto;
 
 import java.util.List;

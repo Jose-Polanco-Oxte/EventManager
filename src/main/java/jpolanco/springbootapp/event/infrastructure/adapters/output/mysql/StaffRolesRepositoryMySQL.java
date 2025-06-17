@@ -39,13 +39,4 @@ public class StaffRolesRepositoryMySQL implements StaffRolesRepository {
     public void deleteById(String s) {
         jpaStaffRoleRepository.deleteById(s);
     }
-
-    @Override
-    public String update(String entity) {
-        StaffRoleEntity staffRoleEntity = jpaStaffRoleRepository.findById(entity)
-                .orElseThrow(() -> new IllegalArgumentException("Staff role not found: " + entity));
-        staffRoleEntity.setName(entity);
-        jpaStaffRoleRepository.save(staffRoleEntity);
-        return staffRoleEntity.getName();
-    }
 }

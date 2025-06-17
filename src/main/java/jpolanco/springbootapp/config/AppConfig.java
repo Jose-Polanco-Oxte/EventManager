@@ -32,9 +32,7 @@ public class AppConfig {
         return username -> {
             final var user = userRepository.findByEmail(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            List<String> roles = user.getRoles().stream()
-                    .map(Role::getValue)
-                    .toList();
+            List<String> roles = user.getRoles().stream().toList();
             return new MyUserDetails(
                     user.getId(),
                     user.getEmail(),

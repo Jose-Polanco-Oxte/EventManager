@@ -72,7 +72,7 @@ public class AuxTokenManagerImpl implements AuxTokenManager {
     public boolean sessionLimitReached(String email) {
         var user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            throw new IllegalUserOperation("User not found with email: " + email);
+            return false;
         }
         var userId = user.get().getId();
         var sessions = jwtRepository.countSessionsByUserId(userId);

@@ -2,6 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.persistence;
 
 
 import jakarta.persistence.*;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import lombok.*;
 
 import java.time.Instant;
@@ -40,8 +41,9 @@ public class UserEntity {
     )
     private Set<RoleEntity> roles = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private UserStatus status;
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
@@ -52,7 +54,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<TokenEntity> tokenEntities;
 
-    public UserEntity(UUID id, String firstName, String lastName, String email, String password, Set<RoleEntity> roles, String status, Instant createdAt, String qrFileName) {
+    public UserEntity(UUID id, String firstName, String lastName, String email, String password, Set<RoleEntity> roles, UserStatus status, Instant createdAt, String qrFileName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

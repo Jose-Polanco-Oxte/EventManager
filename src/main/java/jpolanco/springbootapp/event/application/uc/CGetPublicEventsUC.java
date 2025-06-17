@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.application.uc;
 
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
 
 public interface CGetPublicEventsUC {
     /**

@@ -7,10 +7,7 @@ import jpolanco.springbootapp.user.domain.domainevents.UserRegistered;
 import jpolanco.springbootapp.user.domain.model.valueobjects.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -20,18 +17,18 @@ public class User {
     private Email email;
     private EncodedPassword encodedPassword;
     private Roles roles;
-    private Status status;
+    private UserStatus status;
     private QRFileName qrFileName;
     private final Instant createdAt;
     private List<DomainEvent> events = new ArrayList<>();
 
-    private User(
+    protected User(
             UserId userId,
             FullName name,
             Email email,
             EncodedPassword encodedPassword,
             Roles roles,
-            Status status,
+            UserStatus status,
             QRFileName qrFileName,
             Instant createdAt
     ) {
@@ -57,8 +54,8 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of(Role.create("USER").getValue()))
-                .status("ACTIVE")
+                .roles(Set.of("USER"))
+                .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
                 .addEvent(new UserRegistered(userId, email))
@@ -76,8 +73,8 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of(Role.create("ADMIN").getValue()))
-                .status("ACTIVE")
+                .roles(Set.of("ADMIN"))
+                .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
                 .build();
@@ -94,8 +91,8 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of(Role.create("ORGANIZER").getValue()))
-                .status("ACTIVE")
+                .roles(Set.of("ORGANIZER"))
+                .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
                 .build();
@@ -107,8 +104,8 @@ public class User {
             String lastName,
             String email,
             String encodedPassword,
-            Set<Role> roles,
-            String status,
+            Set<String> roles,
+            UserStatus status,
             String qrFileName,
             Instant createdAt
     ) {
@@ -125,105 +122,8 @@ public class User {
     }
 
     // Private builder constructor
-    private static Builder builder() {
-        return new Builder();
-    }
-
-    private static class Builder {
-        private Result<UserId> userId;
-        private Result<FullName> fullName;
-        private Result<Email> email;
-        private Result<EncodedPassword> encodedPassword;
-        private Result<Roles> roles;
-        private Result<Status> status;
-        private Result<QRFileName> qrFileName;
-        private Instant createdAt;
-        private Result<Void> isValid = Result.success();
-        private DomainEvent domainEvent;
-
-        private void checker(Result<?> result) {
-            if (result.isFailure() && !isValid.isFailure()) {
-                isValid = Result.failure(result.getError());
-            }
-        }
-        public Builder userId(String userId) {
-            Result<UserId> result = UserId.create(userId);
-            checker(result);
-            this.userId = result;
-            return this;
-        }
-
-        public Builder fullName(String firstName, String lastName) {
-            Result<FullName> result = FullName.create(firstName, lastName);
-            checker(result);
-            this.fullName = result;
-            return this;
-        }
-
-        public Builder email(String email) {
-            Result<Email> result = Email.create(email);
-            checker(result);
-            this.email = result;
-            return this;
-        }
-
-        public Builder encodedPassword(String encodedPassword) {
-            Result<EncodedPassword> result = EncodedPassword.create(encodedPassword);
-            checker(result);
-            this.encodedPassword = result;
-            return this;
-        }
-
-        public Builder roles(Set<Role> roles) {
-            Result<Roles> result = Roles.create(roles);
-            checker(result);
-            this.roles = result;
-            return this;
-        }
-
-        public Builder status(String status) {
-            Result<Status> result = Status.create(status);
-            checker(result);
-            this.status = result;
-            return this;
-        }
-
-        public Builder qrFileName(String qrFileName) {
-            Result<QRFileName> result = QRFileName.create(qrFileName);
-            checker(result);
-            this.qrFileName = result;
-            return this;
-        }
-
-        public Builder createdAt(Instant createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public Builder addEvent(DomainEvent event) {
-            this.domainEvent = event;
-            return this;
-        }
-
-        private Result<User> build() {
-            // Comprobamos el estado del result es valido
-            if (isValid.isFailure()) {
-                return Result.failure(isValid.getError());
-            }
-
-            var user = new User(
-                    userId.getValue(),
-                    fullName.getValue(),
-                    email.getValue(),
-                    encodedPassword.getValue(),
-                    roles.getValue(),
-                    status.getValue(),
-                    qrFileName.getValue(),
-                    createdAt
-            );
-            user.recordEvent(domainEvent);
-            return Result.success(user);
-        }
+    private static UserBuilder builder() {
+        return new UserBuilder();
     }
 
     // Identificator
@@ -249,8 +149,8 @@ public class User {
         return this.name.toString();
     }
 
-    public Result<FullName> changeName(String newFirstName, String newLastName) {
-        var result = FullName.create(newFirstName, newLastName);
+    public Result<FullName> changeName(String firstName, String lastName) {
+        var result = FullName.create(firstName, lastName);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -258,8 +158,8 @@ public class User {
         return result;
     }
 
-    public Result<FullName> changeFirstName(String newFirstName) {
-        var result = FullName.create(newFirstName, this.name.getLastName());
+    public Result<FullName> changeFirstName(String firstName) {
+        var result = FullName.create(firstName, this.name.getLastName());
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -267,8 +167,8 @@ public class User {
         return result;
     }
 
-    public Result<FullName> changeLastName(String newLastName) {
-        var result = FullName.create(this.name.getFirstName(), newLastName);
+    public Result<FullName> changeLastName(String lastName) {
+        var result = FullName.create(this.name.getFirstName(), lastName);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -281,8 +181,8 @@ public class User {
         return email.getValue();
     }
 
-    public Result<Email> changeEmail(String newEmail) {
-        var result = Email.create(newEmail);
+    public Result<Email> changeEmail(String email) {
+        var result = Email.create(email);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -291,8 +191,8 @@ public class User {
     }
 
     // EncodedPassword domain
-    public Result<EncodedPassword> changePassword(String newEncodedPassword) {
-        var result = EncodedPassword.create(newEncodedPassword);
+    public Result<EncodedPassword> changePassword(String encodedPassword) {
+        var result = EncodedPassword.create(encodedPassword);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -305,16 +205,13 @@ public class User {
     }
 
     // Roles domain
-    public Set<Role> getRoles() {
+    public Set<String> getRoles() {
         return roles.getValues();
     }
 
-    public Result<Roles> changeAllRoles(List<String> newRoles) {
-        Result<Roles> result = Roles.create(newRoles.stream()
-                .map(Role::create)
-                .map(Result::getValue)
-                .collect(Collectors.toSet()));
-
+    public Result<Roles> changeAllRoles(List<String> roles) {
+        var set = new HashSet<>(roles);
+        var result = Roles.create(set);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -322,50 +219,37 @@ public class User {
         return result;
     }
 
-    public Result<Role> addRole(String newRole) {
-        var result = Role.create(newRole);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        return this.roles.addValue(result.getValue());
+    public void addRole(String role) {
+        this.roles.addValue(role);
     }
 
-    public Result<Role> removeRole(String roleToRemove) {
-        Result<Role> result = Role.create(roleToRemove);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        return this.roles.removeValue(result.getValue());
+    public void removeRole(String role) {
+        this.roles.removeValue(role);
     }
 
-    public boolean hasRole(String roleToCheck) {
-        Result<Role> result = Role.create(roleToCheck);
-        if (result.isFailure()) {
-            return false;
-        }
-        return this.roles.getValues().contains(result.getValue());
+    public boolean hasRole(String role) {
+        return this.roles.getValues().contains(role);
     }
 
     // Status domain
-    public Result<Status> changeStatus(String newStatus) {
-        var result = Status.create(newStatus);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        this.status = result.getValue();
-        return result;
+    public void changeStatus(UserStatus status) {
+        this.status = status;
     }
 
     public boolean isActive() {
-        return this.status.getValue().equals("ACTIVE");
+        return this.status.equals(UserStatus.ACTIVE);
+    }
+
+    public boolean isInactive() {
+        return this.status.equals(UserStatus.INACTIVE);
+    }
+
+    public boolean isSuspended() {
+        return this.status.equals(UserStatus.SUSPENDED);
     }
 
     public String getStatus() {
         return status.getValue();
-    }
-
-    public boolean equalsTo(User other) {
-        return this.email.getValue().equals(other.email.getValue());
     }
 
     //QRFileName domain
@@ -386,7 +270,7 @@ public class User {
         return this.events;
     }
 
-    private void recordEvent(DomainEvent event) {
+    public void recordEvent(DomainEvent event) {
         if (event != null) {
             this.events.add(event);
         }

@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.shared.infrastructure.mappers;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.Dto;
-import jpolanco.springbootapp.shared.application.DtoCreator;
+import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.infrastructure.dto.Dto;
+import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
 import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
 import org.springframework.stereotype.Component;
 

@@ -4,7 +4,8 @@ import jakarta.validation.Valid;
 import jpolanco.springbootapp.shared.infrastructure.OrderField;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
 import jpolanco.springbootapp.user.infrastructure.components.UserSortField;
-import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserService;
+import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserCommandService;
+import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +16,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService service;
+    private final UserQueryService queryService;
+    private final UserCommandService commandService;
 
     @PostMapping("/update/{userId}")
     public ResponseEntity<Object> update(@Valid @RequestBody AnyUserUpdateRequest request,
                                           @PathVariable String userId) {
-        var response = service.updateUser(request, userId);
+        var response = commandService.updateUser(request, userId);
         if (response.isFailure()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
         }
@@ -29,7 +31,7 @@ public class UserController {
 
     @GetMapping("get/{userId}")
     public ResponseEntity<Object> getUser(@PathVariable String userId) {
-        var response = service.getUserById(userId);
+        var response = queryService.getUserById(userId);
         if (response.isFailure()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
         }
@@ -38,7 +40,7 @@ public class UserController {
 
     @GetMapping("get-by-email/{email}")
     public ResponseEntity<Object> getUserByEmail(@PathVariable String email) {
-        var response = service.getUserByEmail(email);
+        var response = queryService.getUserByEmail(email);
         if (response.isFailure()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
         }
@@ -47,7 +49,7 @@ public class UserController {
 
     @DeleteMapping("delete-by-id/{userId}")
     public ResponseEntity<Object> delete(@PathVariable String userId) {
-        var response = service.deleteUser(userId);
+        var response = commandService.deleteUserById(userId);
         if (response.isFailure()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
         }
@@ -56,7 +58,7 @@ public class UserController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllUsers() {
-        var response = service.getAll();
+        var response = queryService.getAll();
         if (response.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -72,7 +74,7 @@ public class UserController {
     ) {
         page = Math.max(page, 0);
         size = Math.max(size, 1);
-        var response = service.getUsers(page, size, sortBy.getField(), orderBy.getValue());
+        var response = queryService.getUsers(page, size, sortBy.getField(), orderBy.getValue());
         if (response.content().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -87,7 +89,7 @@ public class UserController {
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
         size = Math.max(size, 1);
-        var response = service.getUsers(cursor, size, sortBy.getField(), orderBy.getValue());
+        var response = queryService.getUsers(cursor, size, sortBy.getField(), orderBy.getValue());
         if (response.items().isEmpty()) {
             return ResponseEntity.noContent().build();
         }

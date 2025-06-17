@@ -13,7 +13,7 @@ import java.util.List;
 public class SearchUserByEmail implements SearchUserByEmailUC {
     private final UserRepository userRepository;
     @Override
-    public List<User> searchByEmail(String email, int numberOfResults) {
+    public List<User> search(String email, int numberOfResults) {
         return userRepository.searchByEmail(email, numberOfResults);
     }
 }

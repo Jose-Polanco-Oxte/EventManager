@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jpolanco.springbootapp.shared.application.Dto;
+import jpolanco.springbootapp.shared.infrastructure.dto.Dto;
 
 import java.util.List;
 

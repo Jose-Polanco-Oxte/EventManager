@@ -16,7 +16,7 @@ public class Email {
         }
         String EMAIL_REGEX = "[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*@[a-zA-Z0-9_]+([.][a-zA-Z0-9_]+)*[.][a-zA-Z]{2,5}";
         if (!value.matches(EMAIL_REGEX)) {
-            return Result.failure(new Error("InvalidEmail", "Invalid email format"));
+            return Result.failure(new Error("INVALID_EMAIL", "Invalid email format"));
         }
         return Result.success(new Email(value));
     }
