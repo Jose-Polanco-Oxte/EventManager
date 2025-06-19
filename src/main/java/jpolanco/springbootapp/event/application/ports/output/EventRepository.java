@@ -1,11 +1,12 @@
 package jpolanco.springbootapp.event.application.ports.output;
 
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.utils.PageResult;
 import jpolanco.springbootapp.shared.application.adapters.output.CRUDRepository;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventRepository extends CRUDRepository<Event, String> {
 
@@ -22,6 +23,8 @@ public interface EventRepository extends CRUDRepository<Event, String> {
     List<Event> findByCreatorIdAndSchedule(String creatorId, Instant date);
 
     List<Event> findByCreatorId(String creatorId);
+
+    Optional<Event> findFirstConflictingEvent(Instant date, Instant endDate, String creatorId);
 
     PageResult<Event> findByCreatorId(String creatorId, int page, int size, String sortBy, String sortOrder);
 

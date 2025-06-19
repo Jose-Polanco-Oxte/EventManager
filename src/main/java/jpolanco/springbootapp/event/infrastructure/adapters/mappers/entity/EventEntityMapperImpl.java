@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
+import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.valueobjects.Staff;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.*;
@@ -140,7 +140,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getId().toString(),
                 entity.getTitle(),
                 entity.getDescription(),
-                entity.getSchedule().toString(),
+                entity.getSchedule(),
                 entity.getDurationInSeconds(),
                 entity.getStatus(),
                 entity.getLocation().getName(),
@@ -151,10 +151,10 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 categories.getValues(),
                 entity.getPreferences().isPublic(),
                 entity.getPreferences().isEnableComments(),
-                entity.getPreferences().getModality().name(),
+                entity.getPreferences().getModality(),
                 entity.getStaff().stream().
                         map(staffEntity -> {
-                            return new StaffHolder(
+                            return new StaffRequest(
                                     staffEntity.getUser().getId().toString(),
                                     staffEntity.getRole().getName(),
                                     staffEntity.isAssistanceClerk());
@@ -163,7 +163,8 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getPicture_path(),
                 entity.getCreator().getId().toString(),
                 entity.getCreatedAt(),
-                entity.getMaxAttendees()
+                entity.getMaxAttendees(),
+                entity.getCountAttendees()
         );
         if (maybeEvent.isFailure()) {
             throw new EventIntegrity("Error converting EventEntity to Event: " + maybeEvent.getMessage());

@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
-import jpolanco.springbootapp.shared.infrastructure.OrderField;
+import jpolanco.springbootapp.shared.utils.OrderField;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
-import jpolanco.springbootapp.user.infrastructure.components.UserSortField;
+import jpolanco.springbootapp.user.infrastructure.components.utils.UserSortField;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserCommandService;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserQueryService;
 import lombok.RequiredArgsConstructor;

@@ -8,7 +8,6 @@ import jpolanco.springbootapp.user.domain.model.valueobjects.*;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class User {

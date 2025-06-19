@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
+import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
@@ -18,7 +19,7 @@ public class EventId extends IdObject {
         try {
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {
-            return Result.failure(new Error("InvalidUUID", "The provided UUID is invalid."));
+            return Result.failure(EventDomainError.INVALID_ID);
         }
         return Result.success(new EventId(value));
     }

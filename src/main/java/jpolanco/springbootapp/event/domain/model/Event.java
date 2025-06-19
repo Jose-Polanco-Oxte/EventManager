@@ -1,24 +1,25 @@
 package jpolanco.springbootapp.event.domain.model;
 
-import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
+import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
+import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.event.domain.model.domainevents.EventCreated;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 public class Event {
     private final EventId eventId;
     private Header header;
     private Schedule schedule;
-    private long durationInSeconds;
+    private Duration duration;
     private EventStatus status;
     private Location location;
     private Categories category;
@@ -30,16 +31,16 @@ public class Event {
     private UserId creatorId;
     private final Instant createdAt;
     private List<DomainEvent> events = new ArrayList<>();
-    private int maxAttendees;
+    private Attendees attendees;
 
-    protected Event(EventId eventId, Header header, Schedule schedule, long durationInSeconds, EventStatus status,
+    protected Event(EventId eventId, Header header, Schedule schedule, Duration duration, EventStatus status,
                     Location location, Categories category, boolean isPublic, boolean enableComments,
                     Modality modality, List<Staff> staff, PictureFileName pictureFileName, UserId creatorId,
-                    Instant createdAt, int maxAttendees) {
+                    Instant createdAt, Attendees attendees) {
         this.eventId = eventId;
         this.header = header;
         this.schedule = schedule;
-        this.durationInSeconds = durationInSeconds;
+        this.duration = duration;
         this.status = status;
         this.location = location;
         this.category = category;
@@ -50,13 +51,13 @@ public class Event {
         this.pictureFileName = pictureFileName;
         this.creatorId = creatorId;
         this.createdAt = createdAt;
-        this.maxAttendees = maxAttendees;
+        this.attendees = attendees;
     }
 
     public static Result<Event> create(
             String title,
             String description,
-            String schedule,
+            Instant schedule,
             long durationInSeconds,
             String locationName,
             String locationCity,
@@ -66,11 +67,11 @@ public class Event {
             List<String> categories,
             boolean isPublic,
             boolean enableComments,
-            String modality,
+            Modality modality,
             String pictureFileName,
-            List<StaffHolder> staffs,
+            List<StaffRequest> staffs,
             String creatorId,
-            int maxInvitees
+            long maxAttendees
                                        ) {
         var id = UUID.randomUUID().toString();
         var maybeEventId = builder()
@@ -88,7 +89,7 @@ public class Event {
                 .pictureFileName(pictureFileName)
                 .creatorId(creatorId)
                 .createdAt(Instant.now())
-                .maxInvitees(maxInvitees)
+                .attendees(maxAttendees, 0)
                 .addDomainEvent(new EventCreated(
                         id,title,
                         description,
@@ -109,7 +110,7 @@ public class Event {
             String eventId,
             String title,
             String description,
-            String schedule,
+            Instant schedule,
             long durationInSeconds,
             EventStatus status,
             String locationName,
@@ -120,12 +121,13 @@ public class Event {
             List<String> categories,
             boolean isPublic,
             boolean enableComments,
-            String modality,
-            List<StaffHolder> staffs,
+            Modality modality,
+            List<StaffRequest> staffs,
             String pictureFileName,
             String creatorId,
             Instant createdAt,
-            int maxInvitees
+            long maxAttendees,
+            long currentAttendees
     ) {
         var maybeEvent = builder()
                 .eventId(eventId)
@@ -142,7 +144,7 @@ public class Event {
                 .pictureFileName(pictureFileName)
                 .creatorId(creatorId)
                 .createdAt(createdAt)
-                .maxInvitees(maxInvitees)
+                .attendees(maxAttendees, currentAttendees)
                 .build();
         if (maybeEvent.isFailure()) {
             return Result.failure(maybeEvent.getError());
@@ -159,6 +161,7 @@ public class Event {
         return eventId.getValue();
     }
 
+    // Header methods
     public String getTitle() {
         return header.getTitle();
     }
@@ -167,18 +170,98 @@ public class Event {
         return header.getDescription();
     }
 
+    public Result<Void> changeTitle(String title) {
+        var maybeTitle = Header.create(title, this.header.getDescription());
+        if (maybeTitle.isFailure()) {
+            return Result.failure(maybeTitle.getError());
+        }
+        return Result.success();
+    }
+
+    public Result<Void> changeDescription(String description) {
+        var maybeDescription = Header.create(this.header.getTitle(), description);
+        if (maybeDescription.isFailure()) {
+            return Result.failure(maybeDescription.getError());
+        }
+        this.header = maybeDescription.getValue();
+        return Result.success();
+    }
+
+    // Schedule methods
     public Instant getSchedule() {
-        return Instant.parse(schedule.getValue());
+        return schedule.getValue();
     }
 
+    public Result<Void> changeSchedule(Instant date) {
+        var maybeSchedule = Schedule.create(date);
+        if (maybeSchedule.isFailure()) {
+            return Result.failure(maybeSchedule.getError());
+        }
+        this.schedule = maybeSchedule.getValue();
+        return Result.success();
+    }
+
+    // Duration methods
     public long getDurationInSeconds() {
-        return durationInSeconds;
+        return duration.getValue();
     }
 
+    public long getDurationInMinutes() {
+        return duration.getValue() / 60;
+    }
+
+    public long getDurationInHours() {
+        return duration.getValue() / 3600;
+    }
+
+    public Result<Void> changeDuration(long durationInSeconds) {
+        var maybeDuration = Duration.create(durationInSeconds);
+        if (maybeDuration.isFailure()) {
+            return Result.failure(maybeDuration.getError());
+        }
+        this.duration = maybeDuration.getValue();
+        return Result.success();
+    }
+
+    // Status methods
     public EventStatus getStatus() {
         return status;
     }
 
+    public boolean isScheduled() {
+        return status.equals(EventStatus.SCHEDULED);
+    }
+
+    public boolean isCancelled() {
+        return status.equals(EventStatus.CANCELLED);
+    }
+
+    public boolean isCompleted() {
+        return status.equals(EventStatus.COMPLETED);
+    }
+
+    public boolean isInProgress() {
+        return status.equals(EventStatus.IN_PROGRESS);
+    }
+
+    public void schedule() {
+        this.status = EventStatus.SCHEDULED;
+    }
+
+    public void cancel() {
+        this.status = EventStatus.CANCELLED;
+    }
+
+    public void complete() {
+        this.status = EventStatus.COMPLETED;
+    }
+
+    public void changeStatus(EventStatus status) {
+        this.status = status;
+    }
+
+
+    // Location methods
     public String getLocationName() {
         return location.getName();
     }
@@ -199,20 +282,130 @@ public class Event {
         return location.getLongitude();
     }
 
+    public Result<Void> changeLocationName(String locationName) {
+        var maybeLocation = Location.create(this.getLatitude(), this.getLongitude(), locationName, this.getLocationCity(), this.getLocationCountry());
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    public Result<Void> changeLocationCity(String locationCity) {
+        var maybeLocation = Location.create(this.getLatitude(), this.getLongitude(), this.getLocationName(), locationCity, this.getLocationCountry());
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    public Result<Void> changeLocationCountry(String locationCountry) {
+        var maybeLocation = Location.create(this.getLatitude(), this.getLongitude(), this.getLocationName(), this.getLocationCity(), locationCountry);
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    public Result<Void> changeLatitude(double latitude) {
+        var maybeLocation = Location.create(latitude, this.getLongitude(), this.getLocationName(), this.getLocationCity(), this.getLocationCountry());
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    public Result<Void> changeLongitude(double longitude) {
+        var maybeLocation = Location.create(this.getLatitude(), longitude, this.getLocationName(), this.getLocationCity(), this.getLocationCountry());
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    public Result<Void> changeLocation(double latitude, double longitude, String locationName, String locationCity, String locationCountry) {
+        var maybeLocation = Location.create(latitude, longitude, locationName, locationCity, locationCountry);
+        if (maybeLocation.isFailure()) {
+            return Result.failure(maybeLocation.getError());
+        }
+        this.location = maybeLocation.getValue();
+        return Result.success();
+    }
+
+    // Categories methods
+
     public Categories getCategories() {
         return category;
+    }
+
+    public Result<Void> changeAllCategories(List<String> categories) {
+        var maybeCategories = Categories.create(categories);
+        if (maybeCategories.isFailure()) {
+            return Result.failure(maybeCategories.getError());
+        }
+        this.category.addCategories(categories);
+        return Result.success();
     }
 
     public void removeCategory(String category) {
         this.category.removeCategory(category);
     }
 
+    public Result<Void> removeCategories(List<String> categories) {
+        for (String cat : categories) {
+            this.category.removeCategory(cat);
+        }
+        if (this.category.isEmpty()) {
+            return Result.failure(EventDomainError.CATEGORIES_EMPTY);
+        }
+        return Result.success();
+    }
+
     public void addCategory(String category) {
         this.category.addCategory(category);
     }
 
+    public void addCategories(List<String> categories) {
+        this.category.addCategories(categories);
+    }
+
+    public Result<Void> changeCategories(List<String> categories) {
+        var maybeCategories = Categories.create(categories);
+        if (maybeCategories.isFailure()) {
+            return Result.failure(maybeCategories.getError());
+        }
+        this.category = maybeCategories.getValue();
+        return Result.success();
+    }
+
+    // Preference methods
     public boolean isPublic() {
         return isPublic;
+    }
+
+    public boolean isPrivate() {
+        return !isPublic;
+    }
+
+
+    public void makePublic() {
+        this.isPublic = true;
+    }
+
+    public void makePrivate() {
+        this.isPublic = false;
+    }
+
+    public void enableComments() {
+        this.isPublic = true;
+    }
+
+    public void disableComments() {
+        this.isPublic = false;
     }
 
     public boolean isEnableComments() {
@@ -223,6 +416,24 @@ public class Event {
         return modality;
     }
 
+    public Result<Void> changeModality(Modality modality) {
+        this.modality = modality;
+        return Result.success();
+    }
+
+    public void makeVirtual() {
+        this.modality = Modality.VIRTUAL;
+    }
+
+    public void makeInPerson() {
+        this.modality = Modality.IN_PERSON;
+    }
+
+    public void makeHybrid() {
+        this.modality = Modality.HYBRID;
+    }
+
+    // Staff methods
     public List<String> getStaffIds() {
         return staff.stream()
                 .map(staffMember -> staffMember.getUserId().getValue())
@@ -242,7 +453,7 @@ public class Event {
                 .toList();
     }
 
-    public void setStaff(List<StaffHolder> staff) {
+    public void setStaff(List<StaffRequest> staff) {
         this.staff = staff.stream()
                 .map(staffHolder -> Staff.create(staffHolder.staffId(), staffHolder.role(), staffHolder.isAssistanceClerk()))
                 .filter(Result::isSuccess)
@@ -252,111 +463,6 @@ public class Event {
 
     public List<Staff> getStaff() {
         return staff;
-    }
-
-    public String getCreatorId() {
-        return creatorId.getValue();
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getPictureFileName() {
-        return pictureFileName.getValue();
-    }
-
-    public int getMaxAttendees() {
-        return maxAttendees;
-    }
-
-
-    // Domain methods
-
-    public Result<Void> changeTitle(String title) {
-        var maybeTitle = Header.create(title, this.header.getDescription());
-        if (maybeTitle.isFailure()) {
-            return Result.failure(maybeTitle.getError());
-        }
-        return Result.success();
-    }
-
-    public Result<Void> changeDescription(String description) {
-        var maybeDescription = Header.create(this.header.getTitle(), description);
-        if (maybeDescription.isFailure()) {
-            return Result.failure(maybeDescription.getError());
-        }
-        this.header = maybeDescription.getValue();
-        return Result.success();
-    }
-
-    public Result<Void> changeHeader(String title, String description) {
-        var maybeHeader = Header.create(title, description);
-        if (maybeHeader.isFailure()) {
-            return Result.failure(maybeHeader.getError());
-        }
-        this.header = maybeHeader.getValue();
-        return Result.success();
-    }
-
-    public Result<Void> changeSchedule(String date) {
-        var maybeSchedule = Schedule.create(date);
-        if (maybeSchedule.isFailure()) {
-            return Result.failure(maybeSchedule.getError());
-        }
-        this.schedule = maybeSchedule.getValue();
-        return Result.success();
-    }
-
-    public Result<Void> changeDuration(long durationInSeconds) {
-        if (durationInSeconds < 0) {
-            return Result.failure(new Error("DURATION_NEGATIVE", "Duration cannot be negative"));
-        } else if (durationInSeconds == 0) {
-            return Result.failure(new Error("DURATION_ZERO", "Duration cannot be zero"));
-        } else if (durationInSeconds > 24 * 60 * 60) { // More than 24 hours
-            return Result.failure(new Error("DURATION_EXCEEDED", "Duration cannot exceed 24 hours"));
-        } else if (durationInSeconds < 60 * 10) { // Less than 10 minutes
-            return Result.failure(new Error("DURATION_TOO_SHORT", "Duration cannot be less than 10 minutes"));
-        }
-        this.durationInSeconds = durationInSeconds;
-        return Result.success();
-    }
-
-    public Result<Void> changeLocation(double latitude, double longitude, String locationName, String locationCity, String locationCountry) {
-        var maybeLocation = Location.create(latitude, longitude, locationName, locationCity, locationCountry);
-        if (maybeLocation.isFailure()) {
-            return Result.failure(maybeLocation.getError());
-        }
-        this.location = maybeLocation.getValue();
-        return Result.success();
-    }
-
-    public void changeStatus(EventStatus status) {
-        this.status = status;
-    }
-
-    public Result<Void> changeCategories(List<String> categories) {
-        var maybeCategories = Categories.create(categories);
-        if (maybeCategories.isFailure()) {
-            return Result.failure(maybeCategories.getError());
-        }
-        this.category = maybeCategories.getValue();
-        return Result.success();
-    }
-
-    public Result<Void> addCategories(List<String> categories) {
-        var maybeCategories = Categories.create(categories);
-        if (maybeCategories.isFailure()) {
-            return Result.failure(maybeCategories.getError());
-        }
-        this.category.addCategories(categories);
-        return Result.success();
-    }
-
-    public void removeCategories(List<String> categories) {
-        for (String category : categories) {
-            this.category.removeCategory(category);
-        }
     }
 
     public Result<Void> addStaff(String userId, String role, boolean assistance_clerk) {
@@ -379,7 +485,7 @@ public class Event {
             this.staff.remove(staffToRemove.get());
             return Result.success();
         } else {
-            return Result.failure(new Error("STAFF_NOT_FOUND", "Staff member not found"));
+            return Result.failure(EventDomainError.STAFF_NOT_FOUND);
         }
     }
 
@@ -387,6 +493,21 @@ public class Event {
         this.staff.clear();
         return Result.success();
     }
+
+    // Creator methods
+    public String getCreatorId() {
+        return creatorId.getValue();
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    // Picture methods
+    public String getPictureFileName() {
+        return pictureFileName.getValue();
+    }
+
 
     public Result<Void> changePictureFileName(String fileName) {
         var maybePictureFileName = PictureFileName.create(fileName);
@@ -397,44 +518,33 @@ public class Event {
         return Result.success();
     }
 
-    public Result<Void> changeModality(Modality modality) {
-        if (modality == null) {
-            return Result.failure(new Error("MODALITY_IS_NULL", "Modality cannot be null"));
+    // Atendees methods
+    public long getMaxAttendees() {
+        return this.attendees.getMaxAttendees();
+    }
+
+    public long getCurrentAttendees() {
+        return this.attendees.getCurrentAttendees();
+    }
+
+    public Result<Void> addAttendee() {
+        var result = this.attendees.addAttendee();
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
         }
-        this.modality = modality;
         return Result.success();
     }
 
-    public void makePublic() {
-        this.isPublic = true;
-    }
-
-    public void makePrivate() {
-        this.isPublic = false;
-    }
-
-    public void enableComments() {
-        this.isPublic = true;
-    }
-
-    public void disableComments() {
-        this.isPublic = false;
-    }
-
-    public Result<Void> setMaxAttendees(int maxInvitees) {
-        if (maxInvitees < 0) {
-            return Result.failure(new Error("MAX_INVITEES_NEGATIVE", "Max invitees cannot be negative"));
-        } else if (maxInvitees == 0) {
-            return Result.failure(new Error("MAX_INVITEES_ZERO", "Max invitees cannot be zero"));
-        } else if(maxInvitees > 1000) {
-            return Result.failure(new Error("MAX_INVITEES_EXCEEDED", "Max invitees cannot exceed 1000"));
-        } else {
-            this.maxAttendees = maxInvitees;
-            return Result.success();
+    public Result<Void> changeMaxAttendees(int maxInvitees) {
+        var maybeAttendees = Attendees.create(maxInvitees, this.attendees.getCurrentAttendees());
+        if (maybeAttendees.isFailure()) {
+            return Result.failure(maybeAttendees.getError());
         }
+        this.attendees = maybeAttendees.getValue();
+        return Result.success();
     }
-    // Domain events
 
+    // Domain events
     public List<DomainEvent> pullEvents() {
         return this.events;
     }

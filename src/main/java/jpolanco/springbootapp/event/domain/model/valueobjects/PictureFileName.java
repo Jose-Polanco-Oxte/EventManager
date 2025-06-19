@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 public class PictureFileName {
@@ -12,7 +12,7 @@ public class PictureFileName {
 
     public static Result<PictureFileName> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE.field("PictureFileName"));
+            return Result.failure(EventDomainError.NULL_VALUE.field("PictureFileName"));
         }
         return Result.success(new PictureFileName(value));
     }

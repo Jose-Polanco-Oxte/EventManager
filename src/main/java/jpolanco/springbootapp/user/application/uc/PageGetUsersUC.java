@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc;
 
-import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.utils.PageResult;
 import jpolanco.springbootapp.user.domain.model.User;
 
 

@@ -1,7 +1,6 @@
 package jpolanco.springbootapp.config;
 
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.user.domain.model.valueobjects.Role;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.mysql.UserRepositoryMySQL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

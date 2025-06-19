@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.shared.infrastructure.mappers;
 import jpolanco.springbootapp.shared.infrastructure.dto.Dto;
 import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
-import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.utils.PageResult;
 import jpolanco.springbootapp.shared.infrastructure.dto.PageResponseDto;
 import org.springframework.stereotype.Component;
 

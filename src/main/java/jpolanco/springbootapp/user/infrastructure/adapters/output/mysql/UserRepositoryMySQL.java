@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
-import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.utils.PageResult;
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;

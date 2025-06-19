@@ -5,8 +5,8 @@ import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity.EventEntityMapper;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.EventEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
-import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.application.utils.PageResult;
+import jpolanco.springbootapp.shared.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.utils.PageResult;
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Repository
 public class EventRepositoryMySQL implements EventRepository {
-
     private final JpaEventRepository jpaEventRepository;
     private final EventEntityMapper eventEntityMapper;
 
@@ -90,6 +89,12 @@ public class EventRepositoryMySQL implements EventRepository {
                 .stream()
                 .map(eventEntityMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Event> findFirstConflictingEvent(Instant date, Instant endDate, String creatorId) {
+        return jpaEventRepository.findFirstConflictingEvent(date, endDate, UUID.fromString(creatorId))
+                .map(eventEntityMapper::toDomain);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
 import lombok.Getter;
@@ -19,17 +19,14 @@ public class Staff {
     }
 
     public static Result<Staff> create(String userId, String role, boolean assistanceClerk) {
-        var maybeUserId = UserId.create(userId);
+        Result<UserId> maybeUserId = UserId.create(userId);
         if (maybeUserId.isFailure()) {
             return Result.failure(maybeUserId.getError());
         }
-        if (userId == null) {
-            return Result.failure(new Error("USER_ID_IS_NULL", "userId cannot be null"));
-        }
         if (role == null || role.isBlank()) {
-            return Result.failure(new Error("INVALID_ROLE", "role cannot be empty"));
+            return Result.failure(EventDomainError.INVALID_ROLE);
         }
-        var userIdValue = maybeUserId.getValue();
+        UserId userIdValue = maybeUserId.getValue();
         return Result.success(new Staff(userIdValue, role, assistanceClerk));
     }
 }

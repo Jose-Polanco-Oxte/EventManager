@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public class CategoriesRepositoryMySQL implements CategoriesRepository {
     private final JpaCategoryRepository jpaCategoryRepository;
+
     @Override
     public List<String> search(String name, int size) {
         return jpaCategoryRepository.searchByName(name, PageRequest.of(0, size))

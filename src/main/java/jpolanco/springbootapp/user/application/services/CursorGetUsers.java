@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.services;
 
-import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.utils.CursorPageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.application.uc.CursorGetUsersUC;
 import jpolanco.springbootapp.user.domain.model.User;

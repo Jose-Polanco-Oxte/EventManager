@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.output.persistence;
 
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.event.domain.model.EventStatus;
+import jpolanco.springbootapp.event.domain.model.valueobjects.EventStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +50,7 @@ public class EventEntity {
     private String picture_path;
 
     @Column(nullable = false)
-    private int maxAttendees;
+    private Long maxAttendees;
 
     @Column(nullable = false)
     private Long countAttendees = 0L;

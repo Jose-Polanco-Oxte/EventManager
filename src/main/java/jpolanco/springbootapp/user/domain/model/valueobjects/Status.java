@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.domain.model.valueobjects;
 
-import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.user.domain.errors.UserDomainError;
 
 import java.util.Set;
 
@@ -15,10 +15,10 @@ public class Status {
 
     public static Result<Status> create(String value) {
         if (value == null || value.isBlank()) {
-            return Result.failure(Error.NULL_VALUE.field("Status"));
+            return Result.failure(UserDomainError.NULL_VALUE.field("Status"));
         }
         if (!validValues.contains(value)) {
-            return Result.failure(new Error("StatusNotValid", "Status is not valid"));
+            return Result.failure(UserDomainError.INVALID_STATUS);
         }
         return Result.success(new Status(value));
     }

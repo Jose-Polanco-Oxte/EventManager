@@ -8,54 +8,55 @@ import java.time.Instant;
 import java.util.Set;
 
 public class UserBuilder {
-    private Result<UserId> userId;
-    private Result<FullName> fullName;
-    private Result<Email> email;
-    private Result<EncodedPassword> encodedPassword;
-    private Result<Roles> roles;
+    private UserId userId;
+    private FullName fullName;
+    private Email email;
+    private EncodedPassword encodedPassword;
+    private Roles roles;
     private UserStatus status;
-    private Result<QRFileName> qrFileName;
+    private QRFileName qrFileName;
     private Instant createdAt;
-    private Result<Void> isValid = Result.success();
     private DomainEvent domainEvent;
+    private Result<?> isValid = Result.success();
 
-    private void checker(Result<?> result) {
+    private <T> T checker(Result<T> result) {
         if (result.isFailure() && !isValid.isFailure()) {
             isValid = Result.failure(result.getError());
+            return null;
+        } else if (result.isFailure()){
+            return null;
+        } else {
+            return result.getValue();
         }
     }
+
     public UserBuilder userId(String userId) {
-        Result<UserId> result = UserId.create(userId);
-        checker(result);
-        this.userId = result;
+        var result = UserId.create(userId);
+        this.userId = checker(result);
         return this;
     }
 
     public UserBuilder fullName(String firstName, String lastName) {
-        Result<FullName> result = FullName.create(firstName, lastName);
-        checker(result);
-        this.fullName = result;
+        var result = FullName.create(firstName, lastName);
+        this.fullName = checker(result);
         return this;
     }
 
     public UserBuilder email(String email) {
-        Result<Email> result = Email.create(email);
-        checker(result);
-        this.email = result;
+        var result = Email.create(email);
+        this.email = checker(result);
         return this;
     }
 
     public UserBuilder encodedPassword(String encodedPassword) {
-        Result<EncodedPassword> result = EncodedPassword.create(encodedPassword);
-        checker(result);
-        this.encodedPassword = result;
+        var result = EncodedPassword.create(encodedPassword);
+        this.encodedPassword = checker(result);
         return this;
     }
 
     public UserBuilder roles(Set<String> roles) {
-        Result<Roles> result = Roles.create(roles);
-        checker(result);
-        this.roles = result;
+        var result = Roles.create(roles);
+        this.roles = checker(result);
         return this;
     }
 
@@ -65,9 +66,8 @@ public class UserBuilder {
     }
 
     public UserBuilder qrFileName(String qrFileName) {
-        Result<QRFileName> result = QRFileName.create(qrFileName);
-        checker(result);
-        this.qrFileName = result;
+        var result = QRFileName.create(qrFileName);
+        this.qrFileName = checker(result);
         return this;
     }
 
@@ -87,13 +87,13 @@ public class UserBuilder {
         }
 
         var user = new User(
-                userId.getValue(),
-                fullName.getValue(),
-                email.getValue(),
-                encodedPassword.getValue(),
-                roles.getValue(),
+                userId,
+                fullName,
+                email,
+                encodedPassword,
+                roles,
                 status,
-                qrFileName.getValue(),
+                qrFileName,
                 createdAt
         );
         user.recordEvent(domainEvent);

@@ -1,14 +1,11 @@
 package jpolanco.springbootapp.event.domain.model;
 
-import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
+import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
 import jpolanco.springbootapp.shared.domain.DomainEvent;
-import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.domain.ResultBuilder;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +14,7 @@ public class EventBuilder {
     private EventId eventId;
     private Header header;
     private Schedule schedule;
-    private long duration;
+    private Duration duration;
     private EventStatus status;
     private Location location;
     private Categories categories;
@@ -28,7 +25,7 @@ public class EventBuilder {
     private PictureFileName pictureFileName;
     private UserId creatorId;
     private Instant createdAt;
-    private int maxInvitees;
+    private Attendees attendees;
     private DomainEvent domainEvent;
     private Result<?> isValid = Result.success();
 
@@ -55,27 +52,15 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder schedule(String date) {
+    public EventBuilder schedule(Instant date) {
         var maybeSchedule = Schedule.create(date);
         this.schedule = checker(maybeSchedule);
         return this;
     }
 
     public EventBuilder duration(long durationInSeconds) {
-        if (durationInSeconds < 0) {
-            isValid = Result.failure(new Error("DURATION_NEGATIVE", "Duration cannot be negative"));
-            return this;
-        } else if (durationInSeconds == 0) {
-            isValid = Result.failure(new Error("DURATION_ZERO", "Duration cannot be zero"));
-            return this;
-        } else if (durationInSeconds > 24 * 60 * 60) { // More than 24 hours
-            isValid = Result.failure(new Error("DURATION_EXCEEDED", "Duration cannot exceed 24 hours"));
-            return this;
-        } else if (durationInSeconds < 60 * 10) { // Less than 10 minutes
-            isValid = Result.failure(new Error("DURATION_TOO_SHORT", "Duration cannot be less than 10 minutes"));
-            return this;
-        }
-        this.duration = durationInSeconds;
+        var maybeDuration = Duration.create(durationInSeconds);
+        this.duration = checker(maybeDuration);
         return this;
     }
 
@@ -106,24 +91,23 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder modality(String modality) {
-        this.modality = Modality.create(modality);
+    public EventBuilder modality(Modality modality) {
+        this.modality = modality;
         return this;
     }
 
-    public EventBuilder staffs(List<StaffHolder> staffs) {
+    public EventBuilder staffs(List<StaffRequest> staffs) {
         if (staffs == null || staffs.isEmpty()) {
             return this; // No staff to add, return early
         }
-        System.out.println("Adding staffs: " + staffs.size());
-        for (StaffHolder staffHolder : staffs) {
-            if (staffHolder == null || staffHolder.staffId() == null) {
+        for (StaffRequest staffRequest : staffs) {
+            if (staffRequest == null || staffRequest.staffId() == null) {
                 continue; // Skip null staff holders
             }
             var maybeStaff = Staff.create(
-                    staffHolder.staffId(),
-                    staffHolder.role(),
-                    staffHolder.isAssistanceClerk());
+                    staffRequest.staffId(),
+                    staffRequest.role(),
+                    staffRequest.isAssistanceClerk());
             var result = checker(maybeStaff);
             if (result != null) {
                 this.staff.add(result);
@@ -149,16 +133,9 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder maxInvitees(int maxInvitees) {
-        if (maxInvitees < 0) {
-            isValid = Result.failure(new Error("MAX_INVITEES_NEGATIVE", "Max invitees cannot be negative"));
-        } else if (maxInvitees == 0) {
-            isValid = Result.failure(new Error("MAX_INVITEES_ZERO", "Max invitees cannot be zero"));
-        } else if(maxInvitees > 1000) {
-            isValid = Result.failure(new Error("MAX_INVITEES_EXCEEDED", "Max invitees cannot exceed 1000"));
-        } else {
-            this.maxInvitees = maxInvitees;
-        }
+    public EventBuilder attendees(long maxAttendees, long currentAttendees) {
+        var maybeAttendees = Attendees.create(maxAttendees, currentAttendees);
+        this.attendees = checker(maybeAttendees);
         return this;
     }
 
@@ -186,7 +163,7 @@ public class EventBuilder {
                 pictureFileName,
                 creatorId,
                 createdAt,
-                maxInvitees
+                attendees
         );
         if (domainEvent != null) {
             event.recordEvent(domainEvent);

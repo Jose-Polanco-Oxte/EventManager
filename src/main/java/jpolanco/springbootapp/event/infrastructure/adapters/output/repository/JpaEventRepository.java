@@ -8,10 +8,10 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaEventRepository extends JpaRepository<EventEntity, UUID> {
-
     @Query("SELECT COUNT(e) > 0 FROM EventEntity e WHERE e.schedule = ?1 AND e.durationInSeconds = ?2")
     boolean existEventWithSameSchedule(Instant date, long duration);
 
@@ -34,6 +34,21 @@ public interface JpaEventRepository extends JpaRepository<EventEntity, UUID> {
             @Param("cursorId") UUID cursorId,
             @Param("creatorId") UUID creatorId,
             Pageable pageable
+    );
+
+    @Query("""
+        SELECT e FROM EventEntity e
+        WHERE e.creator = :creatorId
+          AND (
+               e.schedule = :schedule
+            OR (e.schedule < :endDate AND FUNCTION('ADD_SECONDS', e.schedule, e.durationInSeconds) > :schedule)
+          )
+        ORDER BY e.schedule ASC
+    """)
+    Optional<EventEntity> findFirstConflictingEvent(
+      @Param("schedule") Instant date,
+      @Param("endDate") Instant endDate,
+      @Param("creatorId") UUID creatorId
     );
 
     @Query("""

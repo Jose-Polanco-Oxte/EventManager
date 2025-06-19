@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.output.persistence;
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.event.domain.model.Modality;
+import jpolanco.springbootapp.event.domain.model.valueobjects.Modality;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

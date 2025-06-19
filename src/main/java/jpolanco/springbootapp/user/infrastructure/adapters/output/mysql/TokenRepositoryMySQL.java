@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
-import jpolanco.springbootapp.shared.domain.TokenStatus;
+import jpolanco.springbootapp.shared.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
 import jpolanco.springbootapp.user.domain.model.Token;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.TokenEntityMapper;

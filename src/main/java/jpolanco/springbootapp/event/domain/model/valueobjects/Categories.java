@@ -1,33 +1,36 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Categories {
-    private List<String> Values;
+    private Set<String> Values;
 
-    private Categories(List<String> values) {
+    private Categories(Set<String> values) {
         this.Values = values;
     }
 
     public static Result<Categories> create(List<String> values) {
         if (values == null || values.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE.field("Categories"));
+            return Result.failure(EventDomainError.NULL_VALUE.field("Categories"));
         }
         for (String value : values) {
             if (value == null || value.isEmpty()) {
-                return Result.failure(new Error("INVALID_CATEGORY", "Category cannot be empty"));
+                return Result.failure(EventDomainError.INVALID_CATEGORY);
             }
         }
-        return Result.success(new Categories(values));
+        return Result.success(new Categories(new HashSet<>(values)));
     }
 
     public List<String> getValues() {
-        return Values;
+        return Values.stream().toList();
     }
 
     public void addCategory(String category) {
+        if (category == null || category.isBlank()) return;
         this.Values.add(category);
     }
 

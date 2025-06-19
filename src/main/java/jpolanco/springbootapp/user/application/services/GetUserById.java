@@ -3,7 +3,6 @@ package jpolanco.springbootapp.user.application.services;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
-import jpolanco.springbootapp.user.infrastructure.components.UserValidator;
 import jpolanco.springbootapp.user.application.uc.GetUserByIdUC;
 import jpolanco.springbootapp.user.domain.model.User;
 import lombok.RequiredArgsConstructor;

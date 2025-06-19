@@ -3,22 +3,30 @@ package jpolanco.springbootapp.shared.domain;
 import org.apache.logging.log4j.util.Strings;
 
 public class Error {
-    final String code;
+    final int code;
     final String message;
 
-    public Error(String code, String message) {
+    public Error(int code, String message) {
         this.code = code;
         this.message = message;
     }
 
     public Error() {
-        this.code = Strings.EMPTY;
+        this.code = 0;
         this.message = Strings.EMPTY;
     }
 
-    public static Error NONE = new Error(Strings.EMPTY, Strings.EMPTY);
-    public static Error NULL_VALUE = new Error("NULL_VALUE", "cannot be null");
+    public static Error NONE = new Error( -1, Strings.EMPTY);
+    public static Error NULL_VALUE = new Error(500, "cannot be null");
     public Error field(String fieldName) {
-        return new Error("NULL_VALUE", fieldName + " cannot be null");
+        return new Error(500, fieldName + " cannot be null");
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

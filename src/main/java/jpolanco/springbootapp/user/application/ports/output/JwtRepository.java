@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.ports.output;
 
-import jpolanco.springbootapp.shared.domain.TokenStatus;
+import jpolanco.springbootapp.shared.utils.TokenStatus;
 import jpolanco.springbootapp.user.domain.model.Token;
 
 import java.util.List;

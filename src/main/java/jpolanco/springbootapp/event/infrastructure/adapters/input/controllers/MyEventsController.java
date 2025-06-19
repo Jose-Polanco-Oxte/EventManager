@@ -1,141 +1,136 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationDto;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventDto;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponseDto;
-import jpolanco.springbootapp.event.infrastructure.components.EventSortField;
-import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventService;
-import jpolanco.springbootapp.event.infrastructure.services.interfaces.MyEventsService;
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.infrastructure.OrderField;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
+import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
+import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
+import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventCommandService;
+import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventQueryService;
+import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
+import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.utils.OrderField;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@RequiredArgsConstructor
+
 @RestController
+@RequiredArgsConstructor
+@Validated
+@PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
 @RequestMapping("/my-events")
 public class MyEventsController {
-    private final EventService eventService;
-    private final MyEventsService myEventsService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> createEvent(
-            @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @Valid @RequestPart("data") EventCreationDto eventCreationDto,
-            @RequestPart("image")MultipartFile image
-    ) throws IOException {
-        return createEventResponse(myUserDetails, eventCreationDto, image, eventService);
-    }
+    private final OwnEventCommandService ownCommandService;
+    private final OwnEventQueryService ownQueryService;
+    private final SearchEventService searchEventService;
 
-    @PutMapping("/update/{eventId}")
+    @PutMapping("/{eventId}")
     public ResponseEntity<Object> updateEvent(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @PathVariable String eventId,
-            @Valid @RequestPart("data") UpdateEventDto eventUpdateDto,
-            @RequestPart ("image") MultipartFile image,
-            @RequestParam() String type
+            @ValidUUID @PathVariable String eventId,
+            @Valid @RequestPart("data") UpdateEventRequest eventUpdateDto,
+            @RequestPart ("image") MultipartFile image
     ) throws IOException {
-        Result<EventResponseDto> result;
-        if (type.equalsIgnoreCase("addstaff")) {
-            result = myEventsService.updateMyEventAddStaff(myUserDetails.getId(), eventId, image.getInputStream(), eventUpdateDto);
-        } else if (type.equalsIgnoreCase("clearstaff")) {
-            result = myEventsService.updateMyEventClearStaff(myUserDetails.getId(), eventId, image.getInputStream(), eventUpdateDto);
-        } else {
-            result = myEventsService.updateMyEvent(myUserDetails.getId(), eventId, image.getInputStream(), eventUpdateDto);
+        var commandResult = ownCommandService.updateEvent(
+                myUserDetails.getId(),
+                eventId,
+                eventUpdateDto,
+                image.getInputStream()
+        );
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        if (result.isFailure()) {
-            return ResponseEntity.badRequest().body(result.getMessage());
-        }
-        return ResponseEntity.ok(result.getValue());
+        return ResponseHandler.ok("Event updated successfully");
     }
 
-    @GetMapping("/get/by-pages")
+    @GetMapping("/pages")
     public ResponseEntity<Object> getMyEventsByPages(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @RequestParam(defaultValue = "0", required = false) int page,
-            @RequestParam(defaultValue = "10", required = false) int size,
+            @Min(0) @RequestParam(defaultValue = "0", required = false) int page,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) EventSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
-        page = Math.max(page, 0);
-        size = Math.max(size, 1);
-        var response = myEventsService.getMyEvents(
+        var response = ownQueryService.getEventsByPages(
                 myUserDetails.getId(),
                 page,
                 size,
-                sortBy.getField(),
+                sortBy.getValue(),
                 orderBy.getValue()
         );
         if (response.content().isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(response);
+        return ResponseHandler.ok(response);
     }
 
-    @GetMapping("/get/by-cursor")
+    @GetMapping("/cursor")
     public ResponseEntity<Object> getEventsByCursor(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
             @RequestParam(defaultValue = "NONE", required = false) String cursor,
-            @RequestParam(defaultValue = "10", required = false) int size,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) EventSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
-        size = Math.max(size, 1);
-        var response = myEventsService.getMyEvents(
+        var response = ownQueryService.getEventsByCursorBased(
                 myUserDetails.getId(),
                 cursor,
                 size,
-                sortBy.getField(),
+                sortBy.getValue(),
                 orderBy.getValue()
         );
         if (response.items().isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(response);
+        return ResponseHandler.ok(response);
     }
 
-    @DeleteMapping("/delete/{eventId}")
+    @DeleteMapping("/{eventId}")
     public ResponseEntity<Object> deleteEvent(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @PathVariable String eventId
+            @ValidUUID @PathVariable String eventId
     ) {
-        var response = myEventsService.deleteMyEvent(myUserDetails.getId(), eventId);
-        if (response.isFailure()) {
-            return ResponseEntity.badRequest().body(response.getMessage());
+        var commandResult = ownCommandService.deleteEvent(myUserDetails.getId(), eventId);
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        return ResponseEntity.ok("Event deleted successfully");
+        return ResponseHandler.ok("Event deleted successfully");
     }
 
-    @PutMapping("/cancel/{eventId}")
+    @PutMapping("/{eventId}/cancel")
     public ResponseEntity<Object> cancelEvent(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @PathVariable String eventId,
+            @ValidUUID @PathVariable String eventId,
             @RequestParam String reason
     ) {
-        var response = myEventsService.myEventCancelation(myUserDetails.getId(), eventId, reason);
-        if (response.isFailure()) {
-            return ResponseEntity.badRequest().body(response.getMessage());
+        var commandResult = ownCommandService.cancelEvent(myUserDetails.getId(), eventId, reason);
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        return ResponseEntity.ok(response.getValue());
+        return ResponseHandler.ok("Event cancelled successfully");
     }
 
-    static ResponseEntity<Object> createEventResponse(
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchMyEventsByName(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @RequestPart("data") @Valid EventCreationDto eventCreationDto,
-            @RequestPart("image") MultipartFile image,
-            EventService eventService
-    ) throws IOException {
-        var response = eventService.createEvent(eventCreationDto, myUserDetails.getId(), image.getInputStream());
-        if (response.isFailure()) {
-            return ResponseEntity.badRequest().body(response.getMessage());
+            @RequestParam String query,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size
+    ) {
+        var events = searchEventService.searchMyEventsByName(query, myUserDetails.getId(), size);
+        if (events.isEmpty()) {
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(response.getValue());
+        return ResponseHandler.ok(events);
     }
 }

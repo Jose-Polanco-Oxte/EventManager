@@ -1,10 +1,8 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.Roles;
 import jpolanco.springbootapp.user.domain.model.User;
 
-import jpolanco.springbootapp.user.domain.model.valueobjects.Role;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;

@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.user.application.services;
 
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.user.application.ports.input.EncoderProvider;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.application.uc.CreateUserUC;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CreateUser implements CreateUserUC {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final EncoderProvider passwordEncoder;
     private final QRProvider qrProvider;
 //    private final UserValidation userValidation;
 

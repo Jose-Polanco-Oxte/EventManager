@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public class StaffRolesRepositoryMySQL implements StaffRolesRepository {
     private final JpaStaffRoleRepository jpaStaffRoleRepository;
+
     @Override
     public List<String> search(String name, int size) {
         return jpaStaffRoleRepository.searchByName(name, PageRequest.of(0, size))

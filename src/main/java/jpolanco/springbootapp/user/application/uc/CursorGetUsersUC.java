@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc;
 
-import jpolanco.springbootapp.shared.application.utils.CursorPageResult;
+import jpolanco.springbootapp.shared.utils.CursorPageResult;
 import jpolanco.springbootapp.user.domain.model.User;
 
 public interface CursorGetUsersUC {

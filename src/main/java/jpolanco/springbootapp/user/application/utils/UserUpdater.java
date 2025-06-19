@@ -5,7 +5,7 @@ import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
-import jpolanco.springbootapp.user.infrastructure.components.adapter.UserValidation;
+import jpolanco.springbootapp.user.infrastructure.components.interfaces.UserValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 

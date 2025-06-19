@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity;
 
 import jpolanco.springbootapp.event.domain.model.valueobjects.Categories;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.CategoryEntity;
-import jpolanco.springbootapp.shared.infrastructure.EntityMapper;
+import jpolanco.springbootapp.shared.infrastructure.mappers.EntityMapper;
 
 import java.util.List;
 

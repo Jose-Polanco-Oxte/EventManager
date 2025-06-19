@@ -46,6 +46,14 @@ public class Result<T> {
         }
     }
 
+    public int getErrorCode() {
+        if (IsSuccess) {
+            return Error.NONE.getCode();
+        } else {
+            return error.getCode();
+        }
+    }
+
     public String getMessage() {
         if (IsSuccess) {
             return "Success";
@@ -62,9 +70,6 @@ public class Result<T> {
         if (IsSuccess) {
             return value;
         } else {
-            System.out.println("Error: " + error.code + " " + error.message);
-            System.out.println("Value: " + value);
-            System.out.println("IsSuccess: " + IsSuccess);
             throw new IllegalStateException("Result has no value");
         }
     }

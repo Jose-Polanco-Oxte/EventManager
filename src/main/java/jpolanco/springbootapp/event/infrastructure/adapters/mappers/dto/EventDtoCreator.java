@@ -1,19 +1,19 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto;
 
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponseDto;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventDtoCreator implements DtoCreator<Event, EventResponseDto> {
+public class EventDtoCreator implements DtoCreator<Event, EventResponse> {
 
     @Override
-    public EventResponseDto create(Event payload) {
+    public EventResponse create(Event payload) {
         if (payload == null) {
             return null;
         }
-        return new EventResponseDto(
+        return new EventResponse(
                 payload.getEventId(),
                 payload.getTitle(),
                 payload.getDescription(),

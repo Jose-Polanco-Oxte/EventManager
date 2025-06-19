@@ -1,11 +1,11 @@
 package jpolanco.springbootapp.event.application.utils;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.input.FileStorageProvider;
-import jpolanco.springbootapp.event.application.ports.input.StaffHolder;
+import jpolanco.springbootapp.event.application.ports.input.providers.FileStorageProvider;
+import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.event.domain.model.EventStatus;
-import jpolanco.springbootapp.event.domain.model.Modality;
+import jpolanco.springbootapp.event.domain.model.valueobjects.EventStatus;
+import jpolanco.springbootapp.event.domain.model.valueobjects.Modality;
 import jpolanco.springbootapp.event.domain.model.domainevents.EventUpdate;
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import jpolanco.springbootapp.shared.domain.Result;
@@ -27,6 +27,10 @@ public class EventUpdater {
         if (result.isFailure() && this.result.isSuccess()) {
             this.result = result;
         }
+    }
+
+    public static EventUpdater updater(Event event, FileStorageProvider fileStorageProvider, EventValidation eventValidation) {
+        return new EventUpdater(event, fileStorageProvider, eventValidation);
     }
 
     private int nullable(String value) {
@@ -57,11 +61,9 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater schedule(String schedule) {
-        if (nullable(schedule) > 0) return this;
-        var date = Instant.parse(schedule);
-        if (!event.getSchedule().equals(date)) {
-            var result = eventValidation.validate(event.getCreatorId(), date, event.getDurationInSeconds(), event.getLatitude(), event.getLongitude());
+    public EventUpdater schedule(Instant schedule) {
+        if (!event.getSchedule().equals(schedule)) {
+            var result = eventValidation.validate(event.getCreatorId(), schedule, event.getDurationInSeconds(), event.getLatitude(), event.getLongitude());
             check(result);
             if (result.isSuccess()) {
                 var changeResult = event.changeSchedule(schedule);
@@ -122,7 +124,14 @@ public class EventUpdater {
 
     public EventUpdater addCategories(List<String> categories) {
         if (categories == null || categories.isEmpty()) return this;
-        var result = event.addCategories(categories);
+        var result = event.changeAllCategories(categories);
+        check(result);
+        return this;
+    }
+
+    public EventUpdater removeCategories(List<String> categories) {
+        if (categories == null || categories.isEmpty()) return this;
+        var result = event.removeCategories(categories);
         check(result);
         return this;
     }
@@ -148,13 +157,13 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater staff(List<StaffHolder> staffs) {
+    public EventUpdater staff(List<StaffRequest> staffs) {
         if (staffs == null || staffs.isEmpty()) return this;
         event.setStaff(staffs);
         return this;
     }
 
-    public EventUpdater addStaff(List<StaffHolder> staffs) {
+    public EventUpdater addStaff(List<StaffRequest> staffs) {
         if (staffs == null || staffs.isEmpty()) return this;
         for (var staff : staffs) {
             var result = event.addStaff(staff.staffId(), staff.role(), staff.isAssistanceClerk());
@@ -197,8 +206,8 @@ public class EventUpdater {
         if (maxInvitees < 0) return this;
         if (event.getMaxAttendees() != maxInvitees) {
             // Validate that the new max invitees is not less than the number of accepted invitations
-            eventValidation.validateEventMaxInviteesOnChange(maxInvitees, event.getEventId());
-            var result = event.setMaxAttendees(maxInvitees);
+            eventValidation.validateEventMaxAttendeesOnChange(maxInvitees, event.getEventId());
+            var result = event.changeMaxAttendees(maxInvitees);
             check(result);
         }
         return this;

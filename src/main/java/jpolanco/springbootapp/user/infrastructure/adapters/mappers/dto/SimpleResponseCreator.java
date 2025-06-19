@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto;
 
-import jpolanco.springbootapp.shared.infrastructure.SimpleResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.SimpleResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component
