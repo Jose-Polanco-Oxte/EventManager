@@ -14,11 +14,11 @@ public interface UserRepository extends CRUDRepository<User, String> {
 
     List<User> findAll();
 
+    PageResult<User> findAll(int page, int size, String sortBy, String sortOrder);
+
+    CursorPageResult<User, String> findAll(String cursor, int size, String sortBy, String sortOrder);
+
     List<User> searchByName(String name, int numberOfResults);
 
     List<User> searchByEmail(String email, int numberOfResults);
-
-    PageResult<User> getUsers(int page, int size, String sortBy, String sortOrder);
-
-    CursorPageResult<User, String> getUsers(String cursor, int size, String sortBy, String sortOrder);
 }

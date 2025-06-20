@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UpdateOwnEvent implements UpdateOwnEventUC {
     private final EventRepository eventRepository;
     private final UpdateEventUC updateEventUC;

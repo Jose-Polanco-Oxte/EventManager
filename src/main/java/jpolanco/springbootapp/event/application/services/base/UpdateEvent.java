@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UpdateEvent implements UpdateEventUC {
     private final EventRepository eventRepository;
     private final EventValidation eventValidation;
@@ -24,22 +24,7 @@ public class UpdateEvent implements UpdateEventUC {
 
     @Override
     public Result<Event> setChanges(Event event, UpdateEventRequest request, InputStream inputStream) {
-        return getEventResult(event, request, inputStream);
-    }
-
-    @Override
-    public Result<Event> setChangesById(String eventId, UpdateEventRequest request, InputStream inputStream) {
-        var maybeEvent = eventRepository.findById(eventId);
-        if (maybeEvent.isEmpty()) {
-            return Result.failure(EventAppError.EVENT_NOT_FOUND);
-        }
-        var event = maybeEvent.get();
-        return getEventResult(event, request, inputStream);
-    }
-
-
-    private Result<Event> getEventResult(Event event, UpdateEventRequest request, InputStream inputStream) {
-        var updater = new EventUpdater(event, fileStorageProvider, eventValidation)
+        var updater = EventUpdater.updater(event, fileStorageProvider, eventValidation)
                 .title(request.title())
                 .description(request.description())
                 .schedule(request.schedule())
@@ -70,5 +55,15 @@ public class UpdateEvent implements UpdateEventUC {
         }
         var savedEvent = eventRepository.save(updatedEvent.getValue());
         return Result.success(savedEvent);
+    }
+
+    @Override
+    public Result<Event> setChangesById(String eventId, UpdateEventRequest request, InputStream inputStream) {
+        var maybeEvent = eventRepository.findById(eventId);
+        if (maybeEvent.isEmpty()) {
+            return Result.failure(EventAppError.EVENT_NOT_FOUND);
+        }
+        var event = maybeEvent.get();
+        return setChanges(event, request, inputStream);
     }
 }

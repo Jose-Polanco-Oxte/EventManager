@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.config;
 
 import jpolanco.springbootapp.config.auth.JwtAuthFilter;
+import jpolanco.springbootapp.config.errors.SecurityAuth;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
@@ -26,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity()
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
@@ -73,12 +74,11 @@ public class SecurityConfig {
 
     private void logout(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Invalid accessToken");
+            throw new SecurityAuth("Invalid accessToken", 401, new IllegalArgumentException("Invalid accessToken"));
         }
-
         final String jwtToken = token.substring(7);
         final TokenEntity foundTokenEntity = jpaTokenRepository.findByToken(jwtToken)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid accessToken"));
+                .orElseThrow(() -> new SecurityAuth("Token not found", 404, new IllegalArgumentException("Token not found")));
         foundTokenEntity.setStatus(TokenStatus.REVOKED);
         jpaTokenRepository.save(foundTokenEntity);
     }

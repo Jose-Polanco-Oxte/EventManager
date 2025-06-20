@@ -10,8 +10,8 @@ import jpolanco.springbootapp.shared.utils.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class GetPublicEvents implements GetPublicEventsUC {
     private final EventRepository eventRepository;
 

@@ -2,7 +2,6 @@ package jpolanco.springbootapp.event.application.services.unique;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
 import jpolanco.springbootapp.event.application.ports.input.providers.FileStorageProvider;
-import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
 import jpolanco.springbootapp.event.application.ports.output.EventRepository;
 import jpolanco.springbootapp.event.application.uc.unique.CreateEventUC;
 import jpolanco.springbootapp.event.application.utils.EventValidation;
@@ -14,12 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class CreateEvent implements CreateEventUC {
     private final EventRepository eventRepository;
     private final EventValidation eventValidation;

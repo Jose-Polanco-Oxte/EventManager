@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class EventCommandServiceImpl implements EventCommandService {
     private final CreateEventUC createEventUC;
     private final UpdateEventUC updateEventUC;

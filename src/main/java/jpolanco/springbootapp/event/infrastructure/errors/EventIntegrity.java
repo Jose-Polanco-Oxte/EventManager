@@ -1,7 +1,13 @@
 package jpolanco.springbootapp.event.infrastructure.errors;
 
-public class EventIntegrity extends RuntimeException {
-    public EventIntegrity(String message) {
-        super(message);
+import jpolanco.springbootapp.shared.infrastructure.errors.ProviderException;
+
+public class EventIntegrity extends ProviderException {
+    public EventIntegrity(String message, int code, Throwable cause) {
+        super(message, code, cause);
+    }
+
+    public EventIntegrity(String message, int code) {
+        super(message, code);
     }
 }

@@ -2,19 +2,16 @@ package jpolanco.springbootapp.event.application.utils;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
 import jpolanco.springbootapp.event.application.ports.output.EventRepository;
-import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
-import jpolanco.springbootapp.invitation.application.ports.output.InvitationRepository;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class EventValidation {
     private final EventRepository eventRepository;
-    private final InvitationRepository invitationRepository;
 
     private int creatorNotHaveOtherEventInSameSchedule(String creatorId, Instant date, long duration) {
         var events = eventRepository.findFirstConflictingEvent(date, date.plusSeconds(duration), creatorId);
@@ -47,11 +44,5 @@ public class EventValidation {
             default -> // No conflicts found
                     Result.success();
         };
-    }
-
-    public void validateEventMaxAttendeesOnChange(int newInvitees, String eventId) {
-        if (invitationRepository.countInvitationsAcceptedByEventId(eventId) > newInvitees) {
-            throw new EventIntegrity("The number of invitees cannot be less than the number of accepted invitations.");
-        }
     }
 }

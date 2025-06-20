@@ -28,11 +28,11 @@ public class PublicEventController {
             @RequestParam() String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var response = searchEventService.searchPublicEventsByName(query, size);
-        if (response.isEmpty()) {
+        var result = searchEventService.searchPublicEventsByName(query, size);
+        if (result.isEmpty()) {
             return ResponseHandler.noContent();
         }
-        return ResponseHandler.ok(response);
+        return ResponseHandler.ok(result);
     }
 
     @GetMapping("/pages")

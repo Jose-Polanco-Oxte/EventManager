@@ -8,11 +8,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+@Entity(name = "tokens")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "tokens")
 public class TokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,10 +23,10 @@ public class TokenEntity {
     private String token;
 
     @Enumerated(EnumType.STRING)
-    private TokenType type;
+    private TokenType type = TokenType.BEARER;
 
     @Enumerated(EnumType.STRING)
-    private TokenStatus status;
+    private TokenStatus status = TokenStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

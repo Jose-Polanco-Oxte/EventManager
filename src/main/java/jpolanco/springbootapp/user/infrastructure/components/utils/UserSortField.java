@@ -15,4 +15,13 @@ public enum UserSortField {
     public String getField() {
         return field;
     }
+
+    public static UserSortField fromString(String field) {
+        for (UserSortField sortField : UserSortField.values()) {
+            if (sortField.field.equalsIgnoreCase(field)) {
+                return sortField;
+            }
+        }
+        return NONE; // Default to NONE if no match found
+    }
 }

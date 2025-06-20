@@ -2,6 +2,7 @@ package jpolanco.springbootapp.user.domain.domainevents;
 
 import jpolanco.springbootapp.shared.domain.DomainEvent;
 import lombok.Getter;
+
 @Getter
 public class UserRegistered extends DomainEvent {
     private final String userId;

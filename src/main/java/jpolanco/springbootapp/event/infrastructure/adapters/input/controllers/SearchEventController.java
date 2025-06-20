@@ -18,16 +18,28 @@ public class SearchEventController {
 
     private final SearchEventService searchEventService;
 
+    @GetMapping("/name")
+    public ResponseEntity<Object> searchEventsByName(
+            @RequestParam String query,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size
+    ) {
+        var result = searchEventService.searchEventsByName(query, size);
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/categories")
     public ResponseEntity<Object> searchCategoriesByName(
             @RequestParam String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var categories = searchEventService.searchCategoriesByName(query, size);
-        if (categories.isEmpty()) {
+        var result = searchEventService.searchCategoriesByName(query, size);
+        if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/staff-roles")
@@ -35,10 +47,10 @@ public class SearchEventController {
             @RequestParam String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var roles = searchEventService.searchStaffRolesByName(query, size);
-        if (roles.isEmpty()) {
+        var result = searchEventService.searchStaffRolesByName(query, size);
+        if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(roles);
+        return ResponseEntity.ok(result);
     }
 }

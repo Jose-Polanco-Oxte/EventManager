@@ -1,98 +1,92 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
+import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.utils.OrderField;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
 import jpolanco.springbootapp.user.infrastructure.components.utils.UserSortField;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserCommandService;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
+@Validated
 @RequestMapping("/users")
 public class UserController {
 
     private final UserQueryService queryService;
     private final UserCommandService commandService;
 
-    @PostMapping("/update/{userId}")
-    public ResponseEntity<Object> update(@Valid @RequestBody AnyUserUpdateRequest request,
-                                          @PathVariable String userId) {
-        var response = commandService.updateUser(request, userId);
-        if (response.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
+    @PutMapping("/{userId}")
+    public ResponseEntity<Object> update(
+            @Valid @RequestBody AnyUserUpdateRequest request,
+            @ValidUUID @PathVariable String userId
+    ) {
+        var commandREsult = commandService.update(request, userId);
+        if (commandREsult.isFailure()) {
+            return ResponseHandler.error(
+                    commandREsult.getMessage(),
+                    commandREsult.getErrorCode()
+            );
         }
-        return ResponseEntity.ok(response.getValue());
+        return ResponseHandler.ok("User updated successfully");
     }
 
-    @GetMapping("get/{userId}")
-    public ResponseEntity<Object> getUser(@PathVariable String userId) {
-        var response = queryService.getUserById(userId);
-        if (response.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
-        }
-        return ResponseEntity.ok(response.getValue());
+    @GetMapping("/{userId}")
+    public ResponseEntity<Object> getUser(@ValidUUID @PathVariable String userId) {
+        var response = queryService.getById(userId);
+        return response.map(ResponseHandler::ok).orElseGet(ResponseHandler::notFound);
     }
 
-    @GetMapping("get-by-email/{email}")
+    @GetMapping("/{email}/email")
     public ResponseEntity<Object> getUserByEmail(@PathVariable String email) {
-        var response = queryService.getUserByEmail(email);
-        if (response.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
-        }
-        return ResponseEntity.ok(response.getValue());
+        var response = queryService.getByEmail(email);
+        return response.map(ResponseHandler::ok).orElseGet(ResponseHandler::notFound);
     }
 
-    @DeleteMapping("delete-by-id/{userId}")
-    public ResponseEntity<Object> delete(@PathVariable String userId) {
-        var response = commandService.deleteUserById(userId);
-        if (response.isFailure()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getMessage());
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Object> delete(@PathVariable @ValidUUID String userId) {
+        var commandResult = commandService.deleteById(userId);
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(
+                    commandResult.getMessage(),
+                    commandResult.getErrorCode()
+            );
         }
-        return ResponseEntity.ok(response.getValue());
+        return ResponseHandler.ok("User deleted successfully");
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<Object> getAllUsers() {
-        var response = queryService.getAll();
-        if (response.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/get/by-pages")
+    @GetMapping("/pages")
     public ResponseEntity<Object> getUsersByPages(
-            @RequestParam(defaultValue = "0", required = false) int page,
-            @RequestParam(defaultValue = "10", required = false) int size,
+            @Min(0) @RequestParam(defaultValue = "0", required = false) int page,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) UserSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
-        page = Math.max(page, 0);
-        size = Math.max(size, 1);
-        var response = queryService.getUsers(page, size, sortBy.getField(), orderBy.getValue());
-        if (response.content().isEmpty()) {
-            return ResponseEntity.noContent().build();
+        var users = queryService.get(page, size, sortBy.getField(), orderBy.getValue());
+        if (users.content().isEmpty()) {
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(response);
+        return ResponseHandler.ok(users);
     }
 
-    @GetMapping("/get/by-cursor")
+    @GetMapping("/cursor")
     public ResponseEntity<Object> getUsersByCursor(
             @RequestParam(defaultValue = "NONE", required = false) String cursor,
-            @RequestParam(defaultValue = "10", required = false) int size,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) UserSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
-        size = Math.max(size, 1);
-        var response = queryService.getUsers(cursor, size, sortBy.getField(), orderBy.getValue());
-        if (response.items().isEmpty()) {
-            return ResponseEntity.noContent().build();
+        var users = queryService.get(cursor, size, sortBy.getField(), orderBy.getValue());
+        if (users.items().isEmpty()) {
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(response);
+        return ResponseHandler.ok(users);
     }
 }

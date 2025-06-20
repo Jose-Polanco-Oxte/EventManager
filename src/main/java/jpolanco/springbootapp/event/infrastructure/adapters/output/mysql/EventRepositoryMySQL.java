@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 public class EventRepositoryMySQL implements EventRepository {
     private final JpaEventRepository jpaEventRepository;
     private final EventEntityMapper eventEntityMapper;

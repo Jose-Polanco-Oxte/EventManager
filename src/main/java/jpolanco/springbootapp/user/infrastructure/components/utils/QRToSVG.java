@@ -4,7 +4,9 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import org.springframework.stereotype.Component;
 
+@Component
 public class QRToSVG {
     public static String generateSVG(String data, int width, int height) throws WriterException {
         QRCodeWriter writer = new QRCodeWriter();

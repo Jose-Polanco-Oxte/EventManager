@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.event.application.uc.base;
 
-import jpolanco.springbootapp.event.application.utils.EventUpdater;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.shared.domain.Result;

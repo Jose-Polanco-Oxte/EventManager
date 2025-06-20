@@ -8,8 +8,8 @@ import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class GetEventById implements GetEventByIdUC {
     private final EventRepository eventRepository;
 

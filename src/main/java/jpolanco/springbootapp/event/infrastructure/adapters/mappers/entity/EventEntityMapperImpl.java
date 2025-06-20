@@ -17,8 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class EventEntityMapperImpl implements EventEntityMapper {
     private final JpaUserRepository jpaUserRepository;
     private final CategoryEntityMapper categoryEntityMapper;
@@ -83,13 +83,13 @@ public class EventEntityMapperImpl implements EventEntityMapper {
             staffEntityList = domain.getStaff().stream()
                     .map(staff -> {
                         if (staff == null || staff.getUserId() == null || staff.getRole() == null) {
-                            throw new EventIntegrity("Staff member or required fields are null");
+                            return null; // Skip null staff members or those with missing fields
                         }
                         switch (validScheduleForStaff(domain.getEventId(), staff, domain.getSchedule(), domain.getDurationInSeconds())) {
                             case 1:
-                                throw new EventIntegrity("Staff member already has an event at the same schedule: " + staff.getUserId().getValue());
+                                throw new EventIntegrity("Staff member already has an event at the same schedule: " + staff.getUserId().getValue(), 401);
                             case 2:
-                                throw new EventIntegrity("Overlapping schedules for staff member: " + staff.getUserId().getValue());
+                                throw new EventIntegrity("Staff member has overlapping schedules: " + staff.getUserId().getValue(), 401);
                             case 0:
                                 // No conflicts found, proceed
                                 break;
@@ -167,7 +167,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getCountAttendees()
         );
         if (maybeEvent.isFailure()) {
-            throw new EventIntegrity("Error converting EventEntity to Event: " + maybeEvent.getMessage());
+            throw new EventIntegrity(maybeEvent.getMessage(), maybeEvent.getErrorCode());
         }
         return maybeEvent.getValue();
     }

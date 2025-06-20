@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class Encoder implements EncoderProvider {
 
     private final PasswordEncoder encoder;

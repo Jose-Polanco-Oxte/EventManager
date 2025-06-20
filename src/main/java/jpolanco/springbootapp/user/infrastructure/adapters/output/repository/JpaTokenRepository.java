@@ -4,6 +4,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.repository;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -24,4 +25,10 @@ public interface JpaTokenRepository extends JpaRepository<TokenEntity, Long> {
     List<TokenEntity> findAllByStatusIs(TokenStatus status);
 
     void deleteAllByStatus(TokenStatus status);
+
+    @Modifying
+    @Query("""
+              UPDATE tokens t SET t.status = 'REVOKED' WHERE t.user.id = ?1
+    """)
+    int revokeAllByUserId(UUID userId);
 }

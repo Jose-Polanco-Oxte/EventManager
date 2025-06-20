@@ -1,52 +1,50 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.user.domain.model.Token;
+import jpolanco.springbootapp.user.application.utils.TokenE;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
+import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
+import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
-@Repository
 public class TokenEntityMapperImpl implements TokenEntityMapper {
-
-    @Value("${jwt.expiration}")
-    private long expiration;
     private final JpaUserRepository userRepository;
 
     @Override
-    public TokenEntity toEntity(Token domain) {
+    public TokenEntity toEntity(TokenE domain) {
         var userId = domain.getUserId();
-        var userEntity = userRepository.findById(UUID.fromString(userId.getValue())).orElseThrow(() ->
-                new IllegalArgumentException("User not found"));
-        return new TokenEntity(
-                domain.getId(),
-                domain.getToken(),
-                domain.getTokenType(),
-                domain.getStatus(),
-                userEntity
-        );
+        var userEntity = userRepository.findById(UUID.fromString(userId)).orElseThrow(() ->
+                new UserIntegrity("User not found", 402));
+        var tokenEntity = new TokenEntity();
+        tokenEntity.setToken(domain.getToken());
+        tokenEntity.setStatus(domain.getStatus());
+        tokenEntity.setUser(userEntity);
+        return tokenEntity;
     }
 
     @Override
-    public Token toDomain(TokenEntity entity) {
-        var maybeToken = Token.load(
-                entity.getId(),
-                entity.getUser().getId().toString(),
+    public TokenEntity toEntity(TokenE token, UserEntity user) {
+        var tokenEntity = new TokenEntity();
+        tokenEntity.setToken(token.getToken());
+        tokenEntity.setStatus(token.getStatus());
+        tokenEntity.setUser(user);
+        return tokenEntity;
+    }
+
+    @Override
+    public TokenE toDomain(TokenEntity entity) {
+        return new TokenE(
                 entity.getToken(),
-                entity.getType(),
-                0,
-                null,
-                null,
-                null,
-                entity.getStatus()
+                entity.getUser().getId().toString(),
+                entity.getStatus(),
+                Instant.EPOCH
         );
-        if (maybeToken.isFailure()) {
-            throw new IllegalArgumentException("Data do not match : " + maybeToken.getError());
-        }
-        return maybeToken.getValue();
     }
 }

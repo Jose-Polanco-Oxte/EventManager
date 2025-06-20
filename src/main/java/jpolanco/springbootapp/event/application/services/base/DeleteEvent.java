@@ -9,8 +9,8 @@ import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class DeleteEvent implements DeleteEventUC {
     private final EventRepository eventRepository;
     private final FileStorageProvider fileStorage;

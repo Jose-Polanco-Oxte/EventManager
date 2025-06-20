@@ -5,7 +5,6 @@ import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
-import jpolanco.springbootapp.user.infrastructure.components.interfaces.UserValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -18,7 +17,7 @@ public class UserUpdater {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final QRProvider qrProvider;
-    private final UserValidation userValidation;
+    private final UserValidator userValidator;
 
     private Result<?> result = Result.success();
 
@@ -26,6 +25,12 @@ public class UserUpdater {
         if (result.isFailure() && this.result.isSuccess()) {
             this.result = result;
         }
+    }
+
+    public static UserUpdater updater(User user, UserRepository userRepository,
+                                                PasswordEncoder passwordEncoder, QRProvider qrProvider,
+                                                UserValidator userValidator) {
+        return new UserUpdater(user, userRepository, passwordEncoder, qrProvider, userValidator);
     }
 
     private boolean nullable(String value) {
@@ -52,7 +57,7 @@ public class UserUpdater {
 
     public UserUpdater email(String email) {
         if (nullable(email)) return this;
-        var valid = userValidation.onUpdateEmailIsValid(user.getId(), email);
+        var valid = userValidator.onUpdateEmailIsValid(user.getId(), email);
         check(valid);
         if (!user.getEmail().equals(email)) {
             var result = user.changeEmail(email);

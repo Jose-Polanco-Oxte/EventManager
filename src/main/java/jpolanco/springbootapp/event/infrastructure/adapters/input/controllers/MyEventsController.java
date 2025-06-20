@@ -3,11 +3,9 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
-import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventQueryService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
@@ -127,10 +125,10 @@ public class MyEventsController {
             @RequestParam String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var events = searchEventService.searchMyEventsByName(query, myUserDetails.getId(), size);
-        if (events.isEmpty()) {
+        var result = searchEventService.searchMyEventsByName(query, myUserDetails.getId(), size);
+        if (result.isEmpty()) {
             return ResponseHandler.noContent();
         }
-        return ResponseHandler.ok(events);
+        return ResponseHandler.ok(result);
     }
 }

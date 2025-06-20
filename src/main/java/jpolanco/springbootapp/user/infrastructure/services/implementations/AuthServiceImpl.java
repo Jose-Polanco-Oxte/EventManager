@@ -1,21 +1,16 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.application.errors.UserAppError;
-import jpolanco.springbootapp.user.infrastructure.components.interfaces.AuxTokenManager;
-import jpolanco.springbootapp.user.infrastructure.components.interfaces.JwtProvider;
-import jpolanco.springbootapp.user.application.uc.CreateUserUC;
-import jpolanco.springbootapp.user.application.uc.GetUserByEmailUC;
-import jpolanco.springbootapp.user.application.uc.LoginUC;
-import jpolanco.springbootapp.user.infrastructure.components.implementation.UserValidator;
+import jpolanco.springbootapp.user.infrastructure.errors.UserInfrastructureError;
+import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
+import jpolanco.springbootapp.user.application.uc.unique.CreateUserUC;
+import jpolanco.springbootapp.user.application.uc.unique.LoginUC;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,88 +19,48 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
     private final LoginUC loginUC;
     private final CreateUserUC createUserUc;
-    private final GetUserByEmailUC getUserByEmailUC;
-    private final JwtProvider jwtService;
-    private final UserValidator userValidator;
-    private final AuthenticationManager authentication;
-    private final AuxTokenManager auxTokenManager;
+    private final JwtService jwtService;
     private final DomainEventsPublisher publisher;
 
     @Override
     @Transactional
     public Result<UserTokenResponse> login(LoginRequest request) {
-        if (auxTokenManager.sessionLimitReached(request.email())) {
-            return Result.failure(UserAppError.SESSION_LIMIT_REACHED);
-        }
         var verifiedUser = loginUC.login(request.email(), request.password());
         if (verifiedUser.isFailure()) {
             return Result.failure(verifiedUser.getError());
         }
         var user = verifiedUser.getValue();
-        var accessToken = jwtService.generateAccessToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        auxTokenManager.saveToken(user, accessToken);
-        authentication.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.getEmail(),
-                        request.password()
-                )
-        );
-        return Result.success(new UserTokenResponse(accessToken, refreshToken));
+        return jwtService.authenticate(user, request.password());
     }
 
     @Override
     @Transactional
     public Result<UserTokenResponse> register(RegisterRequest request) {
-        var valid = userValidator.onCreateUserIsValid(request.email());
-        if (valid.isFailure()) {
-            return Result.failure(valid.getError());
-        }
-        var createdUser = createUserUc.create(
-                request.firstName(),
-                request.lastName(),
-                request.email(),
-                request.password()
-        );
-
+        var createdUser = createUserUc.create(request);
         if (createdUser.isFailure()) {
             return Result.failure(createdUser.getError());
-
         }
         var user = createdUser.getValue();
-        var accessToken = jwtService.generateAccessToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        auxTokenManager.saveToken(user, accessToken);
+        var tokens = jwtService.createTokens(user);
+        if (tokens.isFailure()) {
+            return Result.failure(tokens.getError());
+        }
         user.pullEvents().forEach(publisher::publish);
         user.clearEvents();
-        return Result.success(new UserTokenResponse(accessToken, refreshToken));
+        return Result.success(tokens.getValue());
     }
 
     @Override
     @Transactional
     public Result<UserTokenResponse> refresh(String authHeader) {
-        if (auxTokenManager.invalidTokenInDB(authHeader)) {
-            return Result.failure(UserAppError.INVALID_TOKEN);
-        }
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.failure(UserAppError.INVALID_HEADER);
+            return Result.failure(UserInfrastructureError.INVALID_AUTH_HEADER);
         }
         var refreshToken = authHeader.substring(7);
-        var userEmail = jwtService.extractUsername(refreshToken);
-        if (userEmail == null) {
-            return Result.failure(UserAppError.INVALID_TOKEN);
+        var result = jwtService.refreshTokens(refreshToken);
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
         }
-        var maybeUser = getUserByEmailUC.get(userEmail);
-        if (maybeUser.isFailure()) {
-            return Result.failure(maybeUser.getError());
-        }
-        var user = maybeUser.getValue();
-        if (!jwtService.isTokenValid(refreshToken, user.getEmail())) {
-            return Result.failure(UserAppError.INVALID_TOKEN);
-        }
-        var accessToken = jwtService.generateAccessToken(user);
-        auxTokenManager.revokeAllUserTokens(user.getEmail());
-        auxTokenManager.saveToken(user, accessToken);
-        return Result.success(new UserTokenResponse(accessToken, refreshToken));
+        return Result.success(result.getValue());
     }
 }

@@ -1,10 +1,10 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponseDto;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
 
 import java.util.List;
 
 public interface SearchUserService {
-    List<UserResponseDto> searchUsersByName(String name, int size);
-    List<UserResponseDto> searchUsersByEmail(String email, int size);
+    List<UserResponse> searchByName(String name, int size);
+    List<UserResponse> searchByEmail(String email, int size);
 }

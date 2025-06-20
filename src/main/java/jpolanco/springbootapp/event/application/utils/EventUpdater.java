@@ -202,12 +202,14 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater setMaxAttendees(int maxInvitees) {
-        if (maxInvitees < 0) return this;
-        if (event.getMaxAttendees() != maxInvitees) {
-            // Validate that the new max invitees is not less than the number of accepted invitations
-            eventValidation.validateEventMaxAttendeesOnChange(maxInvitees, event.getEventId());
-            var result = event.changeMaxAttendees(maxInvitees);
+    public EventUpdater setMaxAttendees(int maxAttendees) {
+        if (maxAttendees < 0) return this;
+        if (event.getMaxAttendees() != maxAttendees) {
+            if (maxAttendees < event.getCurrentAttendees()) {
+                check(Result.failure(EventAppError.MAX_ATTENDEES_LESS_THAN_CURRENT));
+                return this;
+            }
+            var result = event.changeMaxAttendees(maxAttendees);
             check(result);
         }
         return this;

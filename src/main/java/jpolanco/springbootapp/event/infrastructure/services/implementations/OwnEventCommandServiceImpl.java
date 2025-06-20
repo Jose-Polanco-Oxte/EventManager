@@ -8,15 +8,14 @@ import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.E
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventCommandService;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.infrastructure.dto.SimpleResponseDto;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class OwnEventCommandServiceImpl implements OwnEventCommandService {
 
     private final UpdateOwnEventUC updateOwnEventUC;

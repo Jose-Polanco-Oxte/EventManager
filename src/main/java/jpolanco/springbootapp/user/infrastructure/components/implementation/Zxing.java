@@ -5,6 +5,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import jpolanco.springbootapp.shared.infrastructure.errors.ProviderException;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.infrastructure.components.utils.QRToSVG;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,10 +40,10 @@ public class Zxing implements QRProvider {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(contextPath + svgFileName))) {
                 writer.write(svg);
             } catch (IOException e) {
-                throw new RuntimeException("Error al guardar el archivo SVG", e);
+                throw new ProviderException("Error al guardar el archivo SVG", 500,e);
             }
         } catch (WriterException | IOException e) {
-            throw new RuntimeException("Error al generar el código QR", e);
+            throw new ProviderException("Error al generar el código QR", 500, e);
         }
     }
 
@@ -58,7 +59,7 @@ public class Zxing implements QRProvider {
             Files.deleteIfExists(FileSystems.getDefault().getPath(contextPath + fileName + ".png"));
             Files.deleteIfExists(FileSystems.getDefault().getPath(contextPath + fileName + ".svg"));
         } catch (IOException e) {
-            throw new RuntimeException("Error al eliminar el archivo QR", e);
+            throw new ProviderException("Error al eliminar el archivo QR", 500, e);
         }
     }
 }

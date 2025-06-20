@@ -26,7 +26,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
             entity.ifPresent(categoriesEntities::add);
         }
         if (categoriesEntities.isEmpty()) {
-            throw new EventIntegrity("No categories found for the provided domain values.");
+            throw new EventIntegrity("No categories found for the provided domain values.", 404);
         }
         return categoriesEntities;
     }
@@ -39,7 +39,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
         }
         var maybeCategories = Categories.create(categories);
         if (maybeCategories.isFailure()) {
-            throw new EventIntegrity("Invalid categories provided.");
+            throw new EventIntegrity("Invalid categories provided.", 400);
         }
         return maybeCategories.getValue();
     }

@@ -1,19 +1,17 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
 import jpolanco.springbootapp.user.application.ports.output.RolesRepository;
-import jpolanco.springbootapp.user.infrastructure.errors.DataFailure;
+import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaRoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@RequiredArgsConstructor
 public class RoleRepositoryMySQL implements RolesRepository {
 
     private final JpaRoleRepository jpaRoleRepository;
-
-    public RoleRepositoryMySQL(JpaRoleRepository jpaRoleRepository) {
-        this.jpaRoleRepository = jpaRoleRepository;
-    }
 
     @Override
     public boolean existsByName(String name) {
@@ -29,6 +27,6 @@ public class RoleRepositoryMySQL implements RolesRepository {
     public String findByName(String name) {
         return jpaRoleRepository.findByName(name)
                 .map(RoleEntity::getName).orElseThrow(() ->
-                        new DataFailure("Role not found"));
+                        new UserIntegrity("Role not found", 404));
     }
 }

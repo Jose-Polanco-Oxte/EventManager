@@ -5,10 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
-import jpolanco.springbootapp.user.infrastructure.adapters.output.mysql.UserRepositoryMySQL;
-import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
-import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
-import jpolanco.springbootapp.user.infrastructure.services.implementations.JwtService;
+import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserRepository;
+import jpolanco.springbootapp.user.application.utils.TokenE;
+import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -26,10 +26,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final JwtManager jwtManager;
     private final UserDetailsService userDetailsService;
-    private final JpaTokenRepository jpaTokenRepository;
-    private final UserRepositoryMySQL userRepository;
+    private final JwtRepository jpaTokenRepository;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -47,11 +47,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         final String jwtToken = authHeader.substring(7);
-        final String userEmail = jwtService.extractUsername(jwtToken);
+        final String userEmail = jwtManager.extractUsername(jwtToken);
         if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
             return;
         }
-        final TokenEntity tokenEntity = jpaTokenRepository.findByToken(jwtToken).orElse(null);
+        final TokenE tokenEntity = jpaTokenRepository.findByToken(jwtToken).orElse(null);
         if (tokenEntity == null || tokenEntity.getStatus() != TokenStatus.ACTIVE) {
             filterChain.doFilter(request, response);
             return;
@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        final boolean isTokenValid = jwtService.isTokenValid(jwtToken, maybeUser.get().getEmail());
+        final boolean isTokenValid = jwtManager.isTokenValid(jwtToken, maybeUser.get().getEmail());
         if (!isTokenValid) {
             return;
         }

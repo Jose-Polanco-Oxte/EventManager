@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SearchEventByName implements SearchEventByNameUC {
     private final EventRepository eventRepository;
 

@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 public class UserRepositoryMySQL implements UserRepository {
 
     private final JpaUserRepository jpaUserRepository;
@@ -55,23 +55,7 @@ public class UserRepositoryMySQL implements UserRepository {
     }
 
     @Override
-    public List<User> searchByName(String name, int size) {
-        return jpaUserRepository.searchByName(name, PageRequest.of(0, size))
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
-    }
-
-    @Override
-    public List<User> searchByEmail(String email, int size) {
-        return jpaUserRepository.searchByEmail(email, PageRequest.of(0, size))
-                .stream()
-                .map(mapper::toDomain)
-                .toList();
-    }
-
-    @Override
-    public PageResult<User> getUsers(int page, int size, String sortBy, String sortOrder) {
+    public PageResult<User> findAll(int page, int size, String sortBy, String sortOrder) {
         var sort = PageAux.resolveSort(sortBy, sortOrder);
         var pageRequest = PageRequest.of(page, size, sort);
 
@@ -87,7 +71,7 @@ public class UserRepositoryMySQL implements UserRepository {
     }
 
     @Override
-    public CursorPageResult<User, String> getUsers(String cursor, int size, String sortBy, String sortOrder) {
+    public CursorPageResult<User, String> findAll(String cursor, int size, String sortBy, String sortOrder) {
         var sort = PageAux.resolveSort(sortBy, sortOrder);
         var pageRequest = PageRequest.of(0, size, sort);
 
@@ -114,5 +98,21 @@ public class UserRepositoryMySQL implements UserRepository {
                 nextCursor,
                 slice.hasNext()
         );
+    }
+
+    @Override
+    public List<User> searchByName(String name, int size) {
+        return jpaUserRepository.searchByName(name, PageRequest.of(0, size))
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<User> searchByEmail(String email, int size) {
+        return jpaUserRepository.searchByEmail(email, PageRequest.of(0, size))
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

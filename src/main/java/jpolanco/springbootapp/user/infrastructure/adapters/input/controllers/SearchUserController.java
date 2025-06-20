@@ -1,42 +1,44 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
+import jakarta.validation.constraints.Min;
+import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.SearchUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
+@Validated
 @RequestMapping("/users/search")
 public class SearchUserController {
     private final SearchUserService searchUserService;
 
-    @GetMapping("/by-name")
+    @GetMapping("/name")
     public ResponseEntity<Object> searchByName(
-            @RequestParam() String name,
-            @RequestParam(defaultValue = "10", required = false) int size
+            @RequestParam() String query,
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        size = Math.max(size, 1);
-        var users = searchUserService.searchUsersByName(name, size);
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        var result = searchUserService.searchByName(query, size);
+        if (result.isEmpty()) {
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(users);
+        return ResponseHandler.ok(result);
     }
 
-    @GetMapping("/by-email")
+    @GetMapping("/email")
     public ResponseEntity<Object> searchByEmail(
             @RequestParam String email,
-            @RequestParam(defaultValue = "10", required = false) int size
+            @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        size = Math.max(size, 1);
-        var users = searchUserService.searchUsersByEmail(email, size);
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        var result = searchUserService.searchByEmail(email, size);
+        if (result.isEmpty()) {
+            return ResponseHandler.noContent();
         }
-        return ResponseEntity.ok(users);
+        return ResponseHandler.ok(result);
     }
 }

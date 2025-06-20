@@ -36,4 +36,7 @@ public class EventAppError extends Error {
 
     public static final EventAppError EVENT_ALREADY_CANCELLED =
             new EventAppError(409, "The event is already cancelled");
+
+    public static final EventAppError MAX_ATTENDEES_LESS_THAN_CURRENT =
+            new EventAppError(422, "The number of invitees cannot be less than the number of accepted invitations");
 }

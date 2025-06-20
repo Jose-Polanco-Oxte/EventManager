@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class OwnEventQueryServiceImpl implements OwnEventQueryService {
     private final GetOwnEventsUC getOwnEventsUC;
     private final EventDtoCreator eventDtoCreator;

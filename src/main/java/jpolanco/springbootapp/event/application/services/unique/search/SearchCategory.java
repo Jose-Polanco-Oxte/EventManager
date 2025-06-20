@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SearchCategory implements SearchCategoryUC {
     private final CategoriesRepository categoriesRepository;
 
