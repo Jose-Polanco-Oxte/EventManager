@@ -1,5 +1,8 @@
 package jpolanco.springbootapp.shared.infrastructure.components;
 
+import jpolanco.springbootapp.shared.application.adapters.output.PageableRepository;
+import jpolanco.springbootapp.shared.utils.PageResult;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.time.Instant;

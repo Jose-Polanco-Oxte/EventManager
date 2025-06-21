@@ -17,12 +17,8 @@ public interface JpaTokenRepository extends JpaRepository<TokenEntity, Long> {
 
     List<TokenEntity> findAllByUserId(UUID user_id);
 
-    int countByUserId(UUID userId);
-
     @Query("SELECT COUNT(t) FROM tokens t WHERE t.user.id = ?1 AND t.status = 'ACTIVE'")
     int countByUserIdAndStatusIsActive(UUID uuid);
-
-    List<TokenEntity> findAllByStatusIs(TokenStatus status);
 
     void deleteAllByStatus(TokenStatus status);
 
@@ -31,4 +27,6 @@ public interface JpaTokenRepository extends JpaRepository<TokenEntity, Long> {
               UPDATE tokens t SET t.status = 'REVOKED' WHERE t.user.id = ?1
     """)
     int revokeAllByUserId(UUID userId);
+
+    void deleteByToken(String token);
 }

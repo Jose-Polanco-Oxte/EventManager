@@ -16,13 +16,7 @@ public interface EventRepository extends CRUDRepository<Event, String> {
 
     List<Event> searchByName(String name, int size);
 
-    List<Event> searchPublicByName(String name, int size);
-
     List<Event> searchMyEventsByName(String name, String creatorId, int size);
-
-    List<Event> findByCreatorIdAndSchedule(String creatorId, Instant date);
-
-    List<Event> findByCreatorId(String creatorId);
 
     Optional<Event> findFirstConflictingEvent(Instant date, Instant endDate, String creatorId);
 
@@ -39,6 +33,4 @@ public interface EventRepository extends CRUDRepository<Event, String> {
     PageResult<Event> findPublicEvents(int page, int size, String sortBy, String sortOrder);
 
     CursorPageResult<Event, String> findPublicEvents(String cursor, int size, String sortBy, String sortOrder);
-
-    void deleteByIdAndCreatorId(String id, String creatorId);
 }

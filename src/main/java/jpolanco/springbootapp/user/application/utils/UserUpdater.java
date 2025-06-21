@@ -12,12 +12,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class UserUpdater {
-
     private final User user;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final QRProvider qrProvider;
-    private final UserValidator userValidator;
+    private final UserValidation userValidation;
 
     private Result<?> result = Result.success();
 
@@ -27,10 +25,9 @@ public class UserUpdater {
         }
     }
 
-    public static UserUpdater updater(User user, UserRepository userRepository,
-                                                PasswordEncoder passwordEncoder, QRProvider qrProvider,
-                                                UserValidator userValidator) {
-        return new UserUpdater(user, userRepository, passwordEncoder, qrProvider, userValidator);
+    public static UserUpdater updater(User user, PasswordEncoder passwordEncoder,
+                                      QRProvider qrProvider, UserValidation userValidation) {
+        return new UserUpdater(user, passwordEncoder, qrProvider, userValidation);
     }
 
     private boolean nullable(String value) {
@@ -57,7 +54,7 @@ public class UserUpdater {
 
     public UserUpdater email(String email) {
         if (nullable(email)) return this;
-        var valid = userValidator.onUpdateEmailIsValid(user.getId(), email);
+        var valid = userValidation.onUpdateEmailIsValid(user.getId(), email);
         check(valid);
         if (!user.getEmail().equals(email)) {
             var result = user.changeEmail(email);
@@ -101,7 +98,6 @@ public class UserUpdater {
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
-        var userUpdated = userRepository.save(user);
-        return Result.success(userUpdated);
+        return Result.success(user);
     }
 }

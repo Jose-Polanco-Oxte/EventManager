@@ -1,7 +1,8 @@
 package jpolanco.springbootapp.event.application.services.derived;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventCommandRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.base.UpdateEventUC;
 import jpolanco.springbootapp.event.application.uc.derived.UpdateOwnEventUC;
 import jpolanco.springbootapp.event.domain.model.Event;
@@ -15,12 +16,13 @@ import java.io.InputStream;
 @Service
 @RequiredArgsConstructor
 public class UpdateOwnEvent implements UpdateOwnEventUC {
-    private final EventRepository eventRepository;
+    private final EventQueryRepository queryRepository;
+    private final EventCommandRepository commandRepository;
     private final UpdateEventUC updateEventUC;
 
     @Override
     public Result<Event> setChanges(String eventId, String creatorId, UpdateEventRequest request, InputStream imageStream) {
-        var maybeEvent = eventRepository.findById(eventId);
+        var maybeEvent = queryRepository.findById(eventId);
         if (maybeEvent.isEmpty()) {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }

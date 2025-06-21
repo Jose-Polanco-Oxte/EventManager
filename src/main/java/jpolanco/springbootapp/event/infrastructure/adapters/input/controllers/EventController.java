@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;

@@ -2,6 +2,8 @@ package jpolanco.springbootapp.user.application.utils;
 
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
+import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +14,8 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class UserValidator {
-    private final UserRepository userRepository;
+public class UserValidation {
+    private final UserQueryRepository queryRepository;
     private final PasswordEncoder passwordEncoder;
 
     private boolean isInvalidUUID(String userId) {
@@ -24,15 +26,16 @@ public class UserValidator {
             return true;
         }
     }
+
     private boolean emailExist(String email) {
-        return userRepository.findByEmail(email).isPresent();
+        return queryRepository.findByEmail(email).isPresent();
     }
 
     public Result<User> collectUser(String userId) {
         if (idIsValid(userId).isFailure()) {
             return Result.failure(UserAppError.INVALID_ID_FORMAT);
         }
-        var maybeUser = userRepository.findById(userId);
+        var maybeUser = queryRepository.findById(userId);
         return maybeUser.map(Result::success).orElseGet(() -> Result.failure(UserAppError.USER_NOT_FOUND));
     }
 
@@ -55,7 +58,7 @@ public class UserValidator {
         if (validId.isFailure()) {
             return Result.failure(validId.getError());
         }
-        var OptionalUser = userRepository.findById(userId);
+        var OptionalUser = queryRepository.findById(userId);
         if (OptionalUser.isEmpty()) {
             return Result.failure(UserAppError.USER_NOT_FOUND);
         }

@@ -18,7 +18,7 @@ public interface UserRepository extends CRUDRepository<User, String> {
 
     CursorPageResult<User, String> findAll(String cursor, int size, String sortBy, String sortOrder);
 
-    List<User> searchByName(String name, int numberOfResults);
+    List<User> searchByName(String name, int size);
 
-    List<User> searchByEmail(String email, int numberOfResults);
+    List<User> searchByEmail(String email, int size);
 }

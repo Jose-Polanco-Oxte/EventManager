@@ -1,7 +1,8 @@
 package jpolanco.springbootapp.event.application.services.derived;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventCommandRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.base.DeleteEventUC;
 import jpolanco.springbootapp.event.application.uc.derived.DeleteOwnEventByIdUC;
 import jpolanco.springbootapp.event.domain.model.valueobjects.EventStatus;
@@ -12,12 +13,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DeleteOwnEvent implements DeleteOwnEventByIdUC {
-    private final EventRepository eventRepository;
+    private final EventQueryRepository queryRepository;
+    private final EventCommandRepository commandRepository;
     private final DeleteEventUC deleteEventUC;
 
     @Override
     public Result<Void> delete(String creatorId, String eventId) {
-        var event = eventRepository.findById(eventId);
+        var event = queryRepository.findById(eventId);
         if (event.isEmpty()) {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }

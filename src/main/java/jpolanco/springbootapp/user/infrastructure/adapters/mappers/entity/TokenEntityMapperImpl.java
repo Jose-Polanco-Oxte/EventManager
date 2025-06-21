@@ -7,7 +7,6 @@ import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.Jpa
 import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.UUID;

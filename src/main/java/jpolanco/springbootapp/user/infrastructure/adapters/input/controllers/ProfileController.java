@@ -1,4 +1,5 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
+
 import jakarta.validation.Valid;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
@@ -51,6 +52,7 @@ public class ProfileController {
         }
         return ResponseHandler.ok("Email updated successfully");
     }
+
     @PutMapping("/password")
     public ResponseEntity<Object> updatePassword(
             @AuthenticationPrincipal MyUserDetails userDetails,

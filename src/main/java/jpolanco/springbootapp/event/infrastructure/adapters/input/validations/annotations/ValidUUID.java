@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations;
+package jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

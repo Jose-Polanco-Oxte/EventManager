@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.utils.OrderField;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.services.unique;
 
-import jpolanco.springbootapp.user.application.ports.output.UserRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.unique.GetUserByEmailUC;
 import jpolanco.springbootapp.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +11,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class GetUserByEmail implements GetUserByEmailUC {
-
-    private final UserRepository userRepository;
+    private final UserQueryRepository queryRepository;
 
     @Override
     public Optional<User> get(String email) {
-        return userRepository.findByEmail(email);
+        return queryRepository.findByEmail(email);
     }
 }

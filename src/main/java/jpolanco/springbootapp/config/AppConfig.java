@@ -2,7 +2,7 @@ package jpolanco.springbootapp.config;
 
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
-import jpolanco.springbootapp.user.infrastructure.adapters.output.mysql.UserRepositoryMySQL;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import java.util.List;
 @Configuration
 public class AppConfig {
 
-    private final UserRepositoryMySQL userRepository;
+    private final UserQueryRepository userRepository;
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();

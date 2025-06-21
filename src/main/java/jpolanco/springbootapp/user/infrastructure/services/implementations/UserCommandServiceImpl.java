@@ -8,8 +8,8 @@ import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserComman
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
     private final UpdateUserUC updateUser;
     private final DeleteUserUC deleteUserUC;

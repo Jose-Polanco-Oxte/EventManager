@@ -22,11 +22,4 @@ public class RoleRepositoryMySQL implements RolesRepository {
     public void save(String name) {
         jpaRoleRepository.save(new RoleEntity(name));
     }
-
-    @Override
-    public String findByName(String name) {
-        return jpaRoleRepository.findByName(name)
-                .map(RoleEntity::getName).orElseThrow(() ->
-                        new UserIntegrity("Role not found", 404));
-    }
 }

@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.application.services.unique;
 
 import jpolanco.springbootapp.event.application.ports.input.request.CursorPaginationRequest;
 import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.unique.GetPublicEventsUC;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.shared.utils.CursorPageResult;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GetPublicEvents implements GetPublicEventsUC {
-    private final EventRepository eventRepository;
+    private final EventQueryRepository queryRepository;
 
     @Override
     public PageResult<Event> get(PagePaginationRequest pagePaginationRequest) {
-        return eventRepository.findPublicEvents(
+        return queryRepository.findPublicEvents(
                 pagePaginationRequest.page(),
                 pagePaginationRequest.size(),
                 pagePaginationRequest.sortBy(),
@@ -27,7 +27,7 @@ public class GetPublicEvents implements GetPublicEventsUC {
 
     @Override
     public CursorPageResult<Event, String> get(CursorPaginationRequest<String> cursorPaginationRequest) {
-        return eventRepository.findPublicEvents(
+        return queryRepository.findPublicEvents(
                 cursorPaginationRequest.cursor(),
                 cursorPaginationRequest.size(),
                 cursorPaginationRequest.sortBy(),

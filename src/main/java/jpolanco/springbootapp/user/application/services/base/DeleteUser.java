@@ -3,7 +3,8 @@ package jpolanco.springbootapp.user.application.services.base;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
-import jpolanco.springbootapp.user.application.ports.output.UserRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.DeleteUserUC;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
@@ -15,7 +16,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DeleteUser implements DeleteUserUC {
-    private final UserRepository userRepository;
+    private final UserQueryRepository queryRepository;
+    private final UserCommandRepository commandRepository;
     private final JpaTokenRepository jpaTokenRepository;
     private final QRProvider qrProvider;
 
@@ -23,13 +25,13 @@ public class DeleteUser implements DeleteUserUC {
     public Result<Void> delete(User user) {
         jpaTokenRepository.deleteAllByUserId(UUID.fromString(user.getId()));
         qrProvider.delete(user.getQRFileName());
-        userRepository.deleteById(user.getId());
+        commandRepository.deleteById(user.getId());
         return Result.success();
     }
 
     @Override
     public Result<Void> deleteById(String userId) {
-        var maybeUser = userRepository.findById(userId);
+        var maybeUser = queryRepository.findById(userId);
         if (maybeUser.isEmpty()) {
             return Result.failure(UserAppError.USER_NOT_FOUND);
         }
@@ -38,7 +40,7 @@ public class DeleteUser implements DeleteUserUC {
         // Check if the user has any tokens associated with them
         jpaTokenRepository.deleteAllByUserId(UUID.fromString(userId));
         qrProvider.delete(user.getQRFileName());
-        userRepository.deleteById(userId);
+        commandRepository.deleteById(userId);
         return Result.success();
     }
 }

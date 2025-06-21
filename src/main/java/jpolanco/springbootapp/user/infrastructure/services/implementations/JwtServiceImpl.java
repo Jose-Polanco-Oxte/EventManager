@@ -1,11 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
-import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.application.utils.TokenE;
@@ -15,20 +11,14 @@ import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
 import jpolanco.springbootapp.user.infrastructure.errors.UserInfrastructureError;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map;
 
-
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
     private final JwtManager jwtManager;

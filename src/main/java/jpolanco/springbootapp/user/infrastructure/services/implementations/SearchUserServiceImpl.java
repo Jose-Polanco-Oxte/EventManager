@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SearchUserServiceImpl implements SearchUserService {
     private final SearchUserByEmailUC searchUserByEmailUC;
     private final SearchUserByNameUC searchUserByNameUC;

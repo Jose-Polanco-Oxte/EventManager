@@ -1,7 +1,8 @@
 package jpolanco.springbootapp.event.application.services.base;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventCommandRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.base.CancelEventUC;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.domainevents.EventCanceled;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CancelEvent implements CancelEventUC {
-    private final EventRepository eventRepository;
+    private final EventQueryRepository queryRepository;
+    private final EventCommandRepository commandRepository;
 
     @Override
     public Result<Event> cancel(Event event, String reason) {
@@ -24,13 +26,13 @@ public class CancelEvent implements CancelEventUC {
         }
         event.cancel();
         event.recordEvent(new EventCanceled(event.getEventId(), reason));
-        eventRepository.save(event);
+        commandRepository.save(event);
         return Result.success(event);
     }
 
     @Override
     public Result<Event> cancelById(String eventId, String reason) {
-        var maybeEvent = eventRepository.findById(eventId);
+        var maybeEvent = queryRepository.findById(eventId);
         if (maybeEvent.isEmpty()) {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }
@@ -40,7 +42,7 @@ public class CancelEvent implements CancelEventUC {
         }
         event.cancel();
         event.recordEvent(new EventCanceled(event.getEventId(), reason));
-        eventRepository.save(event);
+        commandRepository.save(event);
         return Result.success(event);
     }
 }

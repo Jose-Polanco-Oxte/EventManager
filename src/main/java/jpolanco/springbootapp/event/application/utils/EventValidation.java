@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.application.utils;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -11,10 +11,10 @@ import java.time.Instant;
 @Component
 @RequiredArgsConstructor
 public class EventValidation {
-    private final EventRepository eventRepository;
+    private final EventQueryRepository queryRepository;
 
     private int creatorNotHaveOtherEventInSameSchedule(String creatorId, Instant date, long duration) {
-        var events = eventRepository.findFirstConflictingEvent(date, date.plusSeconds(duration), creatorId);
+        var events = queryRepository.findFirstConflictingEvent(date, date.plusSeconds(duration), creatorId);
         if (events.isPresent()) {
             var event = events.get();
             if (event.getSchedule().equals(date)) {
@@ -32,7 +32,7 @@ public class EventValidation {
     }
 
     public Result<Void> validate(String creatorId, Instant date, long duration, double latitude, double longitude) {
-        if (eventRepository.sameScheduleExists(date, duration) && eventRepository.sameLocationExistsAndIsNotVirtual(latitude, longitude)) {
+        if (queryRepository.sameScheduleExists(date, duration) && queryRepository.sameLocationExistsAndIsNotVirtual(latitude, longitude)) {
             return Result.failure(EventAppError.EVENT_LOCATION_AND_SCHEDULE_CONFLICT);
         }
         if (date.isBefore(Instant.now())) {

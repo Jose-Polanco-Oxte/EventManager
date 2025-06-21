@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.application.services.unique;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
 import jpolanco.springbootapp.event.application.ports.input.providers.FileStorageProvider;
-import jpolanco.springbootapp.event.application.ports.output.EventRepository;
+import jpolanco.springbootapp.event.application.ports.output.EventCommandRepository;
 import jpolanco.springbootapp.event.application.uc.unique.CreateEventUC;
 import jpolanco.springbootapp.event.application.utils.EventValidation;
 import jpolanco.springbootapp.event.domain.model.Event;
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CreateEvent implements CreateEventUC {
-    private final EventRepository eventRepository;
+    private final EventCommandRepository CommandRepository;
     private final EventValidation eventValidation;
     private final FileStorageProvider fileStorage;
 
@@ -64,7 +64,7 @@ public class CreateEvent implements CreateEventUC {
             }
         }
         var createdEvent = maybeEvent.getValue();
-        eventRepository.save(createdEvent);
+        CommandRepository.save(createdEvent);
         return Result.success(createdEvent);
     }
 }

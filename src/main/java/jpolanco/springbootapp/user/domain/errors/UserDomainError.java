@@ -27,5 +27,20 @@ public class UserDomainError extends Error {
 
     public static final UserDomainError INVALID_ID =
             new UserDomainError(400, "User ID is invalid");
+
+    public static final UserDomainError MORE_THAN_ONE_SIGN_IN_EMAIL =
+            new UserDomainError(422, "Email must contain only one '@' sign");
+
+    public static final UserDomainError EMAIL_STARTS_WITH_DOT =
+            new UserDomainError(422, "Email must not start with a dot");
+
+    public static final UserDomainError INVALID_EMAIL_DOMAIN =
+            new UserDomainError(422, "Email domain is not valid");
+
+    public static final UserDomainError EMAIL_CONTAINS_WHITESPACE =
+            new UserDomainError(422, "Email must not contain whitespace");
+
+    public static final UserDomainError EMAIL_USER_NAME_LENGTH =
+            new UserDomainError(422, "Email user name must be between 1 and 64 characters long");
 }
 

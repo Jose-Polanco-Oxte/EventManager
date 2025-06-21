@@ -14,8 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final LoginUC loginUC;
     private final CreateUserUC createUserUc;

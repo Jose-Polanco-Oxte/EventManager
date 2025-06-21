@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.validations.v
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.anottations.ValidUUID;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 
 public class UUIDValidator implements ConstraintValidator<ValidUUID, String> {
     @Override
