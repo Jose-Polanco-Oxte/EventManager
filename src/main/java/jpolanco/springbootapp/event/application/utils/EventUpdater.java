@@ -6,13 +6,14 @@ import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.domain.model.valueobjects.EventStatus;
 import jpolanco.springbootapp.event.domain.model.valueobjects.Modality;
-import jpolanco.springbootapp.event.domain.model.domainevents.EventUpdate;
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.event.domain.model.domain_events.EventUpdate;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.StaffChangeRequest;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class EventUpdater {
     private final FileStorageProvider fileStorage;
     private final EventValidation eventValidation;
     private Result<?> result = Result.success();
+    private final List<Changes<?>> changes = new ArrayList<>();
 
     private void check(Result<?> result) {
         if (result.isFailure() && this.result.isSuccess()) {
@@ -46,8 +48,10 @@ public class EventUpdater {
     public EventUpdater title(String title) {
         if (nullable(title) > 0) return this;
         if (!event.getTitle().equals(title)) {
+            var oldTitle = event.getTitle();
             var result = event.changeTitle(title);
             check(result);
+            changes.add(new Changes<>("title", oldTitle, title));
         }
         return this;
     }
@@ -55,8 +59,10 @@ public class EventUpdater {
     public EventUpdater description(String description) {
         if (nullable(description) > 0) return this;
         if (!event.getDescription().equals(description)) {
+            var oldDescription = event.getDescription();
             var result = event.changeDescription(description);
             check(result);
+            changes.add(new Changes<>("description", oldDescription, description));
         }
         return this;
     }
@@ -66,8 +72,10 @@ public class EventUpdater {
             var result = eventValidation.validate(event.getCreatorId(), schedule, event.getDurationInSeconds(), event.getLatitude(), event.getLongitude());
             check(result);
             if (result.isSuccess()) {
+                var oldSchedule = event.getSchedule();
                 var changeResult = event.changeSchedule(schedule);
                 check(changeResult);
+                changes.add(new Changes<>("schedule", oldSchedule, schedule));
             }
         }
         return this;
@@ -79,8 +87,10 @@ public class EventUpdater {
             var result = eventValidation.validate(event.getCreatorId(), event.getSchedule(), durationInSeconds, event.getLatitude(), event.getLongitude());
             check(result);
             if (result.isSuccess()) {
+                var oldDuration = event.getDurationInSeconds();
                 var changeResult = event.changeDuration(durationInSeconds);
                 check(changeResult);
+                changes.add(new Changes<>("duration", oldDuration, durationInSeconds));
             }
         }
         return this;
@@ -88,16 +98,21 @@ public class EventUpdater {
 
     public EventUpdater status(EventStatus status) {
         if (status == null || event.getStatus() == status) return this;
+        var oldStatus = event.getStatus();
         event.changeStatus(status);
+        changes.add(new Changes<>("status", oldStatus.getValue(), status.getValue()));
         return this;
     }
 
     public EventUpdater location(String locationName, String locationCity, String locationCountry, double latitude, double longitude) {
+        var oldLatitude = event.getLatitude();
+        var oldLongitude = event.getLongitude();
+        var oldLocationName = event.getLocationName();
+        var oldLocationCity = event.getLocationCity();
+        var oldLocationCountry = event.getLocationCountry();
         if (latitude == event.getLatitude() && longitude == event.getLongitude()) {
-            // If latitude and longitude are the same, we can skip validation
-            if (event.getLatitude() == latitude && event.getLongitude() == longitude) {
-                return this;
-            }
+            // No change in location, return early
+            return this;
         } else {
             var result = eventValidation.validate(event.getCreatorId(), event.getSchedule(), event.getDurationInSeconds(), latitude, longitude);
             check(result);
@@ -112,98 +127,109 @@ public class EventUpdater {
                 nullable(locationCity) > 0 ? event.getLocationCity() : locationCity,
                 nullable(locationCountry) > 0 ? event.getLocationCountry() : locationCountry);
         check(result);
+        changes.add(new Changes<>("location", new location(oldLatitude, oldLongitude, oldLocationName, oldLocationCity, oldLocationCountry)
+                , new location(latitude, longitude, locationName, locationCity, locationCountry)));
         return this;
     }
 
-    public EventUpdater categories(List<String> categories) {
-        if (categories == null || categories.isEmpty()) return this;
-        var result = event.changeCategories(categories);
-        check(result);
+    private record location(
+            double latitude,
+            double longitude,
+            String name,
+            String city,
+            String country
+    ){}
+
+    public EventUpdater categories(List<String> remove, List<String> add) {
+        if (noChanges(remove) && noChanges(add)) return this;
+        var originalCategories = event.getCategories();
+        if (noChanges(remove)) {
+            event.addCategories(add);
+        } else if (noChanges(add)) {
+            event.removeCategories(remove);
+        } else {
+            event.removeCategories(remove);
+            event.addCategories(add);
+        }
+        changes.add(new Changes<>("categories", originalCategories, event.getCategories()));
         return this;
     }
 
-    public EventUpdater addCategories(List<String> categories) {
-        if (categories == null || categories.isEmpty()) return this;
-        var result = event.changeAllCategories(categories);
-        check(result);
-        return this;
-    }
-
-    public EventUpdater removeCategories(List<String> categories) {
-        if (categories == null || categories.isEmpty()) return this;
-        var result = event.removeCategories(categories);
-        check(result);
-        return this;
+    private boolean noChanges(List<?> list) {
+        return list == null || list.isEmpty();
     }
 
     public EventUpdater isPublic(boolean isPublic) {
         if (event.isPublic() == isPublic) return this;
+        var oldVisibility = event.isPublic();
         if (isPublic) {event.makePublic();} else { event.makePrivate();}
+        changes.add(new Changes<>("visibility", oldVisibility, isPublic));
         return this;
     }
 
     public EventUpdater enableComments(boolean enableComments) {
         if (event.isEnableComments() == enableComments) return this;
+        var oldEnableComments = event.isEnableComments();
         if (enableComments) {event.enableComments();} else {event.disableComments();}
+        changes.add(new Changes<>("enableComments", oldEnableComments, enableComments));
         return this;
     }
 
     public EventUpdater modality(Modality modality) {
         if (modality == null || modality.equals(event.getModality())) return this;
+        var oldModality = event.getModality();
         if (!event.getModality().equals(modality)) {
             var result = event.changeModality(modality);
             check(result);
         }
+        changes.add(new Changes<>("modality", oldModality.getValue(), modality.getValue()));
         return this;
     }
 
-    public EventUpdater staff(List<StaffRequest> staffs) {
-        if (staffs == null || staffs.isEmpty()) return this;
-        event.setStaff(staffs);
-        return this;
-    }
-
-    public EventUpdater addStaff(List<StaffRequest> staffs) {
-        if (staffs == null || staffs.isEmpty()) return this;
-        for (var staff : staffs) {
-            var result = event.addStaff(staff.staffId(), staff.role(), staff.isAssistanceClerk());
-            check(result);
+    public EventUpdater staff(StaffChangeRequest staffs) {
+        var oldStaff = event.getStaff().stream()
+                .map(staff -> new StaffRequest(staff.getUserId().getValue(), staff.getRole(), staff.isAssistanceClerk()))
+                .toList();
+        if (staffs.clear()) {
+            event.clearStaff();
+        } else {
+            if (noChanges(staffs.remove()) && noChanges(staffs.add())) return this;
+            if (noChanges(staffs.remove())) {
+                this.event.addStaffs(staffs.add());
+            } else if (noChanges(staffs.add())) {
+                this.event.removeStaffs(staffs.remove());
+            } else {
+                this.event.removeStaffs(staffs.remove());
+                this.event.addStaffs(staffs.add());
+            }
         }
-        return this;
-    }
-
-    public EventUpdater removeStaff(List<String> staffIds) {
-        if (staffIds == null || staffIds.isEmpty()) return this;
-        for (String staffId : staffIds) {
-            var result = event.removeStaff(staffId);
-            check(result);
+        List<StaffRequest> newStaff;
+        if (event.getStaff().isEmpty()) {
+            newStaff = List.of();
+        } else {
+            newStaff = event.getStaff().stream()
+                    .map(staff -> new StaffRequest(staff.getUserId().getValue(), staff.getRole(), staff.isAssistanceClerk()))
+                    .toList();
         }
-        return this;
-    }
-
-    public EventUpdater clearStaff() {
-        var result = event.clearStaff();
-        check(result);
+        changes.add(new Changes<>("staff", oldStaff, newStaff));
         return this;
     }
 
     public EventUpdater changePicture(InputStream imageStream) {
         if (imageStream == null) return this;
+        var oldPictureFileName = event.getPictureFileName();
         var fileStored = fileStorage.storeImage(event.getPictureFileName(), imageStream);
         if (fileStored == null) {
             result = Result.failure(EventAppError.IMAGE_STORAGE_ERROR);
+            return this;
         }
-        return this;
-    }
-
-    public EventUpdater addDomainEvent(DomainEvent domainEvent) {
-        if (domainEvent == null) return this;
-        event.recordEvent(domainEvent);
+        changes.add(new Changes<>("picture", oldPictureFileName, event.getPictureFileName()));
         return this;
     }
 
     public EventUpdater setMaxAttendees(int maxAttendees) {
         if (maxAttendees < 0) return this;
+        var oldMaxAttendees = event.getMaxAttendees();
         if (event.getMaxAttendees() != maxAttendees) {
             if (maxAttendees < event.getCurrentAttendees()) {
                 check(Result.failure(EventAppError.MAX_ATTENDEES_LESS_THAN_CURRENT));
@@ -211,6 +237,7 @@ public class EventUpdater {
             }
             var result = event.changeMaxAttendees(maxAttendees);
             check(result);
+            changes.add(new Changes<>("maxAttendees", oldMaxAttendees, maxAttendees));
         }
         return this;
     }
@@ -220,7 +247,13 @@ public class EventUpdater {
             return Result.failure(result.getError());
         }
         // Publish the event update domain event
-        event.recordEvent(new EventUpdate());
+        if (!changes.isEmpty()) {
+            event.recordEvent(new EventUpdate(
+                    event.getEventId(),
+                    event.getTitle(),
+                    changes.isEmpty() ? List.of() : changes
+            ));
+        }
         return Result.success(event);
     }
 }

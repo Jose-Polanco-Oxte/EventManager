@@ -8,5 +8,5 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.Upd
 
 public interface UserCommandService {
     Result<Void> update(AnyUserUpdateRequest request, String userId);
-    Result<Void> deleteById(String userId);
+    Result<Void> deleteById(String userId, String reason);
 }

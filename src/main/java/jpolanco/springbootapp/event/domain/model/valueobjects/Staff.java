@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.domain.model.valueobjects;
 
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserId;
 import lombok.Getter;
 
 @Getter
@@ -28,5 +28,16 @@ public class Staff {
         }
         UserId userIdValue = maybeUserId.getValue();
         return Result.success(new Staff(userIdValue, role, assistanceClerk));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Staff staff)) return false;
+        return this.userId.equals(staff.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return userId.hashCode();
     }
 }

@@ -1,19 +1,14 @@
 package jpolanco.springbootapp.event.domain.model;
 
 import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
-import jpolanco.springbootapp.event.domain.errors.EventDomainError;
-import jpolanco.springbootapp.event.domain.model.domainevents.EventCreated;
+import jpolanco.springbootapp.event.domain.model.domain_events.*;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
-import jpolanco.springbootapp.shared.domain.DomainEvent;
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
-import org.springframework.http.HttpStatus;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserId;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Event {
     private final EventId eventId;
@@ -26,16 +21,16 @@ public class Event {
     private boolean isPublic;
     private final boolean enableComments;
     private Modality modality;
-    private List<Staff> staff;
+    private Set<Staff> staff;
     private PictureFileName pictureFileName;
     private UserId creatorId;
     private final Instant createdAt;
-    private List<DomainEvent> events = new ArrayList<>();
+    private List<EventNotification> events = new ArrayList<>();
     private Attendees attendees;
 
     protected Event(EventId eventId, Header header, Schedule schedule, Duration duration, EventStatus status,
                     Location location, Categories category, boolean isPublic, boolean enableComments,
-                    Modality modality, List<Staff> staff, PictureFileName pictureFileName, UserId creatorId,
+                    Modality modality, Set<Staff> staff, PictureFileName pictureFileName, UserId creatorId,
                     Instant createdAt, Attendees attendees) {
         this.eventId = eventId;
         this.header = header;
@@ -198,6 +193,13 @@ public class Event {
             return Result.failure(maybeSchedule.getError());
         }
         this.schedule = maybeSchedule.getValue();
+        recordEvent(
+                new EventScheduleChanged(
+                        getEventId(),
+                        getSchedule(),
+                        getTitle()
+                )
+        );
         return Result.success();
     }
 
@@ -220,6 +222,13 @@ public class Event {
             return Result.failure(maybeDuration.getError());
         }
         this.duration = maybeDuration.getValue();
+        recordEvent(
+                new EventDurationChanged(
+                        getEventId(),
+                        getTitle(),
+                        getDurationInSeconds()
+                )
+        );
         return Result.success();
     }
 
@@ -248,16 +257,27 @@ public class Event {
         this.status = EventStatus.SCHEDULED;
     }
 
-    public void cancel() {
+    public void cancel(String reason) {
         this.status = EventStatus.CANCELLED;
+        recordEvent(new EventCancelled(getEventId(), getTitle(), reason));
     }
 
     public void complete() {
         this.status = EventStatus.COMPLETED;
+        recordEvent(new EventCompleted(getEventId(), getTitle()));
     }
 
     public void changeStatus(EventStatus status) {
         this.status = status;
+        if (status.equals(EventStatus.CANCELLED)) {
+            recordEvent(
+                    new EventCancelled(
+                            getEventId(),
+                            getTitle(),
+                            "Status changed to CANCELLED"
+                    )
+            );
+        }
     }
 
 
@@ -333,53 +353,32 @@ public class Event {
             return Result.failure(maybeLocation.getError());
         }
         this.location = maybeLocation.getValue();
+        recordEvent(
+                new EventLocationChanged(
+                        getEventId(),
+                        getTitle(),
+                        latitude,
+                        longitude,
+                        locationName,
+                        locationCity,
+                        locationCountry
+                )
+        );
         return Result.success();
     }
 
     // Categories methods
 
-    public Categories getCategories() {
-        return category;
+    public List<String> getCategories() {
+        return category.getValues();
     }
 
-    public Result<Void> changeAllCategories(List<String> categories) {
-        var maybeCategories = Categories.create(categories);
-        if (maybeCategories.isFailure()) {
-            return Result.failure(maybeCategories.getError());
-        }
-        this.category.addCategories(categories);
-        return Result.success();
-    }
-
-    public void removeCategory(String category) {
-        this.category.removeCategory(category);
-    }
-
-    public Result<Void> removeCategories(List<String> categories) {
-        for (String cat : categories) {
-            this.category.removeCategory(cat);
-        }
-        if (this.category.isEmpty()) {
-            return Result.failure(EventDomainError.CATEGORIES_EMPTY);
-        }
-        return Result.success();
-    }
-
-    public void addCategory(String category) {
-        this.category.addCategory(category);
+    public void removeCategories(List<String> categories) {
+        this.category.removeCategories(categories);
     }
 
     public void addCategories(List<String> categories) {
         this.category.addCategories(categories);
-    }
-
-    public Result<Void> changeCategories(List<String> categories) {
-        var maybeCategories = Categories.create(categories);
-        if (maybeCategories.isFailure()) {
-            return Result.failure(maybeCategories.getError());
-        }
-        this.category = maybeCategories.getValue();
-        return Result.success();
     }
 
     // Preference methods
@@ -394,10 +393,12 @@ public class Event {
 
     public void makePublic() {
         this.isPublic = true;
+        recordEvent(new EventPrivacyChanged(getEventId(), getTitle(), true));
     }
 
     public void makePrivate() {
         this.isPublic = false;
+        recordEvent(new EventPrivacyChanged(getEventId(), getTitle(), false));
     }
 
     public void enableComments() {
@@ -418,19 +419,23 @@ public class Event {
 
     public Result<Void> changeModality(Modality modality) {
         this.modality = modality;
+        recordEvent(new EventModalityChanged(getEventId(), getTitle(), modality));
         return Result.success();
     }
 
     public void makeVirtual() {
         this.modality = Modality.VIRTUAL;
+        recordEvent(new EventModalityChanged(getEventId(), getTitle(), Modality.VIRTUAL));
     }
 
     public void makeInPerson() {
         this.modality = Modality.IN_PERSON;
+        recordEvent(new EventModalityChanged(getEventId(), getTitle(), Modality.IN_PERSON));
     }
 
     public void makeHybrid() {
         this.modality = Modality.HYBRID;
+        recordEvent(new EventModalityChanged(getEventId(), getTitle(), Modality.HYBRID));
     }
 
     // Staff methods
@@ -440,58 +445,72 @@ public class Event {
                 .toList();
     }
 
-    public List<String> getStaffRoles() {
-        return staff.stream()
-                .map(Staff::getRole)
+    public void addStaffs(List<StaffRequest> staffs) {
+        // add new staff members to the event and record only new staff members
+        var newStaff = staffs.stream()
+                .map(this::toValidStaff)
+                .flatMap(Optional::stream)
+                .filter(staff::add)
                 .toList();
+        if (!newStaff.isEmpty()) {
+            var staffRequests = newStaff.stream()
+                    .map(staffMember -> new StaffRequest(
+                            staffMember.getUserId().getValue(),
+                            staffMember.getRole(),
+                            staffMember.isAssistanceClerk()))
+                    .toList();
+            recordEvent(new EventStaffAdded(getEventId(), getTitle(), staffRequests));
+        }
     }
 
-    public List<String> getStaffAssistanceClerkIds() {
-        return staff.stream()
-                .filter(Staff::isAssistanceClerk)
-                .map(staffMember -> staffMember.getUserId().getValue())
+    public void removeStaffs(List<String> staffIds) {
+        // remove staff members from the event and record only removed staff members
+        var removedStaff = staffIds.stream()
+                .map(userId -> this.staff.stream()
+                        .filter(staffMember -> staffMember.getUserId().getValue().equals(userId))
+                        .findFirst())
+                .flatMap(Optional::stream)
+                .filter(staff::remove)
                 .toList();
+        if (!removedStaff.isEmpty()) {
+            var staffRequests = removedStaff.stream()
+                    .map(staffMember -> new StaffRequest(
+                            staffMember.getUserId().getValue(),
+                            staffMember.getRole(),
+                            staffMember.isAssistanceClerk()))
+                    .toList();
+            recordEvent(new EventStaffRemoved(getEventId(), getTitle(), staffRequests));
+        }
     }
 
-    public void setStaff(List<StaffRequest> staff) {
-        this.staff = staff.stream()
-                .map(staffHolder -> Staff.create(staffHolder.staffId(), staffHolder.role(), staffHolder.isAssistanceClerk()))
-                .filter(Result::isSuccess)
-                .map(Result::getValue)
-                .toList();
+    private Optional<Staff> toValidStaff(StaffRequest request) {
+        if (request == null) return Optional.empty();
+        var maybeStaff = Staff.create(request.staffId(), request.role(), request.isAssistanceClerk());
+        if (maybeStaff.isFailure()) {
+            return Optional.empty(); // skip invalid staff
+        }
+        return Optional.of(maybeStaff.getValue());
     }
 
     public List<Staff> getStaff() {
-        return staff;
+        return staff.stream().toList();
     }
 
-    public Result<Void> addStaff(String userId, String role, boolean assistance_clerk) {
-        var maybeStaff = Staff.create(userId, role, assistance_clerk);
-        if (maybeStaff.isFailure()) {
-            return Result.failure(maybeStaff.getError());
-        }
-        if (this.staff.stream().noneMatch(staffMember -> staffMember.getUserId().equals(maybeStaff.getValue().getUserId()))) {
-            this.staff.add(maybeStaff.getValue());
-        }
-        return Result.success();
-    }
-
-    public Result<Void> removeStaff(String userId) {
-        var staffToRemove = this.staff.stream()
-                .filter(staffMember -> staffMember.getUserId().getValue().equals(userId))
-                .findFirst();
-
-        if (staffToRemove.isPresent()) {
-            this.staff.remove(staffToRemove.get());
-            return Result.success();
-        } else {
-            return Result.failure(EventDomainError.STAFF_NOT_FOUND);
-        }
-    }
-
-    public Result<Void> clearStaff() {
+    public void clearStaff() {
+        var staffCleared = this.staff.stream()
+                .map(staffMember -> new StaffRequest(
+                        staffMember.getUserId().getValue(),
+                        staffMember.getRole(),
+                        staffMember.isAssistanceClerk()))
+                .toList();
         this.staff.clear();
-        return Result.success();
+        recordEvent(
+                new EventStaffCleared(
+                        getEventId(),
+                        getTitle(),
+                        staffCleared
+                )
+        );
     }
 
     // Creator methods
@@ -541,15 +560,22 @@ public class Event {
             return Result.failure(maybeAttendees.getError());
         }
         this.attendees = maybeAttendees.getValue();
+        recordEvent(
+                new EventMaxAttendeesChanged(
+                        getEventId(),
+                        getTitle(),
+                        getMaxAttendees()
+                )
+        );
         return Result.success();
     }
 
     // Domain events
-    public List<DomainEvent> pullEvents() {
+    public List<EventNotification> pullEvents() {
         return this.events;
     }
 
-    public void recordEvent(DomainEvent event) {
+    public void recordEvent(EventNotification event) {
         if (event != null) {
             this.events.add(event);
         }

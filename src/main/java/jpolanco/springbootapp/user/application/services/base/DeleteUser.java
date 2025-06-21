@@ -1,16 +1,19 @@
 package jpolanco.springbootapp.user.application.services.base;
 
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.DeleteUserUC;
+import jpolanco.springbootapp.user.application.application_events.UserDeleted;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,25 +25,26 @@ public class DeleteUser implements DeleteUserUC {
     private final QRProvider qrProvider;
 
     @Override
-    public Result<Void> delete(User user) {
+    public Result<List<EventNotification>> delete(User user, String reason) {
         jpaTokenRepository.deleteAllByUserId(UUID.fromString(user.getId()));
         qrProvider.delete(user.getQRFileName());
         commandRepository.deleteById(user.getId());
-        return Result.success();
+        user.recordEvent(new UserDeleted(user.getId(), reason));
+        return Result.success(user.pullEvents());
     }
 
     @Override
-    public Result<Void> deleteById(String userId) {
+    public Result<List<EventNotification>> deleteById(String userId, String reason) {
         var maybeUser = queryRepository.findById(userId);
         if (maybeUser.isEmpty()) {
             return Result.failure(UserAppError.USER_NOT_FOUND);
         }
         var user = maybeUser.get();
-
-        // Check if the user has any tokens associated with them
-        jpaTokenRepository.deleteAllByUserId(UUID.fromString(userId));
-        qrProvider.delete(user.getQRFileName());
-        commandRepository.deleteById(userId);
-        return Result.success();
+        var result = delete(user, reason);
+        if (result.isFailure()) {
+            return Result.failure(result.getError());
+        }
+        var domainEvents = result.getValue();
+        return Result.success(domainEvents);
     }
 }

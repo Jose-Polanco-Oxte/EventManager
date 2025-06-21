@@ -8,6 +8,6 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.Upd
 public interface ProfileService {
     Result<Void> changeEmail(String userId, UpdateEmailRequest request);
     Result<Void> changeName(String userId, UpdateNameRequest request);
-    Result<Void> delete(String userId);
+    Result<Void> delete(String userId, String reason);
     Result<Void> changePassword(String userId, UpdatePasswordRequest dto);
 }

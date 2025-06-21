@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.persistence;
 
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import lombok.*;
 
 import java.time.Instant;

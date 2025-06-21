@@ -2,9 +2,8 @@ package jpolanco.springbootapp.user.application.utils;
 
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
-import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -72,7 +71,7 @@ public class UserUpdater {
         if (nullable(password)) return this;
         var newEncodedPassword = passwordEncoder.encode(password);
         if (!user.getEncodedPassword().equals(newEncodedPassword)) {
-            var result = user.changePassword(newEncodedPassword);
+            var result = user.changeEncodedPassword(newEncodedPassword);
             check(result);
         }
         return this;

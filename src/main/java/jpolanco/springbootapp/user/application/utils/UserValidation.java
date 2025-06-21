@@ -2,9 +2,7 @@ package jpolanco.springbootapp.user.application.utils;
 
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
-import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
-import jpolanco.springbootapp.user.application.ports.output.UserRepository;
 import jpolanco.springbootapp.user.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,7 +64,7 @@ public class UserValidation {
         if (emailExist(newEmail) && !user.getEmail().equals(newEmail)) {
             return Result.failure(UserAppError.EMAIL_IS_ALREADY_IN_USE);
         }
-        return Result.success();
+        return Result.success(user);
     }
 
     public Result<User> onUpdatePasswordIsValid(String userId, String newPassword, String oldPassword) {

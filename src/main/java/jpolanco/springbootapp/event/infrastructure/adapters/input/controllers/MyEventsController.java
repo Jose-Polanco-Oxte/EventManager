@@ -3,6 +3,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
@@ -97,9 +98,10 @@ public class MyEventsController {
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Object> deleteEvent(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
-            @ValidUUID @PathVariable String eventId
-    ) {
-        var commandResult = ownCommandService.deleteEvent(myUserDetails.getId(), eventId);
+            @ValidUUID @PathVariable String eventId,
+            @Valid @RequestBody CommandReasonRequest request
+            ) {
+        var commandResult = ownCommandService.deleteEvent(myUserDetails.getId(), eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
@@ -110,9 +112,9 @@ public class MyEventsController {
     public ResponseEntity<Object> cancelEvent(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
             @ValidUUID @PathVariable String eventId,
-            @RequestParam String reason
+            @Valid @RequestBody CommandReasonRequest request
     ) {
-        var commandResult = ownCommandService.cancelEvent(myUserDetails.getId(), eventId, reason);
+        var commandResult = ownCommandService.cancelEvent(myUserDetails.getId(), eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }

@@ -7,7 +7,7 @@ import jpolanco.springbootapp.user.application.ports.output.UserCommandRepositor
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.utils.UserUpdater;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
 import jpolanco.springbootapp.user.application.utils.UserValidation;
 import jpolanco.springbootapp.user.application.uc.base.UpdateUserUC;

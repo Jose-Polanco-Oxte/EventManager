@@ -2,8 +2,8 @@ package jpolanco.springbootapp.user.infrastructure.components.utils;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
-import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
-import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
+import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
+import jpolanco.springbootapp.user.application.ports.output.JwtQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,13 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CronJobsUser {
 
-    private final JwtRepository jpaTokenRepository;
+    private final JwtQueryRepository jwtQueryRepository;
+    private final JwtCommandRepository jwtCommandRepository;
     private final JwtManager jwtManager;
 
     @Transactional
     @Scheduled(cron = "0 0 * * * *")
     public void reviewStatusToken() {
-        var tokens = jpaTokenRepository.findAll();
+        var tokens = jwtQueryRepository.findAll();
         if (tokens.isEmpty()) {
             return;
         }
@@ -29,7 +30,7 @@ public class CronJobsUser {
             } catch (ExpiredJwtException e) {
                 if (!token.getStatus().equals(TokenStatus.EXPIRED)) {
                     token.setStatus(TokenStatus.EXPIRED);
-                    jpaTokenRepository.save(token);
+                    jwtCommandRepository.save(token);
                 }
             }
         }
@@ -39,7 +40,7 @@ public class CronJobsUser {
     @Scheduled(cron = "0 0 0 */2 * *")
     public void deleteExpiredTokens() {
         System.out.println("Deleting expired and revoked tokens...");
-        jpaTokenRepository.deleteAllByStatus(TokenStatus.EXPIRED);
-        jpaTokenRepository.deleteAllByStatus(TokenStatus.REVOKED);
+        jwtCommandRepository.deleteAllByStatus(TokenStatus.EXPIRED);
+        jwtCommandRepository.deleteAllByStatus(TokenStatus.REVOKED);
     }
 }

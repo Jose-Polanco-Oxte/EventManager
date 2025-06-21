@@ -3,7 +3,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.User;
 
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import org.springframework.stereotype.Component;

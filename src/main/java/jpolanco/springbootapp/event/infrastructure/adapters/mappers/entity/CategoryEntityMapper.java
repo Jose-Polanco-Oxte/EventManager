@@ -6,5 +6,5 @@ import jpolanco.springbootapp.shared.infrastructure.mappers.EntityMapper;
 
 import java.util.List;
 
-public interface CategoryEntityMapper extends EntityMapper<List<CategoryEntity>, Categories> {
+public interface CategoryEntityMapper extends EntityMapper<List<CategoryEntity>, List<String>> {
 }

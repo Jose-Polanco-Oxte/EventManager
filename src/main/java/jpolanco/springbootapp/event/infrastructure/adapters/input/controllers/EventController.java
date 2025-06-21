@@ -3,6 +3,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
@@ -108,9 +109,10 @@ public class EventController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Object> deleteEvent(
-            @ValidUUID @PathVariable String eventId
+            @ValidUUID @PathVariable String eventId,
+            @Valid @RequestBody CommandReasonRequest request
     ) {
-        var commandResult = commandService.deleteEventById(eventId);
+        var commandResult = commandService.deleteEventById(eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
@@ -121,9 +123,9 @@ public class EventController {
     @PostMapping("/{eventId}/cancel")
     public ResponseEntity<Object> cancelEvent(
             @PathVariable String eventId,
-            @RequestParam String reason
+            @Valid @RequestBody CommandReasonRequest request
     ) {
-        var commandResult = commandService.cancelEvent(eventId, reason);
+        var commandResult = commandService.cancelEvent(eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }

@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.user.application.services.derived;
 
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
@@ -8,6 +9,8 @@ import jpolanco.springbootapp.user.application.uc.derived.DeleteProfileUC;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DeleteProfile implements DeleteProfileUC {
@@ -15,7 +18,7 @@ public class DeleteProfile implements DeleteProfileUC {
     private final DeleteUserUC deleteUserUC;
 
     @Override
-    public Result<Void> delete(String userId) {
+    public Result<List<EventNotification>> delete(String userId, String reason) {
         var maybeUser = queryRepository.findById(userId);
         if (maybeUser.isEmpty()) {
             return Result.failure(UserAppError.USER_NOT_FOUND);
@@ -24,10 +27,6 @@ public class DeleteProfile implements DeleteProfileUC {
         if (user.isSuspended()) {
             return Result.failure(UserAppError.USER_SUSPENDED);
         }
-        var result = deleteUserUC.delete(user);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        return Result.success();
+        return deleteUserUC.delete(user, reason);
     }
 }

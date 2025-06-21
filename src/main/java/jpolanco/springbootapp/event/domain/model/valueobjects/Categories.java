@@ -35,11 +35,15 @@ public class Categories {
     }
 
     public void addCategories(List<String> categories) {
-        this.Values.addAll(categories);
+        this.Values.addAll(List.copyOf(categories));
     }
 
     public void removeCategory(String category) {
         this.Values.remove(category);
+    }
+
+    public void removeCategories(List<String> categories) {
+        categories.forEach(this.Values::remove);
     }
 
     public boolean containsCategory(String category) {

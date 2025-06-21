@@ -1,22 +1,25 @@
 package jpolanco.springbootapp.user.application.uc.base;
 
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.User;
 
+import java.util.List;
+
 public interface DeleteUserUC {
     /**
-     * Deletes the specified user.
+     * Deletes a user and all associated data.
      *
      * @param user the user to be deleted
-     * @return a Result indicating success or failure of the deletion operation
+     * @return a Result containing a list of DomainEvents if the deletion is successful
      */
-    Result<Void> delete(User user);
+    Result<List<EventNotification>> delete(User user, String reason);
 
     /**
-     * Deletes a user by their ID.
+     * Deletes a user by their ID and all associated data.
      *
      * @param userId the ID of the user to be deleted
-     * @return a Result indicating success or failure of the deletion operation
+     * @return a Result containing a list of DomainEvents if the deletion is successful
      */
-    Result<Void> deleteById(String userId);
+    Result<List<EventNotification>> deleteById(String userId, String reason);
 }

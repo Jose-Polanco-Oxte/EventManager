@@ -9,6 +9,7 @@ import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.Up
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,46 +29,52 @@ public class EventCommandServiceImpl implements EventCommandService {
     private final DomainEventsPublisher publisher;
     private final EventDtoCreator eventDtoCreator;
 
-    @Override
     @Transactional
+    @Override
     public Result<EventResponse> createEvent(String creatorId, EventCreationRequest request, InputStream imageStream) {
         var createdEvent = createEventUC.create(creatorId, request, imageStream);
         if (createdEvent.isFailure()) {
             return Result.failure(createdEvent.getError());
         }
         var event = createdEvent.getValue();
-        event.pullEvents().forEach(publisher::publish);
+        publisher.publishAll(event.pullEvents());
         return Result.success(eventDtoCreator.create(createdEvent.getValue()));
     }
 
-    @Override
     @Transactional
+    @Override
     public Result<EventResponse> updateEvent(String eventId, UpdateEventRequest request, InputStream imageStream) {
-        var eventUpdated = updateEventUC.setChangesById(eventId, request, imageStream);
-        if (eventUpdated.isFailure()) {
-            return Result.failure(eventUpdated.getError());
+        var updatedEvent = updateEventUC.setChangesById(eventId, request, imageStream);
+        if (updatedEvent.isFailure()) {
+            return Result.failure(updatedEvent.getError());
         }
-        var event = eventUpdated.getValue();
-        event.pullEvents().forEach(publisher::publish);
+        var event = updatedEvent.getValue();
+        publisher.publishAll(event.pullEvents());
         return Result.success(eventDtoCreator.create(event));
     }
 
 
+    @Transactional
     @Override
-    public Result<Void> deleteEventById(String eventId) {
-        var result = deleteEventUC.deleteById(eventId);
+    public Result<Void> deleteEventById(String eventId, String reason) {
+        var result = deleteEventUC.deleteById(eventId, reason);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
+        List<EventNotification> appEvents = result.getValue();
+        publisher.publishAll(appEvents);
         return Result.success();
     }
 
+    @Transactional
     @Override
     public Result<Void> cancelEvent(String eventId, String reason) {
-        var result = cancelEventUC.cancelById(eventId, reason);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
+        var cancelledEvent = cancelEventUC.cancelById(eventId, reason);
+        if (cancelledEvent.isFailure()) {
+            return Result.failure(cancelledEvent.getError());
         }
+        var event = cancelledEvent.getValue();
+        publisher.publishAll(event.pullEvents());
         return Result.success();
     }
 

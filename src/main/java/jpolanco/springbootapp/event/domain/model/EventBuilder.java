@@ -2,13 +2,15 @@ package jpolanco.springbootapp.event.domain.model;
 
 import jpolanco.springbootapp.event.application.ports.input.request.StaffRequest;
 import jpolanco.springbootapp.event.domain.model.valueobjects.*;
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.valueobjects.UserId;
+import jpolanco.springbootapp.user.domain.model.value_objects.UserId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class EventBuilder {
     private EventId eventId;
@@ -21,12 +23,12 @@ public class EventBuilder {
     private boolean isPublic = true;
     private boolean isEnableComments = true;
     private Modality modality;
-    private List<Staff> staff = new ArrayList<>();
+    private Set<Staff> staff = new HashSet<>();
     private PictureFileName pictureFileName;
     private UserId creatorId;
     private Instant createdAt;
     private Attendees attendees;
-    private DomainEvent domainEvent;
+    private EventNotification eventNotification;
     private Result<?> isValid = Result.success();
 
     private <T> T checker(Result<T> result) {
@@ -139,8 +141,8 @@ public class EventBuilder {
         return this;
     }
 
-    public EventBuilder addDomainEvent(DomainEvent domainEvent) {
-        this.domainEvent = domainEvent;
+    public EventBuilder addDomainEvent(EventNotification eventNotification) {
+        this.eventNotification = eventNotification;
         return this;
     }
 
@@ -159,14 +161,14 @@ public class EventBuilder {
                 isPublic,
                 isEnableComments,
                 modality,
-                staff.stream().toList(),
+                staff,
                 pictureFileName,
                 creatorId,
                 createdAt,
                 attendees
         );
-        if (domainEvent != null) {
-            event.recordEvent(domainEvent);
+        if (eventNotification != null) {
+            event.recordEvent(eventNotification);
         }
         return Result.success(event);
     }

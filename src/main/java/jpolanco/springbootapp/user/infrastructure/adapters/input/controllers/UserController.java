@@ -2,6 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.utils.OrderField;
@@ -51,8 +52,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Object> delete(@PathVariable @ValidUUID String userId) {
-        var commandResult = commandService.deleteById(userId);
+    public ResponseEntity<Object> delete(
+            @PathVariable @ValidUUID String userId,
+            @Valid @RequestBody CommandReasonRequest request
+            ) {
+        var commandResult = commandService.deleteById(userId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(
                     commandResult.getMessage(),

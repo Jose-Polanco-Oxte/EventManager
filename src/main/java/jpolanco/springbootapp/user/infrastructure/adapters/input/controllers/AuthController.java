@@ -25,7 +25,7 @@ public class AuthController {
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        return ResponseHandler.ok(commandResult);
+        return ResponseHandler.ok(commandResult.getValue());
     }
 
     @PostMapping("/login")
@@ -34,7 +34,7 @@ public class AuthController {
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        return ResponseHandler.ok(commandResult);
+        return ResponseHandler.ok(commandResult.getValue());
     }
 
     @PostMapping("/refresh")
@@ -43,6 +43,6 @@ public class AuthController {
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
-        return ResponseHandler.ok(commandResult);
+        return ResponseHandler.ok(commandResult.getValue());
     }
 }

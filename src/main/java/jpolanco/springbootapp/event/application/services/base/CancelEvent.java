@@ -5,7 +5,6 @@ import jpolanco.springbootapp.event.application.ports.output.EventCommandReposit
 import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.base.CancelEventUC;
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.event.domain.model.domainevents.EventCanceled;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +23,7 @@ public class CancelEvent implements CancelEventUC {
         if (event.isCancelled()) {
             return Result.failure(EventAppError.EVENT_ALREADY_CANCELLED);
         }
-        event.cancel();
-        event.recordEvent(new EventCanceled(event.getEventId(), reason));
+        event.cancel(reason);
         commandRepository.save(event);
         return Result.success(event);
     }
@@ -37,12 +35,6 @@ public class CancelEvent implements CancelEventUC {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }
         var event = maybeEvent.get();
-        if (event.isCancelled()) {
-            return Result.failure(EventAppError.EVENT_ALREADY_CANCELLED);
-        }
-        event.cancel();
-        event.recordEvent(new EventCanceled(event.getEventId(), reason));
-        commandRepository.save(event);
-        return Result.success(event);
+        return cancel(event, reason);
     }
 }

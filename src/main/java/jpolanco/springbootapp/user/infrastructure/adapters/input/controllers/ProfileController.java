@@ -2,6 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
@@ -66,8 +67,11 @@ public class ProfileController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<Object> deleteAccount(@AuthenticationPrincipal MyUserDetails userDetails) {
-        var commandResult = profileService.delete(userDetails.getId());
+    public ResponseEntity<Object> deleteAccount(
+            @AuthenticationPrincipal MyUserDetails userDetails,
+            @Valid @RequestBody CommandReasonRequest request
+            ) {
+        var commandResult = profileService.delete(userDetails.getId(), request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }

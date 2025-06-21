@@ -18,10 +18,9 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
     private final JpaCategoryRepository jpaCategoryRepository;
 
     @Override
-    public List<CategoryEntity> toEntity(Categories domain) {
-        var domainCategories = domain.getValues();
+    public List<CategoryEntity> toEntity(List<String> categories) {
         var categoriesEntities = new ArrayList<CategoryEntity>();
-        for (var category : domainCategories) {
+        for (var category : categories) {
             var entity = jpaCategoryRepository.findById(category);
             entity.ifPresent(categoriesEntities::add);
         }
@@ -32,7 +31,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
     }
 
     @Override
-    public Categories toDomain(List<CategoryEntity> entity) {
+    public List<String> toDomain(List<CategoryEntity> entity) {
         var categories = new ArrayList<String>();
         for (var categoryEntity : entity) {
             categories.add(categoryEntity.getName());
@@ -41,6 +40,6 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
         if (maybeCategories.isFailure()) {
             throw new EventIntegrity("Invalid categories provided.", 400);
         }
-        return maybeCategories.getValue();
+        return maybeCategories.getValue().getValues();
     }
 }

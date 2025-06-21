@@ -1,6 +1,5 @@
-package jpolanco.springbootapp.user.domain.model.valueobjects;
+package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.errors.UserDomainError;
@@ -23,5 +22,17 @@ public class UserId extends IdObject {
             return Result.failure(UserDomainError.INVALID_ID);
         }
         return Result.success(new UserId(value));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof UserId)) return false;
+        UserId userId = (UserId) o;
+        return this.getValue().equals(userId.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getValue().hashCode();
     }
 }

@@ -148,7 +148,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                 entity.getLocation().getCountry(),
                 entity.getLocation().getLatitude(),
                 entity.getLocation().getLongitude(),
-                categories.getValues(),
+                categories,
                 entity.getPreferences().isPublic(),
                 entity.getPreferences().isEnableComments(),
                 entity.getPreferences().getModality(),

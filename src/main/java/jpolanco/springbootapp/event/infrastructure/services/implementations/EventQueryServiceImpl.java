@@ -2,7 +2,6 @@ package jpolanco.springbootapp.event.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.event.application.ports.input.request.CursorPaginationRequest;
 import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
-import jpolanco.springbootapp.event.application.uc.unique.GetAllEventsUC;
 import jpolanco.springbootapp.event.application.uc.unique.GetEventByIdUC;
 import jpolanco.springbootapp.event.application.uc.unique.GetEventsUC;
 import jpolanco.springbootapp.event.application.uc.unique.GetPublicEventsUC;

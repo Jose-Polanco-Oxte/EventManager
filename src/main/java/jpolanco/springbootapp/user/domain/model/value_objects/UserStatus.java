@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.user.domain.model.valueobjects;
+package jpolanco.springbootapp.user.domain.model.value_objects;
 
 public enum UserStatus {
     ACTIVE("ACTIVE"),

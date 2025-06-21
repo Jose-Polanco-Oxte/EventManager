@@ -1,10 +1,13 @@
 package jpolanco.springbootapp.user.domain.model;
 
 
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.domainevents.UserRegistered;
-import jpolanco.springbootapp.user.domain.model.valueobjects.*;
+import jpolanco.springbootapp.user.domain.domain_events.UserEmailChanged;
+import jpolanco.springbootapp.user.domain.domain_events.UserPasswordChanged;
+import jpolanco.springbootapp.user.domain.domain_events.UserRegistered;
+import jpolanco.springbootapp.user.domain.domain_events.UserSuspended;
+import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
 import java.time.Instant;
 import java.util.*;
@@ -19,7 +22,7 @@ public class User {
     private UserStatus status;
     private QRFileName qrFileName;
     private final Instant createdAt;
-    private List<DomainEvent> events = new ArrayList<>();
+    private List<EventNotification> events = new ArrayList<>();
 
     protected User(
             UserId userId,
@@ -181,21 +184,28 @@ public class User {
     }
 
     public Result<Email> changeEmail(String email) {
+        var oldEmail = getEmail();
         var result = Email.create(email);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
         this.email = result.getValue();
+        recordEvent(new UserEmailChanged(
+                getId(),
+                oldEmail,
+                getEmail()
+        ));
         return result;
     }
 
     // EncodedPassword domain
-    public Result<EncodedPassword> changePassword(String encodedPassword) {
+    public Result<EncodedPassword> changeEncodedPassword(String encodedPassword) {
         var result = EncodedPassword.create(encodedPassword);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
         this.encodedPassword = result.getValue();
+        recordEvent(new UserPasswordChanged(getId()));
         return result;
     }
 
@@ -247,6 +257,26 @@ public class User {
         return this.status.equals(UserStatus.SUSPENDED);
     }
 
+    public void suspend(String reason) {
+        this.status = UserStatus.SUSPENDED;
+        recordEvent(new UserSuspended(
+                getId(),
+                reason
+        ));
+    }
+
+    public void deactivate(String reason) {
+        this.status = UserStatus.ACTIVE;
+        recordEvent(new UserSuspended(
+                getId(),
+                reason
+        ));
+    }
+
+    public void activate() {
+        this.status = UserStatus.ACTIVE;
+    }
+
     public String getStatus() {
         return status.getValue();
     }
@@ -265,11 +295,11 @@ public class User {
         return result;
     }
 
-    public List<DomainEvent> pullEvents() {
+    public List<EventNotification> pullEvents() {
         return this.events;
     }
 
-    public void recordEvent(DomainEvent event) {
+    public void recordEvent(EventNotification event) {
         if (event != null) {
             this.events.add(event);
         }

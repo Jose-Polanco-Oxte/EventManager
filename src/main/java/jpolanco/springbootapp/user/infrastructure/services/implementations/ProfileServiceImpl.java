@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.application.uc.derived.DeleteProfileUC;
 import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileEmailUC;
 import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileNameUC;
@@ -20,6 +21,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final UpdateProfilePasswordUC updateProfilePasswordUC;
     private final UpdateProfileNameUC updateProfileNameUC;
     private final DeleteProfileUC deleteProfileUC;
+    private final DomainEventsPublisher publisher;
 
     @Transactional
     @Override
@@ -28,25 +30,32 @@ public class ProfileServiceImpl implements ProfileService {
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
         }
+        var user = maybeUser.getValue();
+        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 
+    @Transactional
     @Override
     public Result<Void> changeName(String userId, UpdateNameRequest request) {
         var maybeUser = updateProfileNameUC.setName(userId, request);
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
         }
+        var user = maybeUser.getValue();
+        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 
     @Transactional
     @Override
-    public Result<Void> delete(String userId) {
-        var result =deleteProfileUC.delete(userId);
+    public Result<Void> delete(String userId, String reason) {
+        var result =deleteProfileUC.delete(userId, reason);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
+        var domainEvents = result.getValue();
+        publisher.publishAll(domainEvents);
         return Result.success();
     }
 
@@ -57,6 +66,8 @@ public class ProfileServiceImpl implements ProfileService {
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
         }
+        var user = maybeUser.getValue();
+        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 }

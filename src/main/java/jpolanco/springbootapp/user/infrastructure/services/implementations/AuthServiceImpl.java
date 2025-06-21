@@ -22,8 +22,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final DomainEventsPublisher publisher;
 
-    @Override
     @Transactional
+    @Override
     public Result<UserTokenResponse> login(LoginRequest request) {
         var verifiedUser = loginUC.login(request.email(), request.password());
         if (verifiedUser.isFailure()) {
@@ -33,8 +33,8 @@ public class AuthServiceImpl implements AuthService {
         return jwtService.authenticate(user, request.password());
     }
 
-    @Override
     @Transactional
+    @Override
     public Result<UserTokenResponse> register(RegisterRequest request) {
         var createdUser = createUserUc.create(request);
         if (createdUser.isFailure()) {
@@ -45,13 +45,12 @@ public class AuthServiceImpl implements AuthService {
         if (tokens.isFailure()) {
             return Result.failure(tokens.getError());
         }
-        user.pullEvents().forEach(publisher::publish);
-        user.clearEvents();
+        publisher.publishAll(user.pullEvents());
         return Result.success(tokens.getValue());
     }
 
-    @Override
     @Transactional
+    @Override
     public Result<UserTokenResponse> refresh(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Result.failure(UserInfrastructureError.INVALID_AUTH_HEADER);

@@ -10,7 +10,7 @@ import java.io.InputStream;
 public interface EventCommandService {
     Result<EventResponse> createEvent(String creatorId, EventCreationRequest request, InputStream imageStream);
     Result<EventResponse> updateEvent(String eventId, UpdateEventRequest request, InputStream imageStream);
-    Result<Void> deleteEventById(String eventId);
+    Result<Void> deleteEventById(String eventId, String reason);
     Result<Void> cancelEvent(String eventId, String reason);
     Result<Void> reactivateEvent(String eventId);
 }

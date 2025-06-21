@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.user.domain.model;
 
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.valueobjects.*;
+import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
 import java.time.Instant;
 import java.util.Set;
@@ -16,7 +16,7 @@ public class UserBuilder {
     private UserStatus status;
     private QRFileName qrFileName;
     private Instant createdAt;
-    private DomainEvent domainEvent;
+    private EventNotification eventNotification;
     private Result<?> isValid = Result.success();
 
     private <T> T checker(Result<T> result) {
@@ -76,8 +76,8 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder addEvent(DomainEvent event) {
-        this.domainEvent = event;
+    public UserBuilder addEvent(EventNotification event) {
+        this.eventNotification = event;
         return this;
     }
 
@@ -96,7 +96,7 @@ public class UserBuilder {
                 qrFileName,
                 createdAt
         );
-        user.recordEvent(domainEvent);
+        user.recordEvent(eventNotification);
         return Result.success(user);
     }
 }

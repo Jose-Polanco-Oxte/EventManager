@@ -1,10 +1,10 @@
-package jpolanco.springbootapp.user.domain.domainevents;
+package jpolanco.springbootapp.user.domain.domain_events;
 
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.EventNotification;
 import lombok.Getter;
 
 @Getter
-public class UserRegistered extends DomainEvent {
+public class UserRegistered extends EventNotification {
     private final String userId;
     private final String email;
 

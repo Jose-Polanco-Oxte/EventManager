@@ -26,6 +26,9 @@ public class UpdateEvent implements UpdateEventUC {
 
     @Override
     public Result<Event> setChanges(Event event, UpdateEventRequest request, InputStream inputStream) {
+        if (event == null) {
+            return Result.failure(EventAppError.EVENT_NOT_FOUND);
+        }
         var updater = EventUpdater.updater(event, fileStorageProvider, eventValidation)
                 .title(request.title())
                 .description(request.description())
@@ -42,20 +45,15 @@ public class UpdateEvent implements UpdateEventUC {
                 .enableComments(request.enableComments())
                 .modality(Modality.fromString(request.modality()))
                 .changePicture(inputStream)
-                .setMaxAttendees(request.maxAttendees());
-        updater.removeCategories(request.categories().remove());
-        updater.addCategories(request.categories().add());
-        if (request.staff().clear()) {
-            updater.clearStaff();
-        } else {
-            updater.removeStaff(request.staff().remove());
-            updater.addStaff(request.staff().add());
+                .setMaxAttendees(request.maxAttendees())
+                .categories(request.categories().remove(), request.categories().add())
+                .staff(request.staff())
+                .update();
+        if (updater.isFailure()) {
+            return Result.failure(updater.getError());
         }
-        var updatedEvent = updater.update();
-        if (updatedEvent.isFailure()) {
-            return Result.failure(updatedEvent.getError());
-        }
-        var savedEvent = commandRepository.save(updatedEvent.getValue());
+        var updatedEvent = updater.getValue();
+        var savedEvent = commandRepository.save(updatedEvent);
         return Result.success(savedEvent);
     }
 

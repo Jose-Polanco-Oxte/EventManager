@@ -1,15 +1,15 @@
 package jpolanco.springbootapp.shared.domain;
 
+import lombok.Getter;
+
 import java.time.Instant;
 
-public abstract class DomainEvent {
+@Getter
+public abstract class EventNotification {
     private Instant timeStamp;
 
-    public DomainEvent() {
+    public EventNotification() {
         this.timeStamp = Instant.now();
     }
 
-    public Instant getTimeStamp() {
-        return timeStamp;
-    }
 }

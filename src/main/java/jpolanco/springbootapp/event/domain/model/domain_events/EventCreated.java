@@ -1,8 +1,10 @@
-package jpolanco.springbootapp.event.domain.model.domainevents;
+package jpolanco.springbootapp.event.domain.model.domain_events;
 
-import jpolanco.springbootapp.shared.domain.DomainEvent;
+import jpolanco.springbootapp.shared.domain.EventNotification;
+import lombok.Getter;
 
-public class EventCreated extends DomainEvent {
+@Getter
+public class EventCreated extends EventNotification {
     private final String eventId;
     private final String name;
     private final String description;
@@ -20,27 +22,4 @@ public class EventCreated extends DomainEvent {
         this.creatorId = creatorId;
     }
 
-    public String getEventId() {
-        return eventId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public String getCreatorId() {
-        return creatorId;
-    }
 }

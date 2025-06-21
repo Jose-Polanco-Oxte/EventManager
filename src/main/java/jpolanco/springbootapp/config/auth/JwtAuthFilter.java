@@ -4,10 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
-import jpolanco.springbootapp.user.application.ports.output.JwtRepository;
-import jpolanco.springbootapp.user.application.ports.output.UserRepository;
-import jpolanco.springbootapp.user.application.utils.TokenE;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +25,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtManager jwtManager;
     private final UserDetailsService userDetailsService;
-    private final JwtRepository jpaTokenRepository;
-    private final UserRepository userRepository;
+    private final UserQueryRepository userQueryRepository;
 
     @Override
     protected void doFilterInternal(
@@ -51,13 +47,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
             return;
         }
-        final TokenE tokenEntity = jpaTokenRepository.findByToken(jwtToken).orElse(null);
-        if (tokenEntity == null || tokenEntity.getStatus() != TokenStatus.ACTIVE) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         final UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-        final var maybeUser = userRepository.findByEmail(userDetails.getUsername());
+        final var maybeUser = userQueryRepository.findByEmail(userDetails.getUsername());
         if (maybeUser.isEmpty()) {
             filterChain.doFilter(request, response);
             return;

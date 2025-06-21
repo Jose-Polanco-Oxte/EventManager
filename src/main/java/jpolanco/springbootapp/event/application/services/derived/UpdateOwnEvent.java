@@ -1,7 +1,6 @@
 package jpolanco.springbootapp.event.application.services.derived;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
-import jpolanco.springbootapp.event.application.ports.output.EventCommandRepository;
 import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.base.UpdateEventUC;
 import jpolanco.springbootapp.event.application.uc.derived.UpdateOwnEventUC;
@@ -17,7 +16,6 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class UpdateOwnEvent implements UpdateOwnEventUC {
     private final EventQueryRepository queryRepository;
-    private final EventCommandRepository commandRepository;
     private final UpdateEventUC updateEventUC;
 
     @Override
