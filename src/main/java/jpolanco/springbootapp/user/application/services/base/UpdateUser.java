@@ -30,7 +30,7 @@ public class UpdateUser implements UpdateUserUC {
         var userUpdated = userUpdater
                 .firstName(request.firstName())
                 .lastName(request.lastName())
-                .roles(request.roles())
+                .roles(request.roles().add(), request.roles().remove())
                 .status(UserStatus.fromString(request.status()))
                 .email(request.email())
                 .password(request.password())

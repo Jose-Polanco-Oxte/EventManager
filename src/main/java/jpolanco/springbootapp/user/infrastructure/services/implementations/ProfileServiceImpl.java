@@ -2,10 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
-import jpolanco.springbootapp.user.application.uc.derived.DeleteProfileUC;
-import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileEmailUC;
-import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileNameUC;
-import jpolanco.springbootapp.user.application.uc.derived.UpdateProfilePasswordUC;
+import jpolanco.springbootapp.user.application.uc.derived.*;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdatePasswordRequest;
@@ -21,6 +18,8 @@ public class ProfileServiceImpl implements ProfileService {
     private final UpdateProfilePasswordUC updateProfilePasswordUC;
     private final UpdateProfileNameUC updateProfileNameUC;
     private final DeleteProfileUC deleteProfileUC;
+    private final ReactivateProfileUC reactivateProfileUC;
+    private final DeactivateProfileUC deactivateProfileUC;
     private final DomainEventsPublisher publisher;
 
     @Transactional
@@ -63,6 +62,28 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public Result<Void> changePassword(String userId, UpdatePasswordRequest dto) {
         var maybeUser = updateProfilePasswordUC.setPassword(userId, dto);
+        if (maybeUser.isFailure()) {
+            return Result.failure(maybeUser.getError());
+        }
+        var user = maybeUser.getValue();
+        publisher.publishAll(user.pullEvents());
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> deactivate(String userId, String reason) {
+        var maybeUser = deactivateProfileUC.deactivate(userId, reason);
+        if (maybeUser.isFailure()) {
+            return Result.failure(maybeUser.getError());
+        }
+        var user = maybeUser.getValue();
+        publisher.publishAll(user.pullEvents());
+        return Result.success();
+    }
+
+    @Override
+    public Result<Void> reactivate(String userId) {
+        var maybeUser = reactivateProfileUC.reactivate(userId);
         if (maybeUser.isFailure()) {
             return Result.failure(maybeUser.getError());
         }

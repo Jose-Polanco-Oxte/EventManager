@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ public class SearchEventController {
 
     private final SearchEventService searchEventService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/name")
     public ResponseEntity<Object> searchEventsByName(
             @RequestParam String query,
@@ -30,6 +32,7 @@ public class SearchEventController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
     @GetMapping("/categories")
     public ResponseEntity<Object> searchCategoriesByName(
             @RequestParam String query,
@@ -42,6 +45,7 @@ public class SearchEventController {
         return ResponseEntity.ok(result);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ORGANIZER')")
     @GetMapping("/staff-roles")
     public ResponseEntity<Object> searchStaffRolesByName(
             @RequestParam String query,

@@ -12,5 +12,5 @@ public interface EventCommandService {
     Result<EventResponse> updateEvent(String eventId, UpdateEventRequest request, InputStream imageStream);
     Result<Void> deleteEventById(String eventId, String reason);
     Result<Void> cancelEvent(String eventId, String reason);
-    Result<Void> reactivateEvent(String eventId);
+    Result<Void> restoreEvent(String eventId, String reason);
 }

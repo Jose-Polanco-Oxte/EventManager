@@ -12,7 +12,8 @@ public class EventModalityListener {
 
     @EventListener
     public void handleEventModalityChanged(EventModalityChanged event) {
-        log.info("Event modality changed: eventId= {}, name= {}, newModality= {}, timeStamp= {}",
-                 event.getEventId(), event.getEventName(), event.getModality().getValue(), event.getTimeStamp());
+        log.info("Event modality changed: Event ID = {}, nam={}, New Modality = {}",
+                event.getEventId(), event.getEventName(), event.getModality());
+        // Additional logic can be added here, such as updating the event in the database or notifying other services.
     }
 }

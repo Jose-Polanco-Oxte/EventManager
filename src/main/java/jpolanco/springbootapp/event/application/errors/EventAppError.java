@@ -39,4 +39,10 @@ public class EventAppError extends Error {
 
     public static final EventAppError MAX_ATTENDEES_LESS_THAN_CURRENT =
             new EventAppError(422, "The number of invitees cannot be less than the number of accepted invitations");
+
+    public static final EventAppError EVENT_NOT_FOUND_PUBLIC =
+            new EventAppError(404, "The event was not found or is private and cannot be accessed publicly");
+
+    public static final EventAppError EVENT_NOT_CANCELLED =
+            new EventAppError(409, "The event is not cancelled and cannot be restored");
 }

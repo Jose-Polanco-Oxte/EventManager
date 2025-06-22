@@ -3,7 +3,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
@@ -11,6 +11,7 @@ import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortFie
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.dto.MessageRequest;
 import jpolanco.springbootapp.shared.utils.OrderField;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,6 @@ import java.io.IOException;
 @Validated
 @RequestMapping(value = "/events")
 public class EventController {
-
     private final EventCommandService commandService;
     private final EventQueryService queryService;
 
@@ -46,6 +46,7 @@ public class EventController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{eventId}")
     public ResponseEntity<Object> getEventById(
             @ValidUUID @PathVariable String eventId
@@ -54,6 +55,7 @@ public class EventController {
         return response.<ResponseEntity<Object>>map(ResponseEntity::ok).orElseGet(ResponseHandler::notFound);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pages")
     public ResponseEntity<Object> getEventsByPages(
             @Min(0) @RequestParam(defaultValue = "0", required = false) int page,
@@ -73,6 +75,7 @@ public class EventController {
         return ResponseHandler.ok(events);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/cursor")
     public ResponseEntity<Object> getEventsByCursor(
             @RequestParam(defaultValue = "NONE", required = false) String cursor,
@@ -120,7 +123,7 @@ public class EventController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{eventId}/cancel")
+    @PutMapping("/{eventId}/cancel")
     public ResponseEntity<Object> cancelEvent(
             @PathVariable String eventId,
             @Valid @RequestBody CommandReasonRequest request
@@ -132,6 +135,21 @@ public class EventController {
         return ResponseHandler.ok("Event cancelled successfully");
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{eventId}/restore")
+    public ResponseEntity<Object> restoreEvent(
+            @ValidUUID @PathVariable String eventId,
+            @Valid @RequestBody MessageRequest request
+            ) {
+        var commandResult = commandService.restoreEvent(eventId, request.message());
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
+        }
+        return ResponseHandler.ok("Event restored successfully");
+    }
+
+
+    // Aux method to handle event creation response
     private ResponseEntity<Object> createEventResponse(
             @AuthenticationPrincipal MyUserDetails myUserDetails,
             @RequestPart("data") @Valid EventCreationRequest request,

@@ -40,11 +40,6 @@ public class DeleteUser implements DeleteUserUC {
             return Result.failure(UserAppError.USER_NOT_FOUND);
         }
         var user = maybeUser.get();
-        var result = delete(user, reason);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        var domainEvents = result.getValue();
-        return Result.success(domainEvents);
+        return delete(user, reason);
     }
 }

@@ -29,22 +29,23 @@ public class UpdateEvent implements UpdateEventUC {
         if (event == null) {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }
-        var updater = EventUpdater.updater(event, fileStorageProvider, eventValidation)
+        var updater = EventUpdater.updater(event)
                 .title(request.title())
                 .description(request.description())
-                .schedule(request.schedule())
-                .duration(request.durationInSeconds())
+                .schedule(request.schedule(), eventValidation)
+                .duration(request.durationInSeconds(), eventValidation)
                 .location(
                         request.locationName(),
                         request.locationCity(),
                         request.locationCountry(),
                         request.latitude(),
-                        request.longitude()
+                        request.longitude(),
+                        eventValidation
                 )
-                .isPublic(request.isPublic())
+                .privacy(request.isPublic())
                 .enableComments(request.enableComments())
                 .modality(Modality.fromString(request.modality()))
-                .changePicture(inputStream)
+                .changePicture(inputStream, fileStorageProvider)
                 .setMaxAttendees(request.maxAttendees())
                 .categories(request.categories().remove(), request.categories().add())
                 .staff(request.staff())

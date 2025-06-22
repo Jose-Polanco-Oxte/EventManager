@@ -10,4 +10,6 @@ public interface ProfileService {
     Result<Void> changeName(String userId, UpdateNameRequest request);
     Result<Void> delete(String userId, String reason);
     Result<Void> changePassword(String userId, UpdatePasswordRequest dto);
+    Result<Void> deactivate(String userId, String reason);
+    Result<Void> reactivate(String userId);
 }

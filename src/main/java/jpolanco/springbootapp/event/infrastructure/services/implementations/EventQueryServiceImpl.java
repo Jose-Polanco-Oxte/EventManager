@@ -2,7 +2,8 @@ package jpolanco.springbootapp.event.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.event.application.ports.input.request.CursorPaginationRequest;
 import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
-import jpolanco.springbootapp.event.application.uc.unique.GetEventByIdUC;
+import jpolanco.springbootapp.event.application.uc.base.GetEventByIdUC;
+import jpolanco.springbootapp.event.application.uc.derived.GetPublicEventByIdUC;
 import jpolanco.springbootapp.event.application.uc.unique.GetEventsUC;
 import jpolanco.springbootapp.event.application.uc.unique.GetPublicEventsUC;
 import jpolanco.springbootapp.event.domain.model.Event;
@@ -24,6 +25,7 @@ public class EventQueryServiceImpl implements EventQueryService {
     private final GetEventByIdUC getEventByIdUC;
     private final GetEventsUC getEventsUC;
     private final GetPublicEventsUC getPublicEventsUC;
+    private final GetPublicEventByIdUC getPublicEventByIdUC;
     private final EventDtoCreator eventDtoCreator;
     private final SlicePageCreator<Event, EventResponse> slicePageCreator;
     private final CursorPageCreator<Event, EventResponse, String> cursorPageCreator;
@@ -31,6 +33,16 @@ public class EventQueryServiceImpl implements EventQueryService {
     @Override
     public Optional<EventResponse> getEventById(String eventId) {
         var maybeEvent = getEventByIdUC.get(eventId);
+        if (maybeEvent.isFailure()) {
+            return Optional.empty();
+        }
+        var event = maybeEvent.getValue();
+        return Optional.of(eventDtoCreator.create(event));
+    }
+
+    @Override
+    public Optional<EventResponse> getPublicEventById(String eventId) {
+        var maybeEvent = getPublicEventByIdUC.get(eventId);
         if (maybeEvent.isFailure()) {
             return Optional.empty();
         }

@@ -20,8 +20,6 @@ import java.util.List;
 public class EventUpdater {
 
     private final Event event;
-    private final FileStorageProvider fileStorage;
-    private final EventValidation eventValidation;
     private Result<?> result = Result.success();
     private final List<Changes<?>> changes = new ArrayList<>();
 
@@ -31,8 +29,8 @@ public class EventUpdater {
         }
     }
 
-    public static EventUpdater updater(Event event, FileStorageProvider fileStorageProvider, EventValidation eventValidation) {
-        return new EventUpdater(event, fileStorageProvider, eventValidation);
+    public static EventUpdater updater(Event event) {
+        return new EventUpdater(event);
     }
 
     private int nullable(String value) {
@@ -67,7 +65,7 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater schedule(Instant schedule) {
+    public EventUpdater schedule(Instant schedule, EventValidation eventValidation) {
         if (!event.getSchedule().equals(schedule)) {
             var result = eventValidation.validate(event.getCreatorId(), schedule, event.getDurationInSeconds(), event.getLatitude(), event.getLongitude());
             check(result);
@@ -81,7 +79,7 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater duration(long durationInSeconds) {
+    public EventUpdater duration(long durationInSeconds, EventValidation eventValidation) {
         if (durationInSeconds <= 0) return this;
         if (event.getDurationInSeconds() != durationInSeconds) {
             var result = eventValidation.validate(event.getCreatorId(), event.getSchedule(), durationInSeconds, event.getLatitude(), event.getLongitude());
@@ -99,12 +97,33 @@ public class EventUpdater {
     public EventUpdater status(EventStatus status) {
         if (status == null || event.getStatus() == status) return this;
         var oldStatus = event.getStatus();
-        event.changeStatus(status);
+        switch (status) {
+            case COMPLETED -> event.complete();
+            case CANCELLED -> event.cancel("Cancelled by administrator");
+            case SCHEDULED -> event.restore("Restored by administrator");
+            case IN_PROGRESS -> event.start();
+        }
         changes.add(new Changes<>("status", oldStatus.getValue(), status.getValue()));
         return this;
     }
 
-    public EventUpdater location(String locationName, String locationCity, String locationCountry, double latitude, double longitude) {
+    public EventUpdater cancel(String reason) {
+        if (event.isCancelled()) return this;
+        var oldStatus = event.getStatus();
+        event.cancel(reason);
+        changes.add(new Changes<>("status", oldStatus.getValue(), event.getStatus().getValue()));
+        return this;
+    }
+
+    public EventUpdater restore(String messageToAttendees) {
+        if (!event.isCancelled()) return this;
+        var oldStatus = event.getStatus();
+        event.restore(messageToAttendees);
+        changes.add(new Changes<>("status", oldStatus.getValue(), event.getStatus().getValue()));
+        return this;
+    }
+
+    public EventUpdater location(String locationName, String locationCity, String locationCountry, double latitude, double longitude, EventValidation eventValidation) {
         var oldLatitude = event.getLatitude();
         var oldLongitude = event.getLongitude();
         var oldLocationName = event.getLocationName();
@@ -159,7 +178,7 @@ public class EventUpdater {
         return list == null || list.isEmpty();
     }
 
-    public EventUpdater isPublic(boolean isPublic) {
+    public EventUpdater privacy(boolean isPublic) {
         if (event.isPublic() == isPublic) return this;
         var oldVisibility = event.isPublic();
         if (isPublic) {event.makePublic();} else { event.makePrivate();}
@@ -176,11 +195,12 @@ public class EventUpdater {
     }
 
     public EventUpdater modality(Modality modality) {
-        if (modality == null || modality.equals(event.getModality())) return this;
+        if (modality == null || modality == event.getModality()) return this;
         var oldModality = event.getModality();
-        if (!event.getModality().equals(modality)) {
-            var result = event.changeModality(modality);
-            check(result);
+        switch (modality) {
+            case IN_PERSON -> event.makeInPerson();
+            case VIRTUAL -> event.makeVirtual();
+            case HYBRID -> event.makeHybrid();
         }
         changes.add(new Changes<>("modality", oldModality.getValue(), modality.getValue()));
         return this;
@@ -215,7 +235,7 @@ public class EventUpdater {
         return this;
     }
 
-    public EventUpdater changePicture(InputStream imageStream) {
+    public EventUpdater changePicture(InputStream imageStream, FileStorageProvider fileStorage) {
         if (imageStream == null) return this;
         var oldPictureFileName = event.getPictureFileName();
         var fileStored = fileStorage.storeImage(event.getPictureFileName(), imageStream);

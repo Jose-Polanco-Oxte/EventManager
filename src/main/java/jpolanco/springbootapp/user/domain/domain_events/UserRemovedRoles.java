@@ -3,14 +3,18 @@ package jpolanco.springbootapp.user.domain.domain_events;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
-public class UserPasswordChanged extends EventNotification {
+public class UserRemovedRoles extends EventNotification {
     private final String userId;
     private final String email;
+    private final List<String> roles;
 
-    public UserPasswordChanged(String userId, String email) {
+    public UserRemovedRoles(String userId, String email, List<String> roles) {
         super();
         this.userId = userId;
         this.email = email;
+        this.roles = roles;
     }
 }

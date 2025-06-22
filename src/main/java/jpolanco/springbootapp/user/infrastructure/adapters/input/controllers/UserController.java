@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.utils.OrderField;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("/users")
 public class UserController {
-
     private final UserQueryService queryService;
     private final UserCommandService commandService;
 
@@ -92,5 +91,34 @@ public class UserController {
             return ResponseHandler.noContent();
         }
         return ResponseHandler.ok(users);
+    }
+
+    @PutMapping("/{userId}/deactivate")
+    public ResponseEntity<Object> deactivateUser(
+            @ValidUUID @PathVariable String userId,
+            @Valid @RequestBody CommandReasonRequest request
+    ) {
+        var commandResult = commandService.deactivateById(userId, request.reason());
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(
+                    commandResult.getMessage(),
+                    commandResult.getErrorCode()
+            );
+        }
+        return ResponseHandler.ok("User deactivated successfully");
+    }
+
+    @PutMapping("/{userId}/reactivate")
+    public ResponseEntity<Object> reactivateUser(
+            @ValidUUID @PathVariable String userId
+    ) {
+        var commandResult = commandService.reactivateById(userId);
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(
+                    commandResult.getMessage(),
+                    commandResult.getErrorCode()
+            );
+        }
+        return ResponseHandler.ok("User reactivated successfully");
     }
 }

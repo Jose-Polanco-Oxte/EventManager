@@ -45,15 +45,15 @@ public class Roles {
         return new HashSet<>(values);
     }
 
-    public void addValue(String role) {
-        if (!validRoles.contains(role)) {
-            return;
-        }
-        this.values.add(role);
+    public boolean addValue(String role) {
+        return this.values.add(role);
     }
 
-    public void removeValue(String role) {
-        values.remove(role);
+    public boolean removeValue(String role) {
+        if (values.size() <= 1) {
+            return false;
+        }
+        return this.values.remove(role);
     }
 
     @Override

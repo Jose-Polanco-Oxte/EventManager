@@ -262,22 +262,23 @@ public class Event {
         recordEvent(new EventCancelled(getEventId(), getTitle(), reason));
     }
 
+    public void restore(String messageToAttendees) {
+        this.status = EventStatus.SCHEDULED;
+        recordEvent(new EventRestored(getEventId(), getTitle(), messageToAttendees));
+    }
+
     public void complete() {
         this.status = EventStatus.COMPLETED;
         recordEvent(new EventCompleted(getEventId(), getTitle()));
     }
 
+    public void start() {
+        this.status = EventStatus.IN_PROGRESS;
+        recordEvent(new EventStarted(getEventId(), getTitle(), getSchedule()));
+    }
+
     public void changeStatus(EventStatus status) {
         this.status = status;
-        if (status.equals(EventStatus.CANCELLED)) {
-            recordEvent(
-                    new EventCancelled(
-                            getEventId(),
-                            getTitle(),
-                            "Status changed to CANCELLED"
-                    )
-            );
-        }
     }
 
 

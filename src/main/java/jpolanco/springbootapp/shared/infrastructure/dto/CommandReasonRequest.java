@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request;
+package jpolanco.springbootapp.shared.infrastructure.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

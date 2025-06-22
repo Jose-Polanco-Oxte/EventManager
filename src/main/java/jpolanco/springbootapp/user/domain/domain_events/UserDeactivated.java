@@ -4,12 +4,11 @@ import jpolanco.springbootapp.shared.domain.EventNotification;
 import lombok.Getter;
 
 @Getter
-public class UserSuspended extends EventNotification {
+public class UserDeactivated extends EventNotification {
     private final String userId;
     private final String reason;
 
-    public UserSuspended(String userId, String reason) {
-        super();
+    public UserDeactivated(String userId, String reason) {
         this.userId = userId;
         this.reason = reason;
     }

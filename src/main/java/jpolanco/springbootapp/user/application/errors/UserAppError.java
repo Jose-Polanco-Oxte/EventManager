@@ -40,4 +40,7 @@ public class UserAppError extends Error {
 
     public static final UserAppError USER_SUSPENDED =
             new UserAppError(403, "User is suspended");
+
+    public static final UserAppError USER_ALREADY_ACTIVE =
+            new UserAppError(409, "User is already active");
 }

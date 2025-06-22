@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.CommandReasonRequest;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequestMapping("/profile")
 public class ProfileController {
-
     private final ProfileService profileService;
     private final UserQueryService queryService;
 
@@ -64,6 +63,38 @@ public class ProfileController {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
         return ResponseHandler.ok("Password updated successfully");
+    }
+
+    // TODO: Implement profile picture update logic
+    @PutMapping("/picture")
+    public ResponseEntity<Object> updateProfilePicture(
+            @AuthenticationPrincipal MyUserDetails userDetails,
+            @RequestParam("picture") String pictureUrl
+    ) {
+        return null;
+    }
+
+    @PutMapping("/deactivate")
+    public ResponseEntity<Object> deactivateAccount(
+            @AuthenticationPrincipal MyUserDetails userDetails,
+            @Valid @RequestBody CommandReasonRequest request
+    ) {
+        var commandResult = profileService.deactivate(userDetails.getId(), request.reason());
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
+        }
+        return ResponseHandler.ok("Account deactivated successfully");
+    }
+
+    @PutMapping("/reactivate")
+    public ResponseEntity<Object> reactivateAccount(
+            @AuthenticationPrincipal MyUserDetails userDetails
+    ) {
+        var commandResult = profileService.reactivate(userDetails.getId());
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
+        }
+        return ResponseHandler.ok("Account reactivated successfully");
     }
 
     @DeleteMapping()

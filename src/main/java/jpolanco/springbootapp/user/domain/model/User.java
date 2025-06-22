@@ -3,10 +3,7 @@ package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.domain_events.UserEmailChanged;
-import jpolanco.springbootapp.user.domain.domain_events.UserPasswordChanged;
-import jpolanco.springbootapp.user.domain.domain_events.UserRegistered;
-import jpolanco.springbootapp.user.domain.domain_events.UserSuspended;
+import jpolanco.springbootapp.user.domain.domain_events.*;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
 import java.time.Instant;
@@ -151,15 +148,6 @@ public class User {
         return this.name.toString();
     }
 
-    public Result<FullName> changeName(String firstName, String lastName) {
-        var result = FullName.create(firstName, lastName);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        this.name = result.getValue();
-        return result;
-    }
-
     public Result<FullName> changeFirstName(String firstName) {
         var result = FullName.create(firstName, this.name.getLastName());
         if (result.isFailure()) {
@@ -205,7 +193,7 @@ public class User {
             return Result.failure(result.getError());
         }
         this.encodedPassword = result.getValue();
-        recordEvent(new UserPasswordChanged(getId()));
+        recordEvent(new UserPasswordChanged(getId(), getEmail()));
         return result;
     }
 
@@ -228,12 +216,22 @@ public class User {
         return result;
     }
 
-    public void addRole(String role) {
-        this.roles.addValue(role);
+    public void addRoles(List<String> roles) {
+        var newRoles = roles.stream()
+                .filter(r -> r != null && this.roles.addValue(r))
+                .toList();
+        if (!newRoles.isEmpty()) {
+            recordEvent(new UserAddedRoles(getId(), getEmail(), newRoles));
+        }
     }
 
-    public void removeRole(String role) {
-        this.roles.removeValue(role);
+    public void removeRoles(List<String> roles) {
+        var removedRoles = roles.stream()
+                .filter(r -> r != null && this.roles.removeValue(r))
+                .toList();
+        if (!removedRoles.isEmpty()) {
+            recordEvent(new UserRemovedRoles(getId(), getEmail(), removedRoles));
+        }
     }
 
     public boolean hasRole(String role) {
@@ -242,7 +240,15 @@ public class User {
 
     // Status domain
     public void changeStatus(UserStatus status) {
-        this.status = status;
+        switch (status) {
+            case ACTIVE -> {
+                if (this.status.equals(UserStatus.INACTIVE) || this.status.equals(UserStatus.SUSPENDED)) {
+                    reactivate();
+                }
+            }
+            case INACTIVE -> deactivate("User deactivated by admin");
+            case SUSPENDED -> suspend("User suspended by admin");
+        }
     }
 
     public boolean isActive() {
@@ -266,15 +272,18 @@ public class User {
     }
 
     public void deactivate(String reason) {
-        this.status = UserStatus.ACTIVE;
-        recordEvent(new UserSuspended(
+        this.status = UserStatus.INACTIVE;
+        recordEvent(new UserDeactivated(
                 getId(),
                 reason
         ));
     }
 
-    public void activate() {
+    public void reactivate() {
         this.status = UserStatus.ACTIVE;
+        recordEvent(new UserReactivated(
+                getId()
+        ));
     }
 
     public String getStatus() {

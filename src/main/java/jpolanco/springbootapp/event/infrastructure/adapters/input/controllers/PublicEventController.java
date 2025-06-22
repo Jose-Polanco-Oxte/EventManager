@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.constraints.Min;
+import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
@@ -9,10 +10,7 @@ import jpolanco.springbootapp.shared.utils.OrderField;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +20,17 @@ public class PublicEventController {
 
     private final SearchEventService searchEventService;
     private final EventQueryService queryService;
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<Object> getEventById(
+            @ValidUUID @PathVariable String eventId
+    ) {
+        var event = queryService.getPublicEventById(eventId);
+        if (event.isEmpty()) {
+            return ResponseHandler.notFound();
+        }
+        return ResponseHandler.ok(event);
+    }
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchEvent(

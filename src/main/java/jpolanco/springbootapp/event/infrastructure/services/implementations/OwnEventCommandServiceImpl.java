@@ -2,6 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.event.application.uc.derived.CancelOwnEventUC;
 import jpolanco.springbootapp.event.application.uc.derived.DeleteOwnEventByIdUC;
+import jpolanco.springbootapp.event.application.uc.derived.RestoreOwnEventUC;
 import jpolanco.springbootapp.event.application.uc.derived.UpdateOwnEventUC;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
@@ -25,6 +26,7 @@ public class OwnEventCommandServiceImpl implements OwnEventCommandService {
     private final DeleteOwnEventByIdUC deleteOwnEventByIdUC;
     private final EventDtoCreator eventDtoCreator;
     private final CancelOwnEventUC cancelOwnEventUC;
+    private final RestoreOwnEventUC restoreOwnEventUC;
     private final DomainEventsPublisher publisher;
 
     @Transactional
@@ -64,7 +66,13 @@ public class OwnEventCommandServiceImpl implements OwnEventCommandService {
     }
 
     @Override
-    public Result<Void> reactivateEvent(String creatorId, String eventId) {
-        return null;
+    public Result<Void> restoreEvent(String creatorId, String eventId, String message) {
+        var restoredEvent = restoreOwnEventUC.restore(creatorId, eventId, message);
+        if (restoredEvent.isFailure()) {
+            return Result.failure(restoredEvent.getError());
+        }
+        var event = restoredEvent.getValue();
+        publisher.publishAll(event.pullEvents());
+        return Result.success();
     }
 }

@@ -2,6 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.event.application.uc.base.CancelEventUC;
 import jpolanco.springbootapp.event.application.uc.base.DeleteEventUC;
+import jpolanco.springbootapp.event.application.uc.base.RestoreEventUC;
 import jpolanco.springbootapp.event.application.uc.base.UpdateEventUC;
 import jpolanco.springbootapp.event.application.uc.unique.CreateEventUC;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
@@ -26,6 +27,7 @@ public class EventCommandServiceImpl implements EventCommandService {
     private final UpdateEventUC updateEventUC;
     private final DeleteEventUC deleteEventUC;
     private final CancelEventUC cancelEventUC;
+    private final RestoreEventUC restoreEventUC;
     private final DomainEventsPublisher publisher;
     private final EventDtoCreator eventDtoCreator;
 
@@ -79,7 +81,13 @@ public class EventCommandServiceImpl implements EventCommandService {
     }
 
     @Override
-    public Result<Void> reactivateEvent(String eventId) {
-        return null;
+    public Result<Void> restoreEvent(String eventId, String reason) {
+        var restoredEvent = restoreEventUC.restoreById(eventId, reason);
+        if (restoredEvent.isFailure()) {
+            return Result.failure(restoredEvent.getError());
+        }
+        var event = restoredEvent.getValue();
+        publisher.publishAll(event.pullEvents());
+        return Result.success();
     }
 }

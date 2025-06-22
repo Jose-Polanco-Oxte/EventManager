@@ -1,8 +1,8 @@
-package jpolanco.springbootapp.event.application.services.unique;
+package jpolanco.springbootapp.event.application.services.base;
 
 import jpolanco.springbootapp.event.application.errors.EventAppError;
 import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
-import jpolanco.springbootapp.event.application.uc.unique.GetEventByIdUC;
+import jpolanco.springbootapp.event.application.uc.base.GetEventByIdUC;
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.RequiredArgsConstructor;

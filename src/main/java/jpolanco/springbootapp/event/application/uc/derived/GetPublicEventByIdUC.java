@@ -1,14 +1,14 @@
-package jpolanco.springbootapp.event.application.uc.unique;
+package jpolanco.springbootapp.event.application.uc.derived;
 
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.shared.domain.Result;
 
-public interface GetEventByIdUC {
+public interface GetPublicEventByIdUC {
     /**
-     * Retrieves an event by its ID.
+     * Retrieves a public event by its ID.
      *
      * @param eventId the ID of the event to be retrieved
-     * @return the Event object if found, or null if not found
+     * @return a Result containing the Event if found, or an error if not found
      */
     Result<Event> get(String eventId);
 }

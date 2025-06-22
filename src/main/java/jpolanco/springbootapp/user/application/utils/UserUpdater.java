@@ -78,19 +78,41 @@ public class UserUpdater {
     }
 
     public UserUpdater status(UserStatus status) {
-        if (status == null) {
-            return this;
+        if (status == null) return this;
+        user.changeStatus(status);
+        return this;
+    }
+
+    public UserUpdater reactivate() {
+        user.reactivate();
+        return this;
+    }
+
+    public UserUpdater suspend(String reason) {
+        user.suspend(reason);
+        return this;
+    }
+
+    public UserUpdater deactivate(String reason) {
+        user.deactivate(reason);
+        return this;
+    }
+
+    public UserUpdater roles(List<String> add, List<String> remove) {
+        if (noChanges(add) && noChanges(remove)) return this;
+        if (noChanges(remove)) {
+            user.addRoles(add);
+        } else if (noChanges(add)) {
+            user.removeRoles(remove);
         } else {
-            user.changeStatus(status);
+            user.removeRoles(remove);
+            user.addRoles(add);
         }
         return this;
     }
 
-    public UserUpdater roles(List<String> roles) {
-        if (roles == null || roles.isEmpty()) return this;
-        var result = user.changeAllRoles(roles);
-        check(result);
-        return this;
+    private boolean noChanges(List<?> list) {
+        return list == null || list.isEmpty();
     }
 
     public Result<User> update() {

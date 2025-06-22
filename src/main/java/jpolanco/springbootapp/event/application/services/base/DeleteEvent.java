@@ -41,11 +41,6 @@ public class DeleteEvent implements DeleteEventUC {
             return Result.failure(EventAppError.EVENT_NOT_FOUND);
         }
         var event = maybeEvent.get();
-        var result = delete(event, reason);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        var domainEvents = result.getValue();
-        return Result.success(domainEvents);
+        return delete(event, reason);
     }
 }

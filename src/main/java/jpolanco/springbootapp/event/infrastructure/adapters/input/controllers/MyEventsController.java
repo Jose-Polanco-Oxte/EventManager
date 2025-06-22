@@ -3,7 +3,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.CommandReasonRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
@@ -11,6 +11,7 @@ import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventC
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventQueryService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.dto.MessageRequest;
 import jpolanco.springbootapp.shared.utils.OrderField;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -100,7 +101,7 @@ public class MyEventsController {
             @AuthenticationPrincipal MyUserDetails myUserDetails,
             @ValidUUID @PathVariable String eventId,
             @Valid @RequestBody CommandReasonRequest request
-            ) {
+    ) {
         var commandResult = ownCommandService.deleteEvent(myUserDetails.getId(), eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
@@ -119,6 +120,19 @@ public class MyEventsController {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
         return ResponseHandler.ok("Event cancelled successfully");
+    }
+
+    @PutMapping("/{eventId}/restore")
+    public ResponseEntity<Object> restoreEvent(
+            @AuthenticationPrincipal MyUserDetails myUserDetails,
+            @ValidUUID @PathVariable String eventId,
+            @Valid @RequestBody MessageRequest request
+    ) {
+        var commandResult = ownCommandService.restoreEvent(myUserDetails.getId(), eventId, request.message());
+        if (commandResult.isFailure()) {
+            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
+        }
+        return ResponseHandler.ok("Event restored successfully");
     }
 
     @GetMapping("/search")
