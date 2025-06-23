@@ -53,7 +53,7 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of("USER"))
+                .roles(List.of("USER"))
                 .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
@@ -72,7 +72,7 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of("ADMIN"))
+                .roles(List.of("ADMIN"))
                 .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
@@ -90,7 +90,7 @@ public class User {
                 .fullName(firstName, lastName)
                 .email(email)
                 .encodedPassword(encodedPassword)
-                .roles(Set.of("ORGANIZER"))
+                .roles(List.of("ORGANIZER"))
                 .status(UserStatus.ACTIVE)
                 .qrFileName(UUID.randomUUID().toString())
                 .createdAt(Instant.now())
@@ -103,7 +103,7 @@ public class User {
             String lastName,
             String email,
             String encodedPassword,
-            Set<String> roles,
+            List<String> roles,
             UserStatus status,
             String qrFileName,
             Instant createdAt
@@ -202,13 +202,12 @@ public class User {
     }
 
     // Roles domain
-    public Set<String> getRoles() {
-        return roles.getValues();
+    public List<String> getRoles() {
+        return roles.get();
     }
 
     public Result<Roles> changeAllRoles(List<String> roles) {
-        var set = new HashSet<>(roles);
-        var result = Roles.create(set);
+        var result = Roles.create(roles);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -217,25 +216,21 @@ public class User {
     }
 
     public void addRoles(List<String> roles) {
-        var newRoles = roles.stream()
-                .filter(r -> r != null && this.roles.addValue(r))
-                .toList();
-        if (!newRoles.isEmpty()) {
-            recordEvent(new UserAddedRoles(getId(), getEmail(), newRoles));
+        var addedRoles = this.roles.addAll(roles);
+        if (!addedRoles.isEmpty()) {
+            recordEvent(new UserAddedRoles(getId(), getEmail(), addedRoles));
         }
     }
 
     public void removeRoles(List<String> roles) {
-        var removedRoles = roles.stream()
-                .filter(r -> r != null && this.roles.removeValue(r))
-                .toList();
+        var removedRoles = this.roles.removeAll(roles);
         if (!removedRoles.isEmpty()) {
             recordEvent(new UserRemovedRoles(getId(), getEmail(), removedRoles));
         }
     }
 
     public boolean hasRole(String role) {
-        return this.roles.getValues().contains(role);
+        return this.roles.get().contains(role);
     }
 
     // Status domain

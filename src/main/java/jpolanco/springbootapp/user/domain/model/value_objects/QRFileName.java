@@ -11,10 +11,13 @@ public class QRFileName {
     }
 
     public static Result<QRFileName> create(String value) {
-        if (value == null || value.isEmpty()) {
+        if (value == null || value.isBlank()) {
             return Result.failure(UserDomainError.NULL_VALUE.field("QR file name"));
         }
-        return Result.success(new QRFileName(value));
+        if (value.contains(".")) {
+            return Result.failure(UserDomainError.QR_NAME_CONTAINS_DOTS);
+        }
+        return Result.success(new QRFileName(value.trim().replaceAll(" ", "_")));
     }
 
     public String getValue() {

@@ -5,12 +5,14 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.errors.UserDomainError;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class UserId extends IdObject {
 
     private UserId(String value) {
         super(value);
     }
+    private final static Pattern UUID_PATTERN = Pattern.compile("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$");
 
     public static Result<UserId> create(String value) {
         if (value == null || value.isEmpty()) {

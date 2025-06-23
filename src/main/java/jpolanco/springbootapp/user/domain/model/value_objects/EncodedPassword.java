@@ -12,7 +12,10 @@ public class EncodedPassword {
 
     public static Result<EncodedPassword> create(String value) {
         if (value == null || value.isBlank()) {
-            Result.failure(UserDomainError.NULL_VALUE.field("EncodedPassword"));
+            return Result.failure(UserDomainError.NULL_VALUE.field("EncodedPassword"));
+        }
+        if (value.length() < 6) {
+            return Result.failure(UserDomainError.INVALID_ENCODED_PASSWORD_LENGTH);
         }
         return Result.success(new EncodedPassword(value));
     }

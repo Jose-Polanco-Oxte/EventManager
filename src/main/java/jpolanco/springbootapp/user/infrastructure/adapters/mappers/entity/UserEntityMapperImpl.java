@@ -23,7 +23,7 @@ public class UserEntityMapperImpl implements UserEntityMapper {
                 userEntity.getRoles()
                         .stream()
                         .map(RoleEntity::getName)
-                        .collect(Collectors.toSet()),
+                        .toList(),
                 userEntity.getStatus(),
                 userEntity.getQrFileName(),
                 userEntity.getCreatedAt()

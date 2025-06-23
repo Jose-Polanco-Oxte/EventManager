@@ -16,8 +16,8 @@ public class UserDomainError extends Error {
     public static final UserDomainError NAME_INVALID_CHARACTERS =
             new UserDomainError(422, "Name must contain only letters");
 
-    public static final UserDomainError INVALID_ROLE =
-            new UserDomainError(422, "Role is not valid");
+    public static final UserDomainError INVALID_ROLES =
+            new UserDomainError(422, "Roles is not valid");
 
     public static final UserDomainError INVALID_EMAIL_FORMAT =
             new UserDomainError(422, "Email format is invalid");
@@ -42,5 +42,11 @@ public class UserDomainError extends Error {
 
     public static final UserDomainError EMAIL_USER_NAME_LENGTH =
             new UserDomainError(422, "Email user name must be between 1 and 64 characters long");
+
+    public static final UserDomainError INVALID_ENCODED_PASSWORD_LENGTH =
+            new UserDomainError(422, "Encoded password must be at least 6 characters long");
+
+    public static final UserDomainError QR_NAME_CONTAINS_DOTS =
+            new UserDomainError(422, "QR file name must not contain dots");
 }
 

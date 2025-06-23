@@ -5,6 +5,7 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 public class UserBuilder {
@@ -54,7 +55,7 @@ public class UserBuilder {
         return this;
     }
 
-    public UserBuilder roles(Set<String> roles) {
+    public UserBuilder roles(List<String> roles) {
         var result = Roles.create(roles);
         this.roles = checker(result);
         return this;
