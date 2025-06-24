@@ -45,7 +45,7 @@ public class UserEntityMapperImpl implements UserEntityMapper {
                         .stream()
                         .map(RoleEntity::new)
                         .collect(Collectors.toSet()),
-                UserStatus.valueOf(user.getStatus()),
+                UserStatus.valueOf(user.getStatus().getValue()),
                 user.getCreatedAt(),
                 user.getQRFileName()
         );

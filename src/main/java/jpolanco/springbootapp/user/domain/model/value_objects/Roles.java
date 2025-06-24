@@ -9,14 +9,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Roles {
-    private final Set<String> values;
-    private final static Set<String> validRoles = Set.of(
-            "USER",
-            "ADMIN",
-            "ORGANIZER"
-    );
+    private final Set<UserRoles> values;
 
-    private Roles(Set<String> values) {
+    private Roles(Set<UserRoles> values) {
         this.values = values;
     }
 
@@ -24,8 +19,7 @@ public class Roles {
         if (values == null || values.isEmpty()) {
             return Result.failure(UserDomainError.NULL_VALUE);
         }
-        var set = new HashSet<>(values);
-        var result = isValidRole(set);
+        var result = isValidRole(values);
         if (result.isFailure()) {
             return Result.failure(result.getError());
         }
@@ -33,32 +27,35 @@ public class Roles {
         return Result.success(new Roles(validRoles));
     }
 
-    private static Result<Set<String>> isValidRole(Set<String> roles) {
-        Set<String> filter = roles.stream()
-                .filter(r -> r!= null && !r.isBlank() && validRoles.contains(r) )
+    private static Result<Set<UserRoles>> isValidRole(List<String> roles) {
+        Set<UserRoles> set = roles.stream()
+                .filter(UserRoles::isValidRole)
+                .map(UserRoles::fromString)
                 .collect(Collectors.toSet());
-        if (filter.isEmpty()) {
+        if (set.isEmpty()) {
             return Result.failure(UserDomainError.INVALID_ROLES);
         }
-        return Result.success(filter);
+        return Result.success(set);
     }
 
     public List<String> get() {
-        return values.stream().toList();
+        return values.stream()
+                .map(UserRoles::getValue)
+                .toList();
     }
 
     public boolean add(String role) {
-        if (role == null || role.isBlank() || !validRoles.contains(role)) {
+        if (!UserRoles.isValidRole(role)) {
             return false;
         }
-        return this.values.add(role);
+        return this.values.add(UserRoles.fromString(role));
     }
 
     public boolean remove(String role) {
-        if (values.size() <= 1) {
+        if (this.values.size() < 2 || !UserRoles.isValidRole(role) || role.equals(UserRoles.USER.getValue())) {
             return false;
         }
-        return this.values.remove(role);
+        return this.values.remove(UserRoles.fromString(role));
     }
 
     public List<String> removeAll(List<String> roles) {
@@ -80,7 +77,7 @@ public class Roles {
     }
 
     public boolean hasRole(String role) {
-        return this.values.contains(role);
+        return this.values.contains(UserRoles.fromString(role));
     }
 
     @Override

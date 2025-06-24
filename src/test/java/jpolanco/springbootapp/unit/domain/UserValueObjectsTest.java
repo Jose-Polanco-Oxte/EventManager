@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Value Object Test")
 public class UserValueObjectsTest {
+
     /**
      * This class contains tests for the value objects used in the User domain model.
      * It includes tests for:
@@ -359,12 +360,11 @@ public class UserValueObjectsTest {
             assertFalse(roles.add("ADMIN")); // Attempt to add a duplicate role
 
             /* TEST: Remove role */
-            assertTrue(roles.remove("USER")); // Remove a valid role
+            assertFalse(roles.remove("USER")); // Cannot remove USER
             assertFalse(roles.remove("INVALID")); // Attempt to remove an invalid role
             assertTrue(roles.remove("ORGANIZER")); // Remove another valid role
-            assertFalse(roles.remove("USER")); // Attempt to remove a role that has already been removed
+            assertFalse(roles.remove("ORGANIZER")); // Attempt to remove a role that has already been removed
             assertFalse(roles.remove(null)); // Attempt to remove a null role
-            assertFalse(roles.remove("ADMIN")); // Remove another valid role, but cant because it is the last one left
         }
 
         @Test

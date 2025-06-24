@@ -61,42 +61,6 @@ public class User {
                 .build();
     }
 
-    public static Result<User> createAdmin(
-            String firstName,
-            String lastName,
-            String email,
-            String encodedPassword
-    ) {
-        return builder()
-                .userId(UUID.randomUUID().toString())
-                .fullName(firstName, lastName)
-                .email(email)
-                .encodedPassword(encodedPassword)
-                .roles(List.of("ADMIN"))
-                .status(UserStatus.ACTIVE)
-                .qrFileName(UUID.randomUUID().toString())
-                .createdAt(Instant.now())
-                .build();
-    }
-
-    public static Result<User> createOrganizer(
-            String firstName,
-            String lastName,
-            String email,
-            String encodedPassword
-    ) {
-        return builder()
-                .userId(UUID.randomUUID().toString())
-                .fullName(firstName, lastName)
-                .email(email)
-                .encodedPassword(encodedPassword)
-                .roles(List.of("ORGANIZER"))
-                .status(UserStatus.ACTIVE)
-                .qrFileName(UUID.randomUUID().toString())
-                .createdAt(Instant.now())
-                .build();
-    }
-
     public static Result<User> load(
             String userId,
             String firstName,
@@ -142,10 +106,6 @@ public class User {
 
     public String getLastName() {
         return name.getLastName();
-    }
-
-    public String getFullName() {
-        return this.name.toString();
     }
 
     public Result<FullName> changeFirstName(String firstName) {
@@ -206,15 +166,6 @@ public class User {
         return roles.get();
     }
 
-    public Result<Roles> changeAllRoles(List<String> roles) {
-        var result = Roles.create(roles);
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
-        this.roles = result.getValue();
-        return result;
-    }
-
     public void addRoles(List<String> roles) {
         var addedRoles = this.roles.addAll(roles);
         if (!addedRoles.isEmpty()) {
@@ -235,12 +186,11 @@ public class User {
 
     // Status domain
     public void changeStatus(UserStatus status) {
+        if (status == null || this.status.equals(status)) {
+            return; // No change needed
+        }
         switch (status) {
-            case ACTIVE -> {
-                if (this.status.equals(UserStatus.INACTIVE) || this.status.equals(UserStatus.SUSPENDED)) {
-                    reactivate();
-                }
-            }
+            case ACTIVE -> reactivate();
             case INACTIVE -> deactivate("User deactivated by admin");
             case SUSPENDED -> suspend("User suspended by admin");
         }
@@ -259,6 +209,9 @@ public class User {
     }
 
     public void suspend(String reason) {
+        if (isSuspended()) {
+            return;
+        }
         this.status = UserStatus.SUSPENDED;
         recordEvent(new UserSuspended(
                 getId(),
@@ -267,6 +220,9 @@ public class User {
     }
 
     public void deactivate(String reason) {
+        if (isInactive() || isSuspended()) {
+            return;
+        }
         this.status = UserStatus.INACTIVE;
         recordEvent(new UserDeactivated(
                 getId(),
@@ -275,14 +231,31 @@ public class User {
     }
 
     public void reactivate() {
+        if (isActive()) {
+            return;
+        }
         this.status = UserStatus.ACTIVE;
         recordEvent(new UserReactivated(
                 getId()
         ));
     }
 
-    public String getStatus() {
-        return status.getValue();
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    // Roles domain
+
+    public boolean isAdmin() {
+        return this.roles.get().contains(UserRoles.ADMIN.getValue());
+    }
+
+    public boolean isUser() {
+        return this.roles.get().contains(UserRoles.USER.getValue());
+    }
+
+    public boolean isOrganizer() {
+        return this.roles.get().contains(UserRoles.ORGANIZER.getValue());
     }
 
     //QRFileName domain
