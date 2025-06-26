@@ -1,32 +1,39 @@
 package jpolanco.springbootapp.shared.domain;
 
-import org.apache.logging.log4j.util.Strings;
+import lombok.Getter;
 
+import java.util.Objects;
+
+@Getter
 public class Error {
-    final int code;
-    final String message;
+    private final int code;
+    private final String message;
+    private final String field;
 
     public Error(int code, String message) {
+        this(code, message, null);
+    }
+
+    public Error(int code, String message, String field) {
         this.code = code;
         this.message = message;
+        this.field = field;
     }
 
-    public Error() {
-        this.code = 0;
-        this.message = Strings.EMPTY;
+    public static Error NONE = new Error(0, "No error");
+    public static Error NULL_VALUE = new Error(400, "Value cannot be null");
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Error other)) return false;
+        return code == other.code &&
+                message.equals(other.message) &&
+                Objects.equals(field, other.field);
     }
 
-    public static Error NONE = new Error( -1, Strings.EMPTY);
-    public static Error NULL_VALUE = new Error(500, "cannot be null or empty");
-    public Error field(String fieldName) {
-        return new Error(500, fieldName + " cannot be null or empty");
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, message, field);
     }
 }

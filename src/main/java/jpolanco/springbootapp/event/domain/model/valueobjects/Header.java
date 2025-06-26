@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 import lombok.Getter;
 
@@ -16,10 +17,10 @@ public class Header {
 
     public static Result<Header> create(String title, String description) {
         if (title == null || title.isBlank()) {
-            return Result.failure(EventDomainError.NULL_VALUE.field("title"));
+            return Result.failure(DomainError.NULL_VALUE.withField("title"));
         }
         if (description == null || description.isBlank()) {
-            return Result.failure(EventDomainError.NULL_VALUE.field("description"));
+            return Result.failure(DomainError.NULL_VALUE.withField("description"));
         }
         if (title.length() > 100) {
             return Result.failure(EventDomainError.TITLE_TOO_LONG);

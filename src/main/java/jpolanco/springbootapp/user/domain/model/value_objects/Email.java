@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.errors.UserDomainError;
 
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -21,28 +21,42 @@ public class Email {
 
     private static Result<Void> valid(String email) {
         if (email == null || email.isBlank()) {
-            return Result.failure(UserDomainError.NULL_VALUE.field("Email")); // Email must not be null or blank
+            return Result.failure(DomainError.NULL_VALUE
+                    .withField("Email"));
         }
         var split = email.split("@");
         if (split.length != 2) {
-            return Result.failure(UserDomainError.MORE_THAN_ONE_SIGN_IN_EMAIL);
+            return Result.failure(DomainError.INVALID_FORMAT
+                    .withDetails("Must contain exactly one '@' character")
+                    .withField("email")
+            );
         }
         var userName = split[0];
         var domain = split[1];
         if (email.startsWith(".")) {
-            return Result.failure(UserDomainError.EMAIL_STARTS_WITH_DOT);
+            return Result.failure(DomainError.INVALID_FORMAT
+                    .withDetails("Cannot start with a dot")
+                    .withField("email"));
         }
         if (SPECIAL_CHARACTERS_PATTERN.matcher(userName).matches() || SPECIAL_CHARACTERS_PATTERN.matcher(domain).matches()) {
-            return Result.failure(UserDomainError.INVALID_EMAIL_FORMAT);
+            return Result.failure(DomainError.INVALID_FORMAT
+                    .withDetails("Cannot contain special characters")
+                    .withField("email"));
         }
         if (domain.contains(" ") || userName.contains(" ")) {
-            return Result.failure(UserDomainError.EMAIL_CONTAINS_WHITESPACE);
+            return Result.failure(DomainError.INVALID_FORMAT
+                    .withDetails("Cannot contain whitespace")
+                    .withField("email"));
         }
-        if (userName.isEmpty() || userName.length() > 64) {
-            return Result.failure(UserDomainError.EMAIL_USER_NAME_LENGTH);
+        if (userName.length() > 64) {
+            return Result.failure(DomainError.TOO_LONG
+                    .withDetails("Email user name must be between 1 and 64 characters long")
+                    .withField("email"));
         }
         if (!validDomains.contains(domain)) {
-            return Result.failure(UserDomainError.INVALID_EMAIL_DOMAIN);
+            return Result.failure(DomainError.of(400, "Invalid domain")
+                    .withDetails("Email domain is not valid: " + domain)
+                    .withField("email"));
         }
         return Result.success();
     }
@@ -57,5 +71,17 @@ public class Email {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Email other)) return false;
+        return value.equals(other.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
     }
 }

@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.time.Instant;
@@ -15,7 +15,7 @@ public class Schedule {
 
     public static Result<Schedule> create(Instant dateUTC) {
         if (dateUTC == null) {
-            return Result.failure(Error.NULL_VALUE.field("DateUTC"));
+            return Result.failure(DomainError.NULL_VALUE.withField("DateUTC"));
         }
         if (dateUTC.isBefore(Instant.now())) {
             return Result.failure(EventDomainError.PAST_EVENT);

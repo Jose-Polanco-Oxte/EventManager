@@ -159,6 +159,19 @@ public class UserEntityTest {
             var  checkIDUUID = UUID.fromString(userEntity.getId());
             assertNotNull(checkIDUUID, "ID should be a valid UUID");
         }
+
+        @Test
+        @DisplayName("Should create UserEntity with default values")
+        void shouldCreateUserEntityWithDefaultValues() {
+            assertTrue(userEntity.isUser());
+            assertFalse(userEntity.isAdmin());
+            assertFalse(userEntity.isOrganizer());
+            assertTrue(userEntity.isActive(), "Default status should be ACTIVE");
+            assertFalse(userEntity.isInactive(), "Default status should not be INACTIVE");
+            assertFalse(userEntity.isSuspended(), "Default status should be SUSPENDED");
+            assertEquals(1, userEntity.getRoles().size(), "Roles should match");
+            assertEquals(userEntity.getCreatedAt(), createdAt, "Created at should match the initialized value");
+        }
     }
 
     @Nested
@@ -512,6 +525,55 @@ public class UserEntityTest {
             assertFalse(userEntity.pullEvents().isEmpty(), "Pull events should not be empty before clearing");
             userEntity.clearEvents();
             assertTrue(userEntity.pullEvents().isEmpty(), "Pull events should be empty after clearing");
+        }
+    }
+
+    @Nested
+    @DisplayName("Equality and HashCode tests")
+    class EqualityAndHashCodeTests {
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            assertEquals(userEntity, userEntity, "User entity should be equal to itself");
+        }
+
+        @Test
+        @DisplayName("Should not be equal to null")
+        void shouldNotBeEqualToNull() {
+            assertNotEquals(null, userEntity, "User entity should not be equal to null");
+        }
+
+        @Test
+        @DisplayName("Should not be equal to different class type")
+        void shouldNotBeEqualToDifferentClassType() {
+            assertNotEquals(new Object(), userEntity, "User entity should not be equal to different class type");
+        }
+
+        @Test
+        @DisplayName("Should have same hash code for equal objects")
+        void shouldHaveSameHashCodeForEqualObjects() {
+            String testId = UUID.randomUUID().toString();
+            User user = User.of(testId, firstName, lastName, email, encodedPassword).getValue();
+            User anotherUser = User.of(testId, firstName, lastName, email, encodedPassword).getValue();
+            assertEquals(user.hashCode(), anotherUser.hashCode(), "Hash codes of equal user entities should match");
+        }
+
+        @Test
+        @DisplayName("Two UserEntities with the same ID should be equal")
+        void twoUserEntitiesWithSameIdShouldBeEqual() {
+            String testId = UUID.randomUUID().toString();
+            User user1 = User.of(testId, firstName, lastName, email, encodedPassword).getValue();
+            User user2 = User.of(testId, firstName, lastName, email, encodedPassword).getValue();
+            assertEquals(user1, user2, "Two UserEntities with the same ID should be equal");
+        }
+
+        @Test
+        @DisplayName("Two UserEntities with different IDs should not be equal")
+        void twoUserEntitiesWithDifferentIdsShouldNotBeEqual() {
+            User user1 = User.of(UUID.randomUUID().toString(), firstName, lastName, email, encodedPassword).getValue();
+            User user2 = User.of(UUID.randomUUID().toString(), firstName, lastName, email, encodedPassword).getValue();
+            assertNotEquals(user1, user2, "Two UserEntities with different IDs should not be equal");
         }
     }
 }

@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.unit.domain;
 
+import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.unit.utils.Unicode;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 import org.junit.jupiter.api.DisplayName;
@@ -77,6 +78,21 @@ public class UserValueObjectsTest {
                 assertEquals(email, result.getValue().getValue());
             }
         }
+
+        @Test
+        @DisplayName("Two email objects with same value should be equal")
+        void shouldBeEqualForSameEmailValues() {
+            var emailOne = Email.create("same@gmail.com").getValue();
+            var emailTwo = Email.create("same@gmail.com").getValue();
+            assertEquals(emailOne, emailTwo, "Expected both email objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var email = Email.create("same@gmail.com").getValue();
+            assertEquals(email, email, "Expected email to be equal to itself");
+        }
     }
 
     @Nested
@@ -114,6 +130,21 @@ public class UserValueObjectsTest {
                 // Verify the value is set correctly
                 assertEquals(password, result.getValue().getValue());
             }
+        }
+
+        @Test
+        @DisplayName("Two EncodedPassword objects with same value should be equal")
+        void shouldBeEqualForSameEncodedPasswordValues() {
+            var passwordOne = EncodedPassword.create("sameEncodedPassword").getValue();
+            var passwordTwo = EncodedPassword.create("sameEncodedPassword").getValue();
+            assertEquals(passwordOne, passwordTwo, "Expected both EncodedPassword objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var password = EncodedPassword.create("sameEncodedPassword").getValue();
+            assertEquals(password, password, "Expected EncodedPassword to be equal to itself");
         }
     }
 
@@ -219,6 +250,21 @@ public class UserValueObjectsTest {
                 assertEquals(input1Formated + " " + input2Formated, result.getValue().toString());
             }
         }
+
+        @Test
+        @DisplayName("Two FullName objects with same values should be equal")
+        void shouldBeEqualForSameFullNameValues() {
+            var fullNameOne = FullName.create("Same First", "Same Last").getValue();
+            var fullNameTwo = FullName.create("Same First", "Same Last").getValue();
+            assertEquals(fullNameOne, fullNameTwo, "Expected both FullName objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var fullName = FullName.create("Same First", "Same Last").getValue();
+            assertEquals(fullName, fullName, "Expected FullName to be equal to itself");
+        }
     }
 
     @Nested
@@ -234,7 +280,6 @@ public class UserValueObjectsTest {
                     null,                   // Null string
                     "qr/invalid/name.png"   // Contain extension
             );
-
             for (String name : invalidNames) {
                 var result = QRFileName.create(name);
                 assertTrue(result.isFailure(), "Expected failure for: " + name);
@@ -264,6 +309,21 @@ public class UserValueObjectsTest {
                 // Verify the value is set correctly
                 assertEquals(name.trim().replaceAll(" ", "_"), result.getValue().getValue());
             }
+        }
+
+        @Test
+        @DisplayName("Two QRFileName objects with same value should be equal")
+        void shouldBeEqualForSameQRFileNameValues() {
+            var qrFileNameOne = QRFileName.create("same_qr_file_name").getValue();
+            var qrFileNameTwo = QRFileName.create("same_qr_file_name").getValue();
+            assertEquals(qrFileNameOne, qrFileNameTwo, "Expected both QRFileName objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var qrFileName = QRFileName.create("same_qr_file_name").getValue();
+            assertEquals(qrFileName, qrFileName, "Expected QRFileName to be equal to itself");
         }
     }
 
@@ -334,7 +394,7 @@ public class UserValueObjectsTest {
                 assertTrue(result.isSuccess(), "Expected success for roles: " + roles + " but got failure: " + result.getMessage());
                 assertTrue(containsOnlyValidRoles(result.getValue().get()),
                         "Expected only valid roles but got: " + result.getValue().get());
-//                System.out.println("Roles created: " + result.getValue().get().toString());
+//                System.out.println("Roles created: " + result.getValue().getByPages().toString());
             }
         }
 
@@ -412,6 +472,21 @@ public class UserValueObjectsTest {
                 assertTrue(containsOnlyValidRoles(roles.get()), "Expected only valid roles to remain but got: " + result);
             }
         }
+
+        @Test
+        @DisplayName("Two Roles objects with same values should be equal")
+        void shouldBeEqualForSameRolesValues() {
+            var rolesOne = Roles.create(List.of("USER", "ADMIN")).getValue();
+            var rolesTwo = Roles.create(List.of("USER", "ADMIN")).getValue();
+            assertEquals(rolesOne, rolesTwo, "Expected both Roles objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var roles = Roles.create(List.of("USER", "ADMIN")).getValue();
+            assertEquals(roles, roles, "Expected Roles to be equal to itself");
+        }
     }
 
     @Nested
@@ -437,6 +512,41 @@ public class UserValueObjectsTest {
 
             var result2 = UserId.create("awfgawn 24_ty");
             assertTrue(result2.isFailure(), "Expected failure for invalid UUID format");
+        }
+
+        @Test
+        @DisplayName("Should fail to create UserId with invalid UUID format")
+        void shouldFailToCreateUserIdWithInvalidUUID() {
+            List<String> invalidUUIDs = Arrays.asList(
+                    "",                     // Empty string
+                    " ",                    // Whitespace
+                    "invalid-uuid",        // Invalid UUID format
+                    "12345",                // Too short
+                    "12345678901234567890",// Too long
+                    "not-a-uuid-format"     // Completely invalid format
+            );
+
+            for (String uuid : invalidUUIDs) {
+                var result = UserId.create(uuid);
+                assertTrue(result.isFailure(), "Expected failure for invalid UUID: " + uuid);
+            }
+        }
+
+        @Test
+        @DisplayName("Two UserId objects with same value should be equal")
+        void shouldBeEqualForSameUserIdValues() {
+            var randomUUID = UUID.randomUUID().toString();
+            var userIdOne = UserId.create(randomUUID).getValue();
+            var userIdTwo = UserId.create(randomUUID).getValue();
+            assertEquals(userIdOne, userIdTwo, "Expected both UserId objects to be equal");
+        }
+
+        @Test
+        @DisplayName("Should be equal to itself")
+        void shouldBeEqualToItself() {
+            var randomUUID = UUID.randomUUID().toString();
+            var userId = UserId.create(randomUUID).getValue();
+            assertEquals(userId, userId, "Expected UserId to be equal to itself");
         }
     }
 }

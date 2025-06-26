@@ -46,6 +46,14 @@ public class Result<T> {
         }
     }
 
+    public boolean equalTypes(Error error) {
+        if (IsSuccess) {
+            return error == Error.NONE;
+        } else {
+            return this.error.equals(error);
+        }
+    }
+
     public int getErrorCode() {
         if (IsSuccess) {
             return Error.NONE.getCode();
@@ -58,7 +66,35 @@ public class Result<T> {
         if (IsSuccess) {
             return "Success";
         } else {
-            return error.message;
+            return error.getMessage();
+        }
+    }
+
+    public String getField() {
+        if (IsSuccess) {
+            return null;
+        } else {
+            return error.getField();
+        }
+    }
+
+    public String getDetails() {
+        if (IsSuccess) {
+            return null;
+        } else if (error instanceof DomainError) {
+            return ((DomainError) error).getDetails();
+        } else {
+            return null;
+        }
+    }
+
+    public DomainError getDomainError() {
+        if (IsSuccess) {
+            return null;
+        } else if (error instanceof DomainError) {
+            return (DomainError) error;
+        } else {
+            return null;
         }
     }
 
@@ -101,5 +137,20 @@ public class Result<T> {
             return Result.failure(r.error);
         }
         return fn.apply(r.getValue());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Result<?> result = (Result<?>) o;
+        return Objects.equals(value, result.value) &&
+                Objects.equals(this.error, result.error) &&
+                this.IsSuccess == result.IsSuccess;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, error, IsSuccess);
     }
 }

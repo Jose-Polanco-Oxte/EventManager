@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.infrastructure.errors.InfrastructureError;
 import jpolanco.springbootapp.shared.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
@@ -8,7 +9,6 @@ import jpolanco.springbootapp.user.application.utils.TokenE;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
 import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
-import jpolanco.springbootapp.user.infrastructure.errors.UserInfrastructureError;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,17 +59,22 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Result<UserTokenResponse> refreshTokens(String refreshToken) {
         var userEmail = jwtManager.extractUsername(refreshToken);
-        if (userEmail == null) {
-            return Result.failure(UserInfrastructureError.INVALID_CLAIMS_REFRESH_TOKEN);
-        }
+        if (userEmail == null) return Result.failure(InfrastructureError.EXTERNAL_SERVICE_ERROR
+                .withField("RefreshToken")
+                .withMessage("failed to extract user email from refresh token"));
+
         var maybeUser = userQueryRepository.findByEmail(userEmail);
-        if (maybeUser.isEmpty()) {
-            return Result.failure(UserInfrastructureError.USER_NOT_FOUND);
-        }
+        if (maybeUser.isEmpty()) return Result.failure(InfrastructureError.EXTERNAL_SERVICE_ERROR
+                .withField("Email")
+                .withMessage("failed to find user with email " + userEmail));
+
         var user = maybeUser.get();
         if (!jwtManager.isTokenValid(refreshToken, user.getEmail())) {
-            return Result.failure(UserInfrastructureError.INVALID_REFRESH_TOKEN);
+            return Result.failure(InfrastructureError.EXTERNAL_SERVICE_ERROR
+                    .withField("RefreshToken")
+                    .withMessage("refresh token is invalid or expired"));
         }
+
         jwtCommandRepository.revokeByToken(refreshToken);
         return createTokens(user);
     }

@@ -61,6 +61,26 @@ public class User {
                 .build();
     }
 
+    public static Result<User> of(
+            String id,
+            String firstName,
+            String lastName,
+            String email,
+            String encodedPassword
+    ) {
+        return builder()
+                .userId(id)
+                .fullName(firstName, lastName)
+                .email(email)
+                .encodedPassword(encodedPassword)
+                .roles(List.of("USER"))
+                .status(UserStatus.ACTIVE)
+                .qrFileName(UUID.randomUUID().toString())
+                .createdAt(Instant.now())
+                .addEvent(new UserRegistered(id, email))
+                .build();
+    }
+
     public static Result<User> load(
             String userId,
             String firstName,
@@ -111,7 +131,7 @@ public class User {
     public Result<FullName> changeFirstName(String firstName) {
         var result = FullName.create(firstName, this.name.getLastName());
         if (result.isFailure()) {
-            return Result.failure(result.getError());
+            return result;
         }
         this.name = result.getValue();
         return result;
@@ -120,7 +140,7 @@ public class User {
     public Result<FullName> changeLastName(String lastName) {
         var result = FullName.create(this.name.getFirstName(), lastName);
         if (result.isFailure()) {
-            return Result.failure(result.getError());
+            return result;
         }
         this.name = result.getValue();
         return result;
@@ -132,10 +152,11 @@ public class User {
     }
 
     public Result<Email> changeEmail(String email) {
+        if (getEmail().equals(email)) return Email.create(getEmail());
         var oldEmail = getEmail();
         var result = Email.create(email);
         if (result.isFailure()) {
-            return Result.failure(result.getError());
+            return result;
         }
         this.email = result.getValue();
         recordEvent(new UserEmailChanged(
@@ -150,7 +171,7 @@ public class User {
     public Result<EncodedPassword> changeEncodedPassword(String encodedPassword) {
         var result = EncodedPassword.create(encodedPassword);
         if (result.isFailure()) {
-            return Result.failure(result.getError());
+            return result;
         }
         this.encodedPassword = result.getValue();
         recordEvent(new UserPasswordChanged(getId(), getEmail()));
@@ -215,7 +236,7 @@ public class User {
         this.status = UserStatus.SUSPENDED;
         recordEvent(new UserSuspended(
                 getId(),
-                reason
+                reason == null ? " " : reason
         ));
     }
 
@@ -226,7 +247,7 @@ public class User {
         this.status = UserStatus.INACTIVE;
         recordEvent(new UserDeactivated(
                 getId(),
-                reason
+                reason == null ? " " : reason
         ));
     }
 
@@ -263,13 +284,9 @@ public class User {
         return qrFileName.getValue();
     }
 
-    public Result<QRFileName> newQRFileName() {
+    public void newQRFileName() {
         Result<QRFileName> result = QRFileName.create(UUID.randomUUID().toString());
-        if (result.isFailure()) {
-            return Result.failure(result.getError());
-        }
         this.qrFileName = result.getValue();
-        return result;
     }
 
     public List<EventNotification> pullEvents() {
@@ -284,5 +301,31 @@ public class User {
 
     public void clearEvents() {
         this.events.clear();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", name=" + name +
+                ", email=" + email +
+                ", encodedPassword=" + encodedPassword +
+                ", roles=" + roles +
+                ", status=" + status +
+                ", qrFileName=" + qrFileName +
+                ", createdAt=" + createdAt +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User user)) return false;
+        return Objects.equals(userId, user.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
     }
 }

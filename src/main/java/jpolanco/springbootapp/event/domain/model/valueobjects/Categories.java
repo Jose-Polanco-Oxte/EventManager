@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.HashSet;
@@ -15,7 +16,8 @@ public class Categories {
 
     public static Result<Categories> create(List<String> values) {
         if (values == null || values.isEmpty()) {
-            return Result.failure(EventDomainError.NULL_VALUE.field("Categories"));
+            return Result.failure(DomainError.NULL_VALUE
+                    .withField("categories list"));
         }
         for (String value : values) {
             if (value == null || value.isEmpty()) {

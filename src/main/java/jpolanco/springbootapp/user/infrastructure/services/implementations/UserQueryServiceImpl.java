@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/*
+ * WARNING: This code is under refactoring and now not be functional.
+ */
+
 @Service
 @RequiredArgsConstructor
 public class UserQueryServiceImpl implements UserQueryService {
@@ -44,13 +48,13 @@ public class UserQueryServiceImpl implements UserQueryService {
     public PageResponseDto<UserResponse> get(int page, int size, String sortBy, String orderBy) {
         return pageCreator
                 .create(getUsersUC
-                        .get(new PagePaginationRequest(page, size, sortBy, orderBy)), new UserDtoCreator());
+                        .getByPages(new PagePaginationRequest(page, size, sortBy, orderBy)), new UserDtoCreator());
     }
 
     @Override
     public CursorPageResponseDto<UserResponse, String> get(String cursor, int size, String sortBy, String orderBy) {
         return cursorPageCreator
                 .create(getUsersUC
-                        .get(new CursorPaginationRequest<>(cursor, size, sortBy, orderBy)), new UserDtoCreator());
+                        .getByCursor(new CursorPaginationRequest<>(cursor, size, sortBy, orderBy)), new UserDtoCreator());
     }
 }

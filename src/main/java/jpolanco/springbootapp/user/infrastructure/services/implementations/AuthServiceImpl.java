@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.infrastructure.errors.UserInfrastructureError;
+import jpolanco.springbootapp.shared.infrastructure.errors.InfrastructureError;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
 import jpolanco.springbootapp.user.application.uc.unique.CreateUserUC;
 import jpolanco.springbootapp.user.application.uc.unique.LoginUC;
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Result<UserTokenResponse> refresh(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Result.failure(UserInfrastructureError.INVALID_AUTH_HEADER);
+            return Result.failure(InfrastructureError.INVALID_HEADER);
         }
         var refreshToken = authHeader.substring(7);
         var result = jwtService.refreshTokens(refreshToken);

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
-import jpolanco.springbootapp.event.domain.errors.EventDomainError;
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 public class Location {
@@ -19,9 +19,8 @@ public class Location {
     }
 
     public static Result<Location> create(double latitude, double longitude, String name, String city, String country) {
-        if (city == null || country == null) {
-            return Result.failure(EventDomainError.NULL_VALUE.field("City or Country"));
-        }
+        if (city == null) return Result.failure(DomainError.NULL_VALUE.withField("city"));
+        if (country == null) return Result.failure(DomainError.NULL_VALUE.withField("country"));
         if (city.isBlank()
                 || country.isBlank()
                 || latitude < -90
@@ -29,7 +28,7 @@ public class Location {
                 || longitude < -180
                 || longitude > 180
                 || (latitude == 0 && longitude == 0)) {
-            return Result.failure(EventDomainError.LOCATION_FORMAT_ERROR);
+            return Result.failure(DomainError.INVALID_FORMAT.withDetails("Invalid location coordinates"));
         }
         return Result.success(new Location(name, city, country, latitude, longitude));
     }

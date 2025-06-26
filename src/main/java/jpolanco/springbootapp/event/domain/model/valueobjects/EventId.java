@@ -1,6 +1,7 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Error;
 import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
@@ -14,7 +15,7 @@ public class EventId extends IdObject {
 
     public static Result<EventId> create(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(Error.NULL_VALUE.field("Event id"));
+            return Result.failure(DomainError.NULL_VALUE.withField("eventId"));
         }
         try {
             UUID.fromString(value);

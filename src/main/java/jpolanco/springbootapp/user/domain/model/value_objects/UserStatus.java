@@ -21,6 +21,6 @@ public enum UserStatus {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Unknown status: " + value);
+        return null;
     }
 }

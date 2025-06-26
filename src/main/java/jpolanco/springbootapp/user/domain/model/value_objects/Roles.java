@@ -1,9 +1,8 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.errors.UserDomainError;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,7 +16,8 @@ public class Roles {
 
     public static Result<Roles> create(List<String> values) {
         if (values == null || values.isEmpty()) {
-            return Result.failure(UserDomainError.NULL_VALUE);
+            return Result.failure(DomainError.NULL_VALUE
+                    .withField("List of roles"));
         }
         var result = isValidRole(values);
         if (result.isFailure()) {
@@ -33,7 +33,9 @@ public class Roles {
                 .map(UserRoles::fromString)
                 .collect(Collectors.toSet());
         if (set.isEmpty()) {
-            return Result.failure(UserDomainError.INVALID_ROLES);
+            return Result.failure(DomainError.INVALID_PARAMETER
+                    .withDetails("Roles are not valid")
+                    .withField("Roles"));
         }
         return Result.success(set);
     }
@@ -81,15 +83,14 @@ public class Roles {
     }
 
     @Override
-    public int hashCode() {
-        return values.hashCode();
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Roles other)) return false;
+        return values.equals(other.values);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Roles roles = (Roles) obj;
-        return values.equals(roles.values);
+    public int hashCode() {
+        return values.hashCode();
     }
 }

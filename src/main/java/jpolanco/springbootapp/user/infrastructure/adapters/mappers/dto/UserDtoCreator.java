@@ -6,7 +6,7 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.Us
 import jpolanco.springbootapp.user.domain.model.User;
 import org.springframework.stereotype.Component;
 
-@Component()
+@Component("UserDtoCreator")
 public class UserDtoCreator implements DtoCreator<User, UserResponse> {
     @Override
     public UserResponse create(User user) {

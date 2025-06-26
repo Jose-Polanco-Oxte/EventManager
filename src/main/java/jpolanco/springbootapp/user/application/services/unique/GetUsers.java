@@ -16,7 +16,7 @@ public class GetUsers implements GetUsersUC {
     private final UserQueryRepository queryRepository;
 
     @Override
-    public PageResult<User> get(PagePaginationRequest request) {
+    public PageResult<User> getByPages(PagePaginationRequest request) {
         return queryRepository.findAll(
                 request.page(),
                 request.size(),
@@ -26,7 +26,7 @@ public class GetUsers implements GetUsersUC {
     }
 
     @Override
-    public CursorPageResult<User, String> get(CursorPaginationRequest<String> request) {
+    public CursorPageResult<User, String> getByCursor(CursorPaginationRequest<String> request) {
         return queryRepository.findAll(
                 request.cursor(),
                 request.size(),

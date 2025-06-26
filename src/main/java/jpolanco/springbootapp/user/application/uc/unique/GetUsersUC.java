@@ -13,7 +13,7 @@ public interface GetUsersUC {
      * @param request the pagination request containing page size and other parameters
      * @return a PageResult containing a list of users and pagination information
      */
-    PageResult<User> get(PagePaginationRequest request);
+    PageResult<User> getByPages(PagePaginationRequest request);
 
     /**
      * Retrieves a paginated list of users using cursor-based pagination.
@@ -21,5 +21,5 @@ public interface GetUsersUC {
      * @param request the cursor pagination request containing cursor and other parameters
      * @return a CursorPageResult containing a list of users and pagination information
      */
-    CursorPageResult<User, String> get(CursorPaginationRequest<String> request);
+    CursorPageResult<User, String> getByCursor(CursorPaginationRequest<String> request);
 }

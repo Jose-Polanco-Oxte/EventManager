@@ -1,14 +1,13 @@
 package jpolanco.springbootapp.user.application.uc.derived;
 
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.shared.domain.Report;
 
 public interface ReactivateProfileUC {
     /**
+     * Reactivates a user profile by user ID.
      *
-     * Reactivates a user with the given userId and reason.
      * @param userId the ID of the user to reactivate
-     * @return a Result containing the reactivated User or an error if the reactivation failed
+     * @return a Report containing the reactivated User
      */
-    Result<User> reactivate(String userId);
+    Report reactivate(String userId);
 }

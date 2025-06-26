@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+
+// TODO: Update the builder to return a Report of the operation instead of a Result.
 public class CreateUser implements CreateUserUC {
     private final UserCommandRepository commandRepository;
     private final EncoderProvider passwordEncoder;

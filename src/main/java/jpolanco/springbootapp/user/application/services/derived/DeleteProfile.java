@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.user.application.services.derived;
 
+import jpolanco.springbootapp.shared.application.AppError;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.application.errors.UserAppError;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.DeleteUserUC;
 import jpolanco.springbootapp.user.application.uc.derived.DeleteProfileUC;
@@ -20,13 +20,12 @@ public class DeleteProfile implements DeleteProfileUC {
     @Override
     public Result<List<EventNotification>> delete(String userId, String reason) {
         var maybeUser = queryRepository.findById(userId);
-        if (maybeUser.isEmpty()) {
-            return Result.failure(UserAppError.USER_NOT_FOUND);
-        }
+        if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
+
         var user = maybeUser.get();
-        if (user.isSuspended()) {
-            return Result.failure(UserAppError.USER_SUSPENDED);
-        }
+        if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
+                    .withMessage("is suspended and cannot be deleted"));
+
         return deleteUserUC.delete(user, reason);
     }
 }

@@ -30,10 +30,10 @@ public class UserController {
     ) {
         var commandREsult = commandService.update(request, userId);
         if (commandREsult.isFailure()) {
-            return ResponseHandler.error(
-                    commandREsult.getMessage(),
-                    commandREsult.getErrorCode()
-            );
+//            return ResponseHandler.error(
+//                    commandREsult.getMessage(),
+//                    commandREsult.getErrorCode()
+//            );
         }
         return ResponseHandler.ok("User updated successfully");
     }

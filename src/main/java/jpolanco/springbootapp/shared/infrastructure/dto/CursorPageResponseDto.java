@@ -6,5 +6,9 @@ public record CursorPageResponseDto<T, ID>(
         List<T> items,
         ID lastItemId,
         boolean hasNextPage
-) implements Dto {
+) implements Dto, EntityCollection {
+    @Override
+    public boolean noContent() {
+        return items.isEmpty();
+    }
 }

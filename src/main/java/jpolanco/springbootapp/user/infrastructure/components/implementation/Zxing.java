@@ -40,10 +40,10 @@ public class Zxing implements QRProvider {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(contextPath + svgFileName))) {
                 writer.write(svg);
             } catch (IOException e) {
-                throw new ProviderException("Error al guardar el archivo SVG", 500,e);
+                throw new ProviderException("Image QR save error", 500,e);
             }
         } catch (WriterException | IOException e) {
-            throw new ProviderException("Error al generar el código QR", 500, e);
+            throw new ProviderException("Image QR generation error", 500, e);
         }
     }
 
@@ -59,7 +59,7 @@ public class Zxing implements QRProvider {
             Files.deleteIfExists(FileSystems.getDefault().getPath(contextPath + fileName + ".png"));
             Files.deleteIfExists(FileSystems.getDefault().getPath(contextPath + fileName + ".svg"));
         } catch (IOException e) {
-            throw new ProviderException("Error al eliminar el archivo QR", 500, e);
+            throw new ProviderException("Image QR deletion error", 500, e);
         }
     }
 }

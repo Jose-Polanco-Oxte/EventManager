@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/*
+ * WARNING: This code is under refactoring and now not be functional.
+ */
+
 @Service
 @RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
@@ -22,13 +26,14 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public Result<Void> update(AnyUserUpdateRequest request, String userId) {
-        var maybeUser = updateUser.setChanges(userId, request);
-        if (maybeUser.isFailure()) {
-            return Result.failure(maybeUser.getError());
-        }
-        var user = maybeUser.getValue();
-        publisher.publishAll(user.pullEvents());
-        return Result.success();
+        var userReport = updateUser.setChanges(userId, request);
+//        if (userReport.isFailure()) {
+//            return userReport.toVoid();
+//        }
+//        var user = userReport.getData();
+//        publisher.publishAll(user.pullEvents());
+//        return userReport.toVoid();
+        return null;
     }
 
     @Transactional
@@ -46,33 +51,33 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Override
     public Result<Void> reactivateById(String userId) {
         var maybeUser = reactivateUserUC.reactivateById(userId);
-        if (maybeUser.isFailure()) {
-            return Result.failure(maybeUser.getError());
-        }
-        var user = maybeUser.getValue();
-        publisher.publishAll(user.pullEvents());
+//        if (maybeUser.isFailure()) {
+//            return Result.failure(maybeUser.getError());
+//        }
+//        var user = maybeUser.getValue();
+//        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 
     @Override
     public Result<Void> deactivateById(String userId, String reason) {
         var maybeUser = deactivateUserUC.deactivateById(userId, reason);
-        if (maybeUser.isFailure()) {
-            return Result.failure(maybeUser.getError());
-        }
-        var user = maybeUser.getValue();
-        publisher.publishAll(user.pullEvents());
+//        if (maybeUser.isFailure()) {
+//            return Result.failure(maybeUser.getError());
+//        }
+//        var user = maybeUser.getValue();
+//        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 
     @Override
     public Result<Void> suspendById(String userId, String reason) {
         var maybeUser = suspendUserUC.suspendById(userId, reason);
-        if (maybeUser.isFailure()) {
-            return Result.failure(maybeUser.getError());
-        }
-        var user = maybeUser.getValue();
-        publisher.publishAll(user.pullEvents());
+//        if (maybeUser.isFailure()) {
+//            return Result.failure(maybeUser.getError());
+//        }
+//        var user = maybeUser.getValue();
+//        publisher.publishAll(user.pullEvents());
         return Result.success();
     }
 }

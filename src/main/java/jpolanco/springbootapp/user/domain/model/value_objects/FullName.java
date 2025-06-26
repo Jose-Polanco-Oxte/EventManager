@@ -1,7 +1,9 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
+import jpolanco.springbootapp.shared.domain.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.errors.UserDomainError;
+
+import java.util.Objects;
 
 public class FullName {
     private final String firstName;
@@ -22,41 +24,56 @@ public class FullName {
         return Result.success(new FullName(first, last));
     }
 
-    private static Result<String> ensureValueIsValid(String value) {
+    private static DomainError ensureValueIsValid(String value) {
         if (value == null || value.isEmpty()) {
-            return Result.failure(UserDomainError.NULL_VALUE.field("Names"));
+            return DomainError.NULL_VALUE;
         }
-        var formated = value.strip()
-                .replaceAll("[\\p{Z}\\p{C}]+", " ")
-                .trim();
-        var splited = formated.split(" ");
-        for (String part : splited) {
+        if (value.length() < 2) {
+            return DomainError.TOO_SHORT
+                    .withDetails("Must be at least 2 characters long");
+        }
+        if (value.length() > 100) {
+            return DomainError.TOO_LONG
+                    .withDetails("Must be at most 100 characters long");
+        }
+        var split = value.split(" ");
+        for (String part : split) {
             if (part.length() < 2) {
-                return Result.failure(UserDomainError.NAME_TOO_SHORT);
+                return DomainError.TOO_SHORT
+                        .withDetails("Each part of the name must be at least 2 characters long");
             }
             if (!part.matches("^\\p{L}+$")) {
-                return Result.failure(UserDomainError.NAME_INVALID_CHARACTERS);
+                return DomainError.INVALID_FORMAT
+                        .withDetails("Can only contain letters");
             }
         }
-        if (formated.length() < 2) {
-            return Result.failure(UserDomainError.NAME_TOO_SHORT);
-        }
-        if (formated.length() > 100) {
-            return Result.failure(UserDomainError.NAME_TOO_LONG);
-        }
-        return Result.success(formated);
+        return null;
     }
 
     private static Result<String[]> namesValidated(String firstName, String lastName) {
-        var firstNameResult = ensureValueIsValid(firstName);
-        var lastNameResult = ensureValueIsValid(lastName);
-        if (firstNameResult.isFailure()) {
-            return Result.failure(firstNameResult.getError());
-        } else if (lastNameResult.isFailure()) {
-            return Result.failure(lastNameResult.getError());
+        var formatedFirstName = format(firstName);
+        var formatedLastName = format(lastName);
+        var firstNameResult = ensureValueIsValid(formatedFirstName);
+        var lastNameResult = ensureValueIsValid(formatedLastName);
+        if (firstNameResult != null) {
+            return Result.failure(firstNameResult.getError().withField("firstName"));
+        } else if (lastNameResult != null) {
+            return Result.failure(lastNameResult.getError().withField("lastName"));
         } else {
-            return Result.success(new String[]{firstNameResult.getValue(), lastNameResult.getValue()});
+            return Result.success(new String[]{
+                    formatedFirstName,
+                    formatedLastName
+            });
         }
+    }
+
+    private static String format(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.strip()
+                .replaceAll("[\\p{Z}\\p{C}]+", " ")
+                .trim();
     }
 
     public String getFirstName() {
@@ -70,5 +87,18 @@ public class FullName {
     @Override
     public String toString() {
         return firstName + " " + lastName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FullName other)) return false;
+        return firstName.equals(other.firstName)
+                && lastName.equals(other.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName);
     }
 }

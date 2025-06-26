@@ -1,11 +1,12 @@
 package jpolanco.springbootapp.user.application.services.base;
 
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.application.errors.UserAppError;
+import jpolanco.springbootapp.shared.application.AppError;
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.DeactivateUserUC;
 import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +17,21 @@ public class DeactivateUser implements DeactivateUserUC {
     private final UserCommandRepository commandRepository;
 
     @Override
-    public Result<User> deactivate(User user, String reason) {
-        user.deactivate(reason);
-        var updatedUser = commandRepository.save(user);
-        return Result.success(updatedUser);
+    public Report deactivate(User user, String reason) {
+        var report = UserUpdater.updater(user)
+                .deactivate(reason)
+                .update();
+        if (report.isFailure()) return report;
+
+        commandRepository.save(user);
+        return report;
     }
 
     @Override
-    public Result<User> deactivateById(String userId, String reason) {
+    public Report deactivateById(String userId, String reason) {
         var maybeUser = queryRepository.findById(userId);
-        if (maybeUser.isEmpty()) {
-            return Result.failure(UserAppError.USER_NOT_FOUND);
-        }
+        if (maybeUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
+
         var user = maybeUser.get();
         return deactivate(user, reason);
     }

@@ -1,16 +1,15 @@
 package jpolanco.springbootapp.user.application.uc.derived;
 
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
 
 public interface UpdateProfileEmailUC {
     /**
-     * Updates the email of a user.
+     * Updates the email of a user identified by userId.
      *
-     * @param userId The ID of the user whose email is to be updated.
-     * @param request The request containing the new email.
-     * @return A Result containing the updated User or an error if the update fails.
+     * @param userId  the ID of the user whose email is to be updated
+     * @param request the request containing the new email
+     * @return a Report containing the updated User or an error if the operation fails
      */
-    Result<User> setEmail(String userId, UpdateEmailRequest request);
+    Report setEmail(String userId, UpdateEmailRequest request);
 }
