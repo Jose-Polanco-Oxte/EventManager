@@ -1,14 +1,14 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
-import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
-import jpolanco.springbootapp.shared.infrastructure.dto.PageResponseDto;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.user.domain.model.User;
 
 import java.util.Optional;
 
 public interface UserQueryService {
-    Optional<UserResponse> getById(String userId);
-    Optional<UserResponse> getByEmail(String email);
-    PageResponseDto<UserResponse> get(int page, int size, String sortBy, String orderBy);
-    CursorPageResponseDto<UserResponse, String> get(String cursor, int size, String sortBy, String orderBy);
+    Optional<User> getById(String userId);
+    Optional<User> getByEmail(String email);
+    PageResult<User> getByPages(int page, int size, String sortBy, String orderBy);
+    CursorPageResult<User, String> getByCursor(String cursor, int size, String sortBy, String orderBy);
 }

@@ -1,31 +1,33 @@
 package jpolanco.springbootapp.shared.infrastructure.mappers;
 
-import jpolanco.springbootapp.shared.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.infrastructure.dto.Dto;
-import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
-import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.Dto;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.ComposedDtoCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class CursorPageCreator<Entity, D extends Dto, ID> /* implements DtoCreator<CursorPageResult<Entity, ID>, CursorPageResponseDto<D, ID>> */{
-//    private final DtoCreator<Entity, D> dtoCreator;
-//
-//    @Override
-//    public CursorPageResponseDto<D, ID> create(CursorPageResult<Entity, ID> payload) {
-//        return new CursorPageResponseDto<>(
-//                payload.items().stream().map(dtoCreator::create).toList(),
-//                payload.lastItemId(),
-//                payload.hasNextPage()
-//        );
-//    }
+public class CursorPageCreator<Entity, D extends Dto, ID>
+        implements ComposedDtoCreator<Entity,
+        CursorPageResult<Entity, ID>,
+        D, DtoCreator<Entity, D>,
+        CursorPageResponse<D, ID>> {
 
-    public CursorPageResponseDto<D, ID> create(CursorPageResult<Entity, ID> payload, DtoCreator<Entity, D> dtoCreator) {
-        return new CursorPageResponseDto<>(
-                payload.items().stream().map(dtoCreator::create).toList(),
-                payload.lastItemId(),
-                payload.hasNextPage()
+    @Override
+    public CursorPageResponse<D, ID> create(CursorPageResult<Entity, ID> result, DtoCreator<Entity, D> creator) {
+        return new CursorPageResponse<>(
+                result.items().stream()
+                        .map(creator::create)
+                        .toList(),
+                result.lastItemId(),
+                result.hasNextPage()
         );
+    }
+
+    public static <Entity, D extends Dto, ID> CursorPageCreator<Entity, D, ID> getInstance() {
+        return new CursorPageCreator<>();
     }
 }

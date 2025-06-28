@@ -19,7 +19,7 @@ public interface DeleteEventUC {
     /**
      * Deletes an event by its ID.
      *
-     * @param eventId the ID of the event to be deleted
+     * @param eventId the ID invoke the event to be deleted
      * @param reason the reason for deletion
      * @return a Result object indicating ok or failure
      */

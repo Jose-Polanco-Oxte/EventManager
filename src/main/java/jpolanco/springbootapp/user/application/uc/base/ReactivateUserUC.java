@@ -1,22 +1,25 @@
 package jpolanco.springbootapp.user.application.uc.base;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.EventNotification;
+import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.User;
+
+import java.util.List;
 
 public interface ReactivateUserUC {
     /**
-     * Reactivates a user with the given reason.
+     * Reactivates a user.
      *
-     * @param user the User to reactivate
-     * @return a Result containing the reactivated User or an error if the reactivation failed
+     * @param user the user to reactivate
+     * @return a Result containing a list invoke EventNotifications indicating success or failure invoke the operation
      */
-    Report reactivate(User user);
+    Result<List<EventNotification>> reactivate(User user);
 
     /**
      * Reactivates a user by their ID.
      *
-     * @param userId the ID of the user to reactivate
-     * @return a Report containing the reactivated User or an error if the reactivation failed
+     * @param userId the ID invoke the user to reactivate
+     * @return a Result containing a list invoke EventNotifications indicating success or failure invoke the operation
      */
-    Report reactivateById(String userId);
+    Result<List<EventNotification>> reactivateById(String userId);
 }

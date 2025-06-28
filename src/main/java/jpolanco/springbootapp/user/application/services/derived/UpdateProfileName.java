@@ -6,7 +6,7 @@ import jpolanco.springbootapp.user.application.ports.output.UserCommandRepositor
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileNameUC;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +17,13 @@ public class UpdateProfileName implements UpdateProfileNameUC {
     private final UserCommandRepository commandRepository;
 
     @Override
-    public Report setName(String userId, UpdateNameRequest request) {
+    public Report setName(String userId, ChangeNameRequest request) {
         var maybeUser = queryRepository.findById(userId);
         if (maybeUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();
         if (user.isSuspended()) return Report.failure(AppError.INVALID_OPERATION
-                .withMessage("Cannot update name of a suspended user."));
+                .withMessage("Cannot update name invoke a suspended user."));
 
         var report = UserUpdater.updater(user)
                 .firstName(request.firstName())

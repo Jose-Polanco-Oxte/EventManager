@@ -1,15 +1,17 @@
 package jpolanco.springbootapp.user.application.services.derived;
 
 import jpolanco.springbootapp.shared.application.AppError;
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.EventNotification;
+import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.derived.UpdateProfileEmailUC;
-import jpolanco.springbootapp.user.domain.model.UserUpdater;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeEmailRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,28 +21,26 @@ public class UpdateProfileEmail implements UpdateProfileEmailUC {
     private final JwtCommandRepository jwtCommandRepository;
 
     @Override
-    public Report setEmail(String userId, UpdateEmailRequest request) {
+    public Result<List<EventNotification>> setEmail(String userId, ChangeEmailRequest request) {
         var OptionalUser = queryRepository.findById(userId);
-        if (OptionalUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
+        if (OptionalUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = OptionalUser.get();
         if (queryRepository.findByEmail(request.email()).isPresent()
                 && !user.getEmail().equals(request.email())) {
-            return Report.failure(AppError.CONFLICT
+            return Result.failure(AppError.CONFLICT
                     .withField("Email")
                     .concatMessage("with " + request.email() + " is already in use"));
         }
 
-        if (user.isSuspended()) return Report.failure(AppError.INVALID_OPERATION
+        if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
                 .withMessage("cannot be changed while the user is suspended"));
 
-        var report = UserUpdater.updater(user)
-                .email(request.email())
-                .update();
-        if (report.isFailure()) return report;
+        var result = user.changeEmail(request.email());
+        if (result.isFailure()) return Result.failure(result.getError());
 
         var savedUser = commandRepository.save(user);
         jwtCommandRepository.revokeAllByUserId(savedUser.getId());
-        return report;
+        return Result.success(savedUser.pullEvents());
     }
 }

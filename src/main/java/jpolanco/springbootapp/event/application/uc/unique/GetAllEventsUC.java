@@ -8,7 +8,7 @@ public interface GetAllEventsUC {
     /**
      * Retrieves all events for a specific user.
      *
-     * @return A list of all events.
+     * @return A list invoke all events.
      */
     List<Event> get();
 }

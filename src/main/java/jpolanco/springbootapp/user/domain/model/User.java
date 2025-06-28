@@ -1,8 +1,10 @@
 package jpolanco.springbootapp.user.domain.model;
 
 
+import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.Either;
 import jpolanco.springbootapp.user.domain.domain_events.*;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
@@ -41,7 +43,7 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public static Result<User> create(
+    public static Either<User, List<Error>> create(
             String firstName,
             String lastName,
             String email,
@@ -61,7 +63,7 @@ public class User {
                 .build();
     }
 
-    public static Result<User> of(
+    public static Either<User, List<Error>> of(
             String id,
             String firstName,
             String lastName,
@@ -81,7 +83,7 @@ public class User {
                 .build();
     }
 
-    public static Result<User> load(
+    public static Either<User, List<Error>> load(
             String userId,
             String firstName,
             String lastName,
@@ -114,7 +116,7 @@ public class User {
         return userId.getValue();
     }
 
-    // Date of creation
+    // Date invoke creation
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -291,6 +293,18 @@ public class User {
 
     public List<EventNotification> pullEvents() {
         return this.events;
+    }
+
+    public User copyEventsFrom(User other) {
+        Optional.ofNullable(other.pullEvents())
+                .orElse(Collections.emptyList())
+                .forEach(this::recordEvent);
+        return this;
+    }
+
+    public User replaceEventsFrom(User other) {
+        this.events.clear();
+        return copyEventsFrom(other);
     }
 
     public void recordEvent(EventNotification event) {

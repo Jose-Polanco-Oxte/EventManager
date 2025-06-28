@@ -21,7 +21,7 @@ public class EventUpdater {
 
     private final Event event;
     private Result<?> result = Result.success();
-    private final List<Changes<?>> changes = new ArrayList<>();
+    private final List<Changes> changes = new ArrayList();
 
     private void check(Result<?> result) {
         if (result.isFailure() && this.result.isSuccess()) {
@@ -49,7 +49,7 @@ public class EventUpdater {
             var oldTitle = event.getTitle();
             var result = event.changeTitle(title);
             check(result);
-            changes.add(new Changes<>("title", oldTitle, title));
+            changes.add(new Changes("title", oldTitle, title));
         }
         return this;
     }
@@ -60,7 +60,7 @@ public class EventUpdater {
             var oldDescription = event.getDescription();
             var result = event.changeDescription(description);
             check(result);
-            changes.add(new Changes<>("description", oldDescription, description));
+            changes.add(new Changes("description", oldDescription, description));
         }
         return this;
     }
@@ -73,7 +73,7 @@ public class EventUpdater {
                 var oldSchedule = event.getSchedule();
                 var changeResult = event.changeSchedule(schedule);
                 check(changeResult);
-                changes.add(new Changes<>("schedule", oldSchedule, schedule));
+                changes.add(new Changes("schedule", oldSchedule, schedule));
             }
         }
         return this;
@@ -88,7 +88,7 @@ public class EventUpdater {
                 var oldDuration = event.getDurationInSeconds();
                 var changeResult = event.changeDuration(durationInSeconds);
                 check(changeResult);
-                changes.add(new Changes<>("duration", oldDuration, durationInSeconds));
+                changes.add(new Changes("duration", oldDuration, durationInSeconds));
             }
         }
         return this;
@@ -103,7 +103,7 @@ public class EventUpdater {
             case SCHEDULED -> event.restore("Restored by administrator");
             case IN_PROGRESS -> event.start();
         }
-        changes.add(new Changes<>("status", oldStatus.getValue(), status.getValue()));
+        changes.add(new Changes("status", oldStatus.getValue(), status.getValue()));
         return this;
     }
 
@@ -111,7 +111,7 @@ public class EventUpdater {
         if (event.isCancelled()) return this;
         var oldStatus = event.getStatus();
         event.cancel(reason);
-        changes.add(new Changes<>("status", oldStatus.getValue(), event.getStatus().getValue()));
+        changes.add(new Changes("status", oldStatus.getValue(), event.getStatus().getValue()));
         return this;
     }
 
@@ -119,7 +119,7 @@ public class EventUpdater {
         if (!event.isCancelled()) return this;
         var oldStatus = event.getStatus();
         event.restore(messageToAttendees);
-        changes.add(new Changes<>("status", oldStatus.getValue(), event.getStatus().getValue()));
+        changes.add(new Changes("status", oldStatus.getValue(), event.getStatus().getValue()));
         return this;
     }
 
@@ -146,7 +146,7 @@ public class EventUpdater {
                 nullable(locationCity) > 0 ? event.getLocationCity() : locationCity,
                 nullable(locationCountry) > 0 ? event.getLocationCountry() : locationCountry);
         check(result);
-        changes.add(new Changes<>("location", new location(oldLatitude, oldLongitude, oldLocationName, oldLocationCity, oldLocationCountry)
+        changes.add(new Changes("location", new location(oldLatitude, oldLongitude, oldLocationName, oldLocationCity, oldLocationCountry)
                 , new location(latitude, longitude, locationName, locationCity, locationCountry)));
         return this;
     }
@@ -170,7 +170,7 @@ public class EventUpdater {
             event.removeCategories(remove);
             event.addCategories(add);
         }
-        changes.add(new Changes<>("categories", originalCategories, event.getCategories()));
+        changes.add(new Changes("categories", originalCategories, event.getCategories()));
         return this;
     }
 
@@ -182,7 +182,7 @@ public class EventUpdater {
         if (event.isPublic() == isPublic) return this;
         var oldVisibility = event.isPublic();
         if (isPublic) {event.makePublic();} else { event.makePrivate();}
-        changes.add(new Changes<>("visibility", oldVisibility, isPublic));
+        changes.add(new Changes("visibility", oldVisibility, isPublic));
         return this;
     }
 
@@ -190,7 +190,7 @@ public class EventUpdater {
         if (event.isEnableComments() == enableComments) return this;
         var oldEnableComments = event.isEnableComments();
         if (enableComments) {event.enableComments();} else {event.disableComments();}
-        changes.add(new Changes<>("enableComments", oldEnableComments, enableComments));
+        changes.add(new Changes("enableComments", oldEnableComments, enableComments));
         return this;
     }
 
@@ -202,7 +202,7 @@ public class EventUpdater {
             case VIRTUAL -> event.makeVirtual();
             case HYBRID -> event.makeHybrid();
         }
-        changes.add(new Changes<>("modality", oldModality.getValue(), modality.getValue()));
+        changes.add(new Changes("modality", oldModality.getValue(), modality.getValue()));
         return this;
     }
 
@@ -231,7 +231,7 @@ public class EventUpdater {
                     .map(staff -> new StaffRequest(staff.getUserId().getValue(), staff.getRole(), staff.isAssistanceClerk()))
                     .toList();
         }
-        changes.add(new Changes<>("staff", oldStaff, newStaff));
+        changes.add(new Changes("staff", oldStaff, newStaff));
         return this;
     }
 
@@ -243,7 +243,7 @@ public class EventUpdater {
             result = Result.failure(EventAppError.IMAGE_STORAGE_ERROR);
             return this;
         }
-        changes.add(new Changes<>("picture", oldPictureFileName, event.getPictureFileName()));
+        changes.add(new Changes("picture", oldPictureFileName, event.getPictureFileName()));
         return this;
     }
 
@@ -257,7 +257,7 @@ public class EventUpdater {
             }
             var result = event.changeMaxAttendees(maxAttendees);
             check(result);
-            changes.add(new Changes<>("maxAttendees", oldMaxAttendees, maxAttendees));
+            changes.add(new Changes("maxAttendees", oldMaxAttendees, maxAttendees));
         }
         return this;
     }

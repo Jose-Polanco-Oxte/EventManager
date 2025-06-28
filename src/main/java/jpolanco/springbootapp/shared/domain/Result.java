@@ -1,6 +1,9 @@
 package jpolanco.springbootapp.shared.domain;
 
 
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.Error;
+
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -51,6 +54,14 @@ public class Result<T> {
             return error == Error.NONE;
         } else {
             return this.error.equals(error);
+        }
+    }
+
+    public boolean dataIsNull() {
+        if (IsSuccess) {
+            return value == null;
+        } else {
+            return false; // If it's a failure, we don't check the value
         }
     }
 

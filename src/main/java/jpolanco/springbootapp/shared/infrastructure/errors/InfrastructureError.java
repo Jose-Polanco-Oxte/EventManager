@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.infrastructure.errors;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 
 public class InfrastructureError extends Error {
     public InfrastructureError(int code, String message) {

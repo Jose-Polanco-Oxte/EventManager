@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.event.application.utils.Changes;
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
@@ -16,7 +16,7 @@ public class UserUpdater {
     private final User user;
 
     private final Map<String, Error> errors = new HashMap<>();
-    private final Map<String, Changes<?>> changes = new HashMap<>();
+    private final Map<String, Changes> changes = new HashMap<>();
 
     public static UserUpdater updater(User user) {
         return new UserUpdater(user);
@@ -26,7 +26,7 @@ public class UserUpdater {
         if (result.isFailure()) {
             errors.put(field, result.getError());
         } else if (!equals(oldValue, newValue)) {
-            changes.put(field, new Changes<>(field, oldValue, newValue));
+            changes.put(field, new Changes(field, String.valueOf(oldValue), String.valueOf(newValue)));
         }
     }
 

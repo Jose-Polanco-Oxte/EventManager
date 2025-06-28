@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.repository;
 
 
-import jpolanco.springbootapp.shared.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

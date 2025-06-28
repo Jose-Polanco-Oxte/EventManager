@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class FullName {
         for (String part : split) {
             if (part.length() < 2) {
                 return DomainError.TOO_SHORT
-                        .withDetails("Each part of the name must be at least 2 characters long");
+                        .withDetails("Each part invoke the name must be at least 2 characters long");
             }
             if (!part.matches("^\\p{L}+$")) {
                 return DomainError.INVALID_FORMAT

@@ -8,7 +8,7 @@ import jpolanco.springbootapp.user.application.ports.output.UserCommandRepositor
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AnyUserUpdateRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllFieldsUserUpdate;
 import jpolanco.springbootapp.user.application.uc.base.UpdateUserUC;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class UpdateUser implements UpdateUserUC {
     private final QRProvider qrProvider;
 
     @Override
-    public Report setChanges(User user, AnyUserUpdateRequest request) {
+    public Report setChanges(User user, AllFieldsUserUpdate request) {
         if (queryRepository.findByEmail(request.email()).isPresent()
                 && !user.getEmail().equals(request.email())) {
             return Report.failure(AppError.CONFLICT
@@ -50,7 +50,7 @@ public class UpdateUser implements UpdateUserUC {
     }
 
     @Override
-    public Report setChanges(String userId, AnyUserUpdateRequest request) {
+    public Report setChanges(String userId, AllFieldsUserUpdate request) {
         var OptionalUser = queryRepository.findById(userId);
         if (OptionalUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
 

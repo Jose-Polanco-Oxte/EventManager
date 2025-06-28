@@ -1,13 +1,18 @@
 package jpolanco.springbootapp.shared.infrastructure.controllers;
 
-import jpolanco.springbootapp.event.application.utils.Changes;
-import jpolanco.springbootapp.shared.domain.DomainError;
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.infrastructure.dto.Dto;
-import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
-import jpolanco.springbootapp.shared.infrastructure.dto.EntityCollection;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.Dto;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.EntityCollection;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.ChangesResponse;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.ErrorResponse;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.SimpleResponse;
+import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
+import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.ComposedDtoCreator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,50 +21,129 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Component
 public class ResponseHandler {
 
-    public static <Payload, D extends Dto> ResponseEntity<?> resultToResponse(Result<Payload> result, DtoCreator<Payload, D> creator) {
+    public static ResponseEntity<SimpleResponse> handleVoidResult(Result<Void> result, String message) {
         if (result.isFailure()) {
-            var error = result.getError();
-            if (error instanceof DomainError e) {
-                return buildResponseFailure(e.getField(), e.getMessage(), e.getCode(), e.getDetails());
-            } else {
-                return buildResponseFailure(error.getField(), error.getMessage(), error.getCode(), null);
-            }
+            throw new BusinessRuleException(result.getError());
         } else {
-            var dto = creator.create(result.getValue());
-            if (dto instanceof EntityCollection collection && collection.noContent()) {
-                return noContent();
-            }
-            return ok(dto);
+            return new ResponseEntity<>(new SimpleResponse(message), HttpStatus.OK);
         }
     }
+
+    public static <T, D extends Dto> ResponseEntity<D> handleEither(Either<T, List<Error>> either, DtoCreator<T, D> creator, HttpStatus status) {
+        if (either.isRight()) {
+            throw new BusinessRuleException(either.getRight());
+        } else {
+            var dto = creator.create(either.getLeft());
+            return new ResponseEntity<>(dto, status);
+        }
+    }
+
+    public static <Payload, D extends Dto> ResponseEntity<D> handleResult(Result<Payload> result, DtoCreator<Payload, D> creator) {
+        if (result.isFailure()) {
+            throw new BusinessRuleException(result.getError());
+        } else {
+            if (result.dataIsNull()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                var dto = creator.create(result.getValue());
+                return new ResponseEntity<>(dto, HttpStatus.OK);
+            }
+        }
+    }
+
+    public static <Payload, D extends Dto> ResponseEntity<D> handleResult(Result<Payload> result, DtoCreator<Payload, D> creator, HttpStatus status) {
+        if (result.isFailure()) {
+            throw new BusinessRuleException(result.getError());
+        } else {
+            if (result.dataIsNull()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } else {
+                var dto = creator.create(result.getValue());
+                return new ResponseEntity<>(dto, status);
+            }
+        }
+    }
+
+    public static <T, D extends Dto> ResponseEntity<D> handleOptional(Optional<T> optional, DtoCreator<T, D> creator) {
+        return optional.map(value -> new ResponseEntity<>(creator.create(value), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    public static <E, D extends Dto> ResponseEntity<List<D>> handleList(List<E> list, DtoCreator<E, D> creator) {
+        if (list.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(list.stream().map(creator::create).toList(), HttpStatus.OK);
+        }
+    }
+
+    public static ResponseEntity<ErrorResponse> handleError(String field, String message, int code, String details) {
+        return new ResponseEntity<>(new ErrorResponse(field, message, code, details), HttpStatus.valueOf(code));
+    }
+
+    public static ResponseEntity<List<ErrorResponse>> handleErrors(List<Error> errors) {
+        List<ErrorResponse> errorResponses = errors.stream()
+                .map(error ->
+                        new ErrorResponse(error.getField(), error.getMessage(), error.getCode(),
+                                (error instanceof DomainError e) ? e.getDetails() : null))
+                .toList();
+        return new ResponseEntity<>(errorResponses, HttpStatus.BAD_REQUEST);
+    }
+
+    public static ResponseEntity<ChangesResponse> handleReport(Report report, String message) {
+        if (report.isFailure()) {
+            throw new BusinessRuleException(report.getErrors());
+        } else {
+            var changes = report.getChanges();
+            return changes != null && !changes.isEmpty()
+                    ? ResponseEntity.ok(new ChangesResponse(message, changes))
+                    : ResponseEntity.noContent().build();
+        }
+    }
+
+    public static <
+            Entity,
+            Input extends EntityCollection,
+            EntityDto extends Dto,
+            Creator extends DtoCreator<Entity, EntityDto>,
+            Response extends Dto>
+    ResponseEntity<Response> handleCollection(
+            Input input,
+            ComposedDtoCreator<Entity, Input, EntityDto, Creator, Response> composedCreator,
+            Creator creator) {
+
+        return input.hasContent()
+                ? ResponseEntity.ok(composedCreator.create(input, creator))
+                : ResponseEntity.noContent().build();
+    }
+
+    public static <
+            Input extends EntityCollection,
+            Response extends Dto>
+    ResponseEntity<Response> handleMapper(
+            Input input,
+            Function<Input, Response> mapper) {
+
+        return input.hasContent()
+                ? ResponseEntity.ok(mapper.apply(input))
+                : ResponseEntity.noContent().build();
+    }
+
 
     public static ResponseEntity<Object> error(String message, HttpStatus status) {
         return buildResponse(message, status, null);
     }
 
-    public static ResponseEntity<?> reportToResponse(Report report) {
-        if (report.isFailure()) {
-            var errors = report.getErrors();
-            return buildReportErrors(errors);
-        } else {
-            var changes = report.getChanges();
-            return buildReportChanges(changes);
-        }
+    public static <Payload, D extends Dto> ResponseEntity<?> optionalToResponse(Optional<Payload> data, DtoCreator<Payload, D> creator) {
+        return data.map(payload -> ok(creator.create(payload))).orElseGet(ResponseHandler::notFound);
     }
 
-    public static <Payload, D extends Dto> ResponseEntity<?> optionalToResponse(Optional<Payload> data, DtoCreator<Payload, D> creator) {
-        if (data.isEmpty()) {
-            return notFound();
-        } else {
-            return ok(creator.create(data.get()));
-        }
-    }
-    
-    public static ResponseEntity<Object> simpleResponse(String message) {
+    public static ResponseEntity<?> simpleResponse(String message) {
         return buildResponse(message, HttpStatus.OK, null);
     }
 
@@ -114,51 +198,12 @@ public class ResponseHandler {
 
     private static ResponseEntity<Object> buildResponse(String message, HttpStatus status, Object data) {
         Map<String, Object> response = new HashMap<>();
-        response.put("status", status.value());
-        response.put("message", message);
-        response.put("timestamp", System.currentTimeMillis());
+        response.put("Status", status.value());
+        response.put("Message", message);
+        response.put("Timestamp", System.currentTimeMillis());
         if (data != null) {
-            response.put("data", data);
+            response.put("Data", data);
         }
         return new ResponseEntity<>(response, status);
-    }
-
-    public static ResponseEntity<?> buildReportErrors(List<Error> errors) {
-        Map<String, String> response = new HashMap<>();
-        for (Error error : errors) {
-            if (error instanceof DomainError domainError) {
-                response.put(domainError.getField(), domainError.getMessage());
-            } else {
-                response.put(error.getField(), error.getMessage());
-            }
-        }
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    public static ResponseEntity<?> buildReportChanges(List<Changes<?>> changes) {
-        Map<String, Change<?>> response = new HashMap<>();
-        for (Changes<?> change : changes) {
-            response.put(change.fieldName(), new Change<>(change.oldValue(), change.newValue()));
-        }
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    public record Change<T>(
-            T before,
-            T after
-    ){}
-
-    private static ResponseEntity<?> buildResponseFailure(String fieldName, String message, int code, String details) {
-        Map<String, Object> response = new HashMap<>();
-        if (fieldName != null) {
-            response.put("Field", fieldName);
-        }
-        response.put("Message", message);
-        if (details != null) {
-            response.put("Details", details);
-        }
-        response.put("Timestamp", System.currentTimeMillis());
-        response.put("Status", HttpStatus.valueOf(code));
-        return new ResponseEntity<>(response, HttpStatus.valueOf(code));
     }
 }

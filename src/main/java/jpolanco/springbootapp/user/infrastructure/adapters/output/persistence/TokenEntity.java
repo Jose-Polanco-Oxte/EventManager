@@ -1,17 +1,17 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.persistence;
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
-import jpolanco.springbootapp.shared.utils.TokenType;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 
 @Entity(name = "tokens")
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class TokenEntity {

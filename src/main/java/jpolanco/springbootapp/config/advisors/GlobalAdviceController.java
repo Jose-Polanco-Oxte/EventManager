@@ -5,6 +5,8 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
 import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.application.errors.IllegalUserOperation;
 import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
@@ -35,6 +37,18 @@ public class GlobalAdviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
 
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<?> handleBusinessRuleException(BusinessRuleException e) {
+        logger.error("Business rule violation: {}", e.getMessage(), e);
+        if (e.getErrors().size() == 1) {
+            // If there's only one error, return it directly
+            var error = e.getErrors().getFirst();
+            return ResponseHandler.handleError(error.getField(), error.getMessage(), error.getCode(), (error instanceof DomainError d) ? d.getDetails() : null);
+        } else {
+            return ResponseHandler.handleErrors(e.getErrors());
+        }
+    }
+
     @ExceptionHandler(SecurityAuth.class)
     public ResponseEntity<Object> handleSecurityAuthException(SecurityAuth e) {
         logger.error("Security authentication error: {}", e.getMessage(), e);
@@ -63,7 +77,7 @@ public class GlobalAdviceController {
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
         assert e.getRequiredType() != null;
         return ResponseHandler.badRequest(
-                "Invalid request parameter: " + e.getName() + " should be of type " + e.getRequiredType().getSimpleName()
+                "Invalid request parameter: " + e.getName() + " should be invoke type " + e.getRequiredType().getSimpleName()
         );
     }
 

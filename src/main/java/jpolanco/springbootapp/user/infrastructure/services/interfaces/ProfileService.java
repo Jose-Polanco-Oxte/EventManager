@@ -1,15 +1,16 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateEmailRequest;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdateNameRequest;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.UpdatePasswordRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeEmailRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangePasswordRequest;
 
 public interface ProfileService {
-    Result<Void> changeEmail(String userId, UpdateEmailRequest request);
-    Result<Void> changeName(String userId, UpdateNameRequest request);
+    Result<Void> changeEmail(String userId, ChangeEmailRequest request);
+    Report changeName(String userId, ChangeNameRequest request);
     Result<Void> delete(String userId, String reason);
-    Result<Void> changePassword(String userId, UpdatePasswordRequest dto);
+    Result<Void> changePassword(String userId, ChangePasswordRequest dto);
     Result<Void> deactivate(String userId, String reason);
     Result<Void> reactivate(String userId);
 }

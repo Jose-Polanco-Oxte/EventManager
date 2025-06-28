@@ -5,8 +5,8 @@ import jpolanco.springbootapp.event.application.ports.input.request.PagePaginati
 import jpolanco.springbootapp.event.application.ports.output.EventQueryRepository;
 import jpolanco.springbootapp.event.application.uc.unique.GetPublicEventsUC;
 import jpolanco.springbootapp.event.domain.model.Event;
-import jpolanco.springbootapp.shared.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.utils.PageResult;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

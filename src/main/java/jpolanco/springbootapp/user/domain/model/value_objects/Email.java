@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.Set;

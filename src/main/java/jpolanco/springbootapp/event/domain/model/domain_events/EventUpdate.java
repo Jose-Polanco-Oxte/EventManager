@@ -10,9 +10,9 @@ import java.util.List;
 public class EventUpdate extends EventNotification {
     private final String eventId;
     private final String eventName;
-    List<Changes<?>> changes;
+    List<Changes> changes;
 
-    public EventUpdate(String eventId, String eventName, List<Changes<?>> changes) {
+    public EventUpdate(String eventId, String eventName, List<Changes> changes) {
         super();
         this.eventId = eventId;
         this.eventName = eventName;

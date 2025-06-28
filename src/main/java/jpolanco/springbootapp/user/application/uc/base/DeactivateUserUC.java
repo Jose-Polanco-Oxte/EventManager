@@ -1,7 +1,10 @@
 package jpolanco.springbootapp.user.application.uc.base;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.EventNotification;
+import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.User;
+
+import java.util.List;
 
 public interface DeactivateUserUC {
     /**
@@ -9,16 +12,18 @@ public interface DeactivateUserUC {
      *
      * @param user   the User to deactivate
      * @param reason the reason for deactivation
-     * @return a Report containing the deactivated User or an error if the deactivation failed
+     * @return a Result containing a list invoke EventNotifications or an error if the deactivation failed
      */
-    Report deactivate(User user, String reason);
+    Result<List<EventNotification>> deactivate(User user, String reason);
 
     /**
-     * Deactivates a user with the given userId and reason.
+     * Deactivates a user by their ID with the given reason.
      *
-     * @param userId the ID of the user to deactivate
+     * @param userId the ID invoke the user to deactivate
      * @param reason the reason for deactivation
-     * @return a Result containing the deactivated User or an error if the deactivation failed
+     * @return a Result containing a list invoke EventNotifications or an error if the deactivation failed
      */
-    Report deactivateById(String userId, String reason);
+    Result<List<EventNotification>> deactivateById(String userId, String reason);
+
+    record Input(String userId, String reason) {}
 }

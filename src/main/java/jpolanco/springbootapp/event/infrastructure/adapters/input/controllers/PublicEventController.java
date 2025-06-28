@@ -66,7 +66,7 @@ public class PublicEventController {
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
         var events = queryService.getPublicEventsByCursorBased(cursor, size, sortBy.getValue(), orderBy.getValue());
-        if (events.items().isEmpty()) {
+        if (events.content().isEmpty()) {
             return ResponseHandler.noContent();
         }
         return ResponseHandler.ok(events);

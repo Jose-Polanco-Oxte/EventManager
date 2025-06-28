@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.user.application.utils;
 
-import jpolanco.springbootapp.shared.utils.TokenStatus;
 import lombok.Getter;
 import lombok.Setter;
 

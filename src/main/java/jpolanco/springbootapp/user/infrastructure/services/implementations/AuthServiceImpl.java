@@ -1,18 +1,23 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
+import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.errors.InfrastructureError;
+import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
 import jpolanco.springbootapp.user.application.uc.unique.CreateUserUC;
 import jpolanco.springbootapp.user.application.uc.unique.LoginUC;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public Result<UserTokenResponse> login(LoginRequest request) {
+    public Result<Map<String, String>> login(LoginRequest request) {
         var verifiedUser = loginUC.login(request.email(), request.password());
         if (verifiedUser.isFailure()) {
             return Result.failure(verifiedUser.getError());
@@ -35,23 +40,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     @Override
-    public Result<UserTokenResponse> register(RegisterRequest request) {
-        var createdUser = createUserUc.create(request);
-        if (createdUser.isFailure()) {
-            return Result.failure(createdUser.getError());
+    public Either<Map<String, String>, List<Error>> register(RegisterRequest request) {
+        Either<User, List<Error>> either = createUserUc.create(request);
+        if (either.isRight()) {
+            return Either.right(either.getRight());
         }
-        var user = createdUser.getValue();
+        var user = either.getLeft();
         var tokens = jwtService.createTokens(user);
         if (tokens.isFailure()) {
-            return Result.failure(tokens.getError());
+            return Either.right(List.of(tokens.getError()));
         }
         publisher.publishAll(user.pullEvents());
-        return Result.success(tokens.getValue());
+        return Either.left(tokens.getValue());
     }
 
     @Transactional
     @Override
-    public Result<UserTokenResponse> refresh(String authHeader) {
+    public Result<Map<String, String>> refresh(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Result.failure(InfrastructureError.INVALID_HEADER);
         }

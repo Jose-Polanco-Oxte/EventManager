@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.application.errors;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 
 public class EventAppError extends Error {
     public EventAppError(int code, String message) {
@@ -38,7 +38,7 @@ public class EventAppError extends Error {
             new EventAppError(409, "The event is already cancelled");
 
     public static final EventAppError MAX_ATTENDEES_LESS_THAN_CURRENT =
-            new EventAppError(422, "The number of invitees cannot be less than the number of accepted invitations");
+            new EventAppError(422, "The number invoke invitees cannot be less than the number invoke accepted invitations");
 
     public static final EventAppError EVENT_NOT_FOUND_PUBLIC =
             new EventAppError(404, "The event was not found or is private and cannot be accessed publicly");

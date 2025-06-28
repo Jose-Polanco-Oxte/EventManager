@@ -2,12 +2,11 @@ package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.errors.InfrastructureError;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.utils.TokenE;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
 import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
     private final AuthenticationManager authentication;
 
     @Override
-    public Result<UserTokenResponse> createTokens(User user) {
+    public Result<Map<String, String>> createTokens(User user) {
         var accessToken = jwtManager.generateAccessToken(user);
         var refreshToken = jwtManager.generateRefreshToken(user);
         jwtCommandRepository.save(
@@ -38,11 +38,14 @@ public class JwtServiceImpl implements JwtService {
                         Instant.now()
                 )
         );
-        return Result.success(new UserTokenResponse(accessToken, refreshToken));
+        return Result.success(Map.of(
+                "access", accessToken,
+                "refresh", refreshToken
+        ));
     }
 
     @Override
-    public Result<UserTokenResponse> authenticate(User user, String password) {
+    public Result<Map<String, String>> authenticate(User user, String password) {
         var response = createTokens(user);
         if (response.isFailure()) {
             return Result.failure(response.getError());
@@ -57,7 +60,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public Result<UserTokenResponse> refreshTokens(String refreshToken) {
+    public Result<Map<String, String>> refreshTokens(String refreshToken) {
         var userEmail = jwtManager.extractUsername(refreshToken);
         if (userEmail == null) return Result.failure(InfrastructureError.EXTERNAL_SERVICE_ERROR
                 .withField("RefreshToken")

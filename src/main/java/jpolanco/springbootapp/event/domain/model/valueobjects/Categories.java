@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.domain.model.valueobjects;
 import jpolanco.springbootapp.event.domain.errors.EventDomainError;
-import jpolanco.springbootapp.shared.domain.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.HashSet;

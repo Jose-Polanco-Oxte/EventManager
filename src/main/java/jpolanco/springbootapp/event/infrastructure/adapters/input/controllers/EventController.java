@@ -3,7 +3,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
-import jpolanco.springbootapp.shared.infrastructure.dto.CommandReasonRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
@@ -11,7 +11,7 @@ import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortFie
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
-import jpolanco.springbootapp.shared.infrastructure.dto.MessageRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.request.MessageRequest;
 import jpolanco.springbootapp.shared.utils.OrderField;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +89,7 @@ public class EventController {
                 sortBy.getValue(),
                 order.getValue()
         );
-        if (events.items().isEmpty()) {
+        if (events.content().isEmpty()) {
             return ResponseHandler.noContent();
         }
         return ResponseHandler.ok(events);

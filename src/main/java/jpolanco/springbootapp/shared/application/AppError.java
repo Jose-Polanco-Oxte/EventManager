@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.application;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 
 import java.util.Objects;
 
@@ -37,6 +37,14 @@ public class AppError extends Error {
     public static <T> AppError idNotFound(T id, String fieldName) {
         return of(404, "id " + id + " not found")
                 .withField(fieldName);
+    }
+
+    public static AppError convertToApp(Error error) {
+        return new AppError(error.getCode(), error.getMessage(), error.getField());
+    }
+
+    public Error convertToError() {
+        return new Error(getCode(), getMessage(), getField());
     }
 
     public AppError withCode(int code) {

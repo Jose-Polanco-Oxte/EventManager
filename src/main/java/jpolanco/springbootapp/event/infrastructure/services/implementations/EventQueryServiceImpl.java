@@ -10,8 +10,8 @@ import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
-import jpolanco.springbootapp.shared.infrastructure.dto.CursorPageResponseDto;
-import jpolanco.springbootapp.shared.infrastructure.dto.SlicePageResponseDto;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.SlicePageResponse;
 import jpolanco.springbootapp.shared.infrastructure.mappers.CursorPageCreator;
 import jpolanco.springbootapp.shared.infrastructure.mappers.SlicePageCreator;
 import lombok.RequiredArgsConstructor;
@@ -51,25 +51,25 @@ public class EventQueryServiceImpl implements EventQueryService {
     }
 
     @Override
-    public SlicePageResponseDto<EventResponse> getEventsByPages(int page, int size, String sortBy, String sortOrder) {
+    public SlicePageResponse<EventResponse> getEventsByPages(int page, int size, String sortBy, String sortOrder) {
         var pages = getEventsUC.get(new PagePaginationRequest(page, size, sortBy, sortOrder));
         return slicePageCreator.create(pages, eventDtoCreator);
     }
 
     @Override
-    public CursorPageResponseDto<EventResponse, String> getEventsByCursorBased(String cursor, int size, String sortBy, String sortOrder) {
+    public CursorPageResponse<EventResponse, String> getEventsByCursorBased(String cursor, int size, String sortBy, String sortOrder) {
         var cursorPage = getEventsUC.get(new CursorPaginationRequest<>(cursor, size, sortBy, sortOrder));
         return cursorPageCreator.create(cursorPage, eventDtoCreator);
     }
 
     @Override
-    public SlicePageResponseDto<EventResponse> getPublicEventsByPages(int page, int size, String sortBy, String sortOrder) {
+    public SlicePageResponse<EventResponse> getPublicEventsByPages(int page, int size, String sortBy, String sortOrder) {
         var pages = getPublicEventsUC.get(new PagePaginationRequest(page, size, sortBy, sortOrder));
         return slicePageCreator.create(pages, eventDtoCreator);
     }
 
     @Override
-    public CursorPageResponseDto<EventResponse, String> getPublicEventsByCursorBased(String cursor, int size, String sortBy, String sortOrder) {
+    public CursorPageResponse<EventResponse, String> getPublicEventsByCursorBased(String cursor, int size, String sortBy, String sortOrder) {
         var cursorPage = getPublicEventsUC.get(new CursorPaginationRequest<>(cursor, size, sortBy, sortOrder));
         return cursorPageCreator.create(cursorPage, eventDtoCreator);
     }

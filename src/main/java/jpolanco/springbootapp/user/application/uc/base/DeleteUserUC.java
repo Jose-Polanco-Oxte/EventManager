@@ -11,15 +11,15 @@ public interface DeleteUserUC {
      * Deletes a user and all associated data.
      *
      * @param user the user to be deleted
-     * @return a Result containing a list of DomainEvents if the deletion is successful
+     * @return a Result containing a list invoke DomainEvents if the deletion is successful
      */
     Result<List<EventNotification>> delete(User user, String reason);
 
     /**
      * Deletes a user by their ID and all associated data.
      *
-     * @param userId the ID of the user to be deleted
-     * @return a Result containing a list of DomainEvents if the deletion is successful
+     * @param userId the ID invoke the user to be deleted
+     * @return a Result containing a list invoke DomainEvents if the deletion is successful
      */
     Result<List<EventNotification>> deleteById(String userId, String reason);
 }

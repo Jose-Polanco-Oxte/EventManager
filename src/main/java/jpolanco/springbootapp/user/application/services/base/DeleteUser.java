@@ -29,9 +29,7 @@ public class DeleteUser implements DeleteUserUC {
         jpaTokenRepository.deleteAllByUserId(UUID.fromString(user.getId()));
         qrProvider.delete(user.getQRFileName());
         commandRepository.deleteById(user.getId());
-
-        user.recordEvent(new UserDeleted(user.getId(), reason));
-        return Result.success(user.pullEvents());
+        return Result.success(List.of(new UserDeleted(user.getId(), reason)));
     }
 
     @Override

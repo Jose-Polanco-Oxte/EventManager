@@ -11,8 +11,8 @@ public interface UpdateOwnEventUC {
     /**
      * Updates the event with the given ID, owned by the creator with the given ID.
      *
-     * @param eventId    The ID of the event to update.
-     * @param creatorId  The ID of the creator who owns the event.
+     * @param eventId    The ID invoke the event to update.
+     * @param creatorId  The ID invoke the creator who owns the event.
      * @param request    The request containing the updated event details.
      * @param imageStream An InputStream for the new image associated with the event.
      * @return A Result containing the updated Event if successful, or an error if not.

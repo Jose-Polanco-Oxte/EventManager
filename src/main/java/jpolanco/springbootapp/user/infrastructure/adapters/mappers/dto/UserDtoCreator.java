@@ -1,12 +1,11 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto;
 
-import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
 import jpolanco.springbootapp.user.domain.model.User;
 import org.springframework.stereotype.Component;
 
-@Component("UserDtoCreator")
+@Component()
 public class UserDtoCreator implements DtoCreator<User, UserResponse> {
     @Override
     public UserResponse create(User user) {
@@ -18,5 +17,9 @@ public class UserDtoCreator implements DtoCreator<User, UserResponse> {
                 user.getStatus().getValue(),
                 user.getRoles().stream().toList()
         );
+    }
+
+    public static UserDtoCreator getInstance() {
+        return new UserDtoCreator();
     }
 }

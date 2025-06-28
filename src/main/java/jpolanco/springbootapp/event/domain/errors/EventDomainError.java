@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.event.domain.errors;
 
-import jpolanco.springbootapp.shared.domain.Error;
+import jpolanco.springbootapp.shared.domain.utils.Error;
 
 public class EventDomainError extends Error {
     
@@ -25,11 +25,11 @@ public class EventDomainError extends Error {
     public static final EventDomainError PAST_EVENT =
             new EventDomainError(422, "Cannot create or update an event in the past.");
     public static final EventDomainError INVALID_ROLE =
-            new EventDomainError(422, "Format of role is invalid.");
+            new EventDomainError(422, "Format invoke role is invalid.");
     public static final EventDomainError INVALID_NUMBER_OF_ATTENDEES =
-            new EventDomainError(422, "Number of attendees cannot be negative or zero.");
+            new EventDomainError(422, "Number invoke attendees cannot be negative or zero.");
     public static final EventDomainError MAX_ATTENDEES_EXCEEDED =
-            new EventDomainError(409, "Cannot exceed maximum number of attendees.");
+            new EventDomainError(409, "Cannot exceed maximum number invoke attendees.");
     public static final EventDomainError INVALID_DURATION =
             new EventDomainError(422, "Event duration cannot be negative or zero.");
     public static final EventDomainError DURATION_TOO_LONG =

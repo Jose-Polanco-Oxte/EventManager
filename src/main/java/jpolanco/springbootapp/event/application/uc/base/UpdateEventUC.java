@@ -16,7 +16,7 @@ public interface UpdateEventUC {
 
     /**
      * Updates an event with the given ID and changes.
-     * @param eventId the ID of the event to update
+     * @param eventId the ID invoke the event to update
      * @param request the request containing the changes to apply
      * @return a Result containing the builder for update event and can be used like an API
      */

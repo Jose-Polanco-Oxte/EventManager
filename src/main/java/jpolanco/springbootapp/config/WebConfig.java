@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.config;
 
-import jpolanco.springbootapp.shared.utils.StringToEnumConverterFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

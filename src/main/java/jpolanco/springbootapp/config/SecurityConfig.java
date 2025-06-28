@@ -2,7 +2,7 @@ package jpolanco.springbootapp.config;
 
 import jpolanco.springbootapp.config.auth.JwtAuthFilter;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaTokenRepository;
 import lombok.RequiredArgsConstructor;

@@ -17,8 +17,9 @@ public class UserCommandMySQL implements UserCommandRepository {
 
     @Override
     public User save(User user) {
-        jpaUserRepository.save(mapper.toEntity(user));
-        return user;
+        return mapper
+                .toDomain(jpaUserRepository.save(mapper.toEntity(user)))
+                .replaceEventsFrom(user);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.components.utils;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.JwtQueryRepository;
 import lombok.RequiredArgsConstructor;

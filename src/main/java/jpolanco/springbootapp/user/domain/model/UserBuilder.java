@@ -1,13 +1,16 @@
 package jpolanco.springbootapp.user.domain.model;
 
+import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.Either;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
+import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+@RequiredArgsConstructor
 public class UserBuilder {
     private UserId userId;
     private FullName fullName;
@@ -18,13 +21,13 @@ public class UserBuilder {
     private QRFileName qrFileName;
     private Instant createdAt;
     private EventNotification eventNotification;
-    private Result<?> isValid = Result.success();
+
+    private final List<Error> errors = new ArrayList<>();
 
     private <T> T checker(Result<T> result) {
-        if (result.isFailure() && !isValid.isFailure()) {
-            isValid = Result.failure(result.getError());
-            return null;
-        } else if (result.isFailure()){
+        System.out.println("Errors quantity: " + errors.size());
+        if (result.isFailure()) {
+            errors.add(result.getError());
             return null;
         } else {
             return result.getValue();
@@ -82,9 +85,9 @@ public class UserBuilder {
         return this;
     }
 
-    public Result<User> build() {
-        if (isValid.isFailure()) {
-            return Result.failure(isValid.getError());
+    public Either<User, List<Error>> build() {
+        if (!errors.isEmpty()) {
+            return Either.right(List.copyOf(errors));
         }
 
         var user = new User(
@@ -98,6 +101,6 @@ public class UserBuilder {
                 createdAt
         );
         user.recordEvent(eventNotification);
-        return Result.success(user);
+        return Either.left(user);
     }
 }

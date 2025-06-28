@@ -1,14 +1,16 @@
 package jpolanco.springbootapp.user.application.services.base;
 
 import jpolanco.springbootapp.shared.application.AppError;
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.EventNotification;
+import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.SuspendUserUC;
 import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,20 +19,16 @@ public class SuspendUser implements SuspendUserUC {
     private final UserCommandRepository commandRepository;
 
     @Override
-    public Report suspend(User user, String reason) {
-        var report = UserUpdater.updater(user)
-                .suspend(reason)
-                .update();
-        if (report.isFailure()) return report;
-
-        commandRepository.save(user);
-        return report;
+    public Result<List<EventNotification>> suspend(User user, String reason) {
+        user.suspend(reason);
+        var savedUser = commandRepository.save(user);
+        return Result.success(savedUser.pullEvents());
     }
 
     @Override
-    public Report suspendById(String userId, String reason) {
+    public Result<List<EventNotification>> suspendById(String userId, String reason) {
         var maybeUser = queryRepository.findById(userId);
-        if (maybeUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
+        if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();
         return suspend(user, reason);

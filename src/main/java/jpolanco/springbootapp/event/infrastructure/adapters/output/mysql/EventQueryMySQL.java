@@ -6,8 +6,8 @@ import jpolanco.springbootapp.event.infrastructure.adapters.mappers.entity.Event
 import jpolanco.springbootapp.event.infrastructure.adapters.output.persistence.EventEntity;
 import jpolanco.springbootapp.event.infrastructure.adapters.output.repository.JpaEventRepository;
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
-import jpolanco.springbootapp.shared.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.utils.PageResult;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;

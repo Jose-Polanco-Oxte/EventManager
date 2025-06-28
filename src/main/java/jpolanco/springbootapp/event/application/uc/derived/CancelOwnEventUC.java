@@ -7,8 +7,8 @@ public interface CancelOwnEventUC {
     /**
      * Cancels an event created by the user with the specified creatorId and eventId.
      *
-     * @param eventId   The ID of the event to be canceled.
-     * @param creatorId The ID of the user who created the event.
+     * @param eventId   The ID invoke the event to be canceled.
+     * @param creatorId The ID invoke the user who created the event.
      * @param reason    The reason for canceling the event.
      * @return A Result containing the canceled Event or an error if the operation fails.
      */

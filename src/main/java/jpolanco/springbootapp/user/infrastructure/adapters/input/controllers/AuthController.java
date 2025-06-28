@@ -4,9 +4,12 @@ import jakarta.validation.Valid;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.TokenDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,29 +22,18 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@Valid @RequestBody RegisterRequest request) {
-        var commandResult = authService.register(request);
-        if (commandResult.isFailure()) {
-            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
-        }
-        return ResponseHandler.ok(commandResult.getValue());
+    public ResponseEntity<UserTokenResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseHandler.handleEither(authService.register(request),
+                TokenDtoCreator.getInstance(), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
-        var commandResult = authService.login(request);
-        if (commandResult.isFailure()) {
-            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
-        }
-        return ResponseHandler.ok(commandResult.getValue());
+    public ResponseEntity<UserTokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseHandler.handleResult(authService.login(request), TokenDtoCreator.getInstance());
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<Object> refresh(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        var commandResult = authService.refresh(authorizationHeader);
-        if (commandResult.isFailure()) {
-            return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
-        }
-        return ResponseHandler.ok(commandResult.getValue());
+    public ResponseEntity<UserTokenResponse> refresh(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        return ResponseHandler.handleResult(authService.refresh(authorizationHeader), TokenDtoCreator.getInstance());
     }
 }

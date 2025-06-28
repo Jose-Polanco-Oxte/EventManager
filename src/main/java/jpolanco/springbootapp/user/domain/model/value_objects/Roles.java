@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.DomainError;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class Roles {
     public static Result<Roles> create(List<String> values) {
         if (values == null || values.isEmpty()) {
             return Result.failure(DomainError.NULL_VALUE
-                    .withField("List of roles"));
+                    .withField("List invoke roles"));
         }
         var result = isValidRole(values);
         if (result.isFailure()) {

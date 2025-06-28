@@ -2,12 +2,12 @@ package jpolanco.springbootapp.event.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.event.application.uc.unique.search.SearchEventByNameUC;
 import jpolanco.springbootapp.event.application.uc.unique.search.SearchOwnEventByNameUC;
+import jpolanco.springbootapp.event.application.uc.unique.search.SearchPublicEventByNameUC;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.CategoriesResponse;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.StaffRolesResponse;
 import jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto.EventDtoCreator;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;
-import jpolanco.springbootapp.shared.application.uc.SearchPublicEventByNameUC;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

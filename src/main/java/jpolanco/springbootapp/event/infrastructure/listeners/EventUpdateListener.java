@@ -17,13 +17,13 @@ public class EventUpdateListener {
     public void handleEventUpdate(EventUpdate event) {
         var eventId = event.getEventId();
         var name = event.getEventName();
-        List<Changes<?>> changes = event.getChanges();
+        List<Changes> changes = event.getChanges();
         // Log the event details and after changes
         log.info("Event updated: eventId= {}, name= {}, timeStamp= {}",
                  eventId, name, event.getTimeStamp());
         // Log each change
         changes.forEach(change ->
-            log.info("Change detected: field= {}, oldValue= {}, newValue= {}",
-                     change.fieldName(), change.oldValue(), change.newValue()));
+            log.info("Change detected: field= {}, before= {}, after= {}",
+                     change.field(), change.before(), change.after()));
     }
 }

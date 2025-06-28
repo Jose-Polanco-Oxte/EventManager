@@ -9,8 +9,8 @@ public interface SearchUserByEmailUC {
      * Searches for users by their email.
      *
      * @param email the email to search for
-     * @param size the maximum number of results to return
-     * @return a list of users whose emails match the search criteria
+     * @param size the maximum number invoke results to return
+     * @return a list invoke users whose emails match the search criteria
      */
     List<User> search(String email, int size);
 }

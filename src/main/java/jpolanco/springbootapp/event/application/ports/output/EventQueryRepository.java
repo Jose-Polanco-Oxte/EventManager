@@ -2,8 +2,8 @@ package jpolanco.springbootapp.event.application.ports.output;
 
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.shared.application.adapters.output.PageableRepository;
-import jpolanco.springbootapp.shared.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.utils.PageResult;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.PageResult;
 
 import java.time.Instant;
 import java.util.List;

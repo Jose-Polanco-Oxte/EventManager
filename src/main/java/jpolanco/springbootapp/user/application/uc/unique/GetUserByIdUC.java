@@ -8,7 +8,7 @@ public interface GetUserByIdUC {
     /**
      * Retrieves a user by their unique identifier.
      *
-     * @param userId the unique identifier of the user
+     * @param userId the unique identifier invoke the user
      * @return an Optional containing the User if found, or empty if not found
      */
     Optional<User> get(String userId);

@@ -2,6 +2,8 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.SearchUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -19,26 +23,22 @@ public class SearchUserController {
     private final SearchUserService searchUserService;
 
     @GetMapping("/name")
-    public ResponseEntity<Object> searchByName(
+    public ResponseEntity<List<UserResponse>> searchByName(
             @RequestParam() String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var result = searchUserService.searchByName(query, size);
-        if (result.isEmpty()) {
-            return ResponseHandler.noContent();
-        }
-        return ResponseHandler.ok(result);
+        return ResponseHandler.handleList(
+                searchUserService.searchByName(query, size),
+                UserDtoCreator.getInstance());
     }
 
     @GetMapping("/email")
-    public ResponseEntity<Object> searchByEmail(
+    public ResponseEntity<List<UserResponse>> searchByEmail(
             @RequestParam String email,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var result = searchUserService.searchByEmail(email, size);
-        if (result.isEmpty()) {
-            return ResponseHandler.noContent();
-        }
-        return ResponseHandler.ok(result);
+        return ResponseHandler.handleList(
+                searchUserService.searchByEmail(email, size),
+                UserDtoCreator.getInstance());
     }
 }

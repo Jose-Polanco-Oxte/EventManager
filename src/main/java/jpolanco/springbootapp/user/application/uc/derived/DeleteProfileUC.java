@@ -7,10 +7,11 @@ import java.util.List;
 
 public interface DeleteProfileUC {
     /**
-     * Deletes the profile of the user with the specified ID.
+     * Deletes a user profile by user ID and reason.
      *
-     * @param userId the ID of the user whose profile is to be deleted
-     * @return a Result indicating success or failure of the deletion operation
+     * @param userId the ID of the user to delete
+     * @param reason the reason for deletion
+     * @return a Result containing a list of EventNotifications if successful, or an error if not
      */
     Result<List<EventNotification>> delete(String userId, String reason);
 }

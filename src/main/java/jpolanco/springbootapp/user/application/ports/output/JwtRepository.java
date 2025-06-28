@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.application.ports.output;
 
 import jpolanco.springbootapp.shared.application.adapters.output.CRUDRepository;
-import jpolanco.springbootapp.shared.utils.TokenStatus;
+import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.utils.TokenE;
 
 import java.util.List;

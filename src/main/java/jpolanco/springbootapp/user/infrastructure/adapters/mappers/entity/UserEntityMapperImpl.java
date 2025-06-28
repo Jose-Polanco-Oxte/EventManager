@@ -1,20 +1,23 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.domain.utils.Error;
+import jpolanco.springbootapp.shared.utils.Either;
 import jpolanco.springbootapp.user.domain.model.User;
 
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
+import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class UserEntityMapperImpl implements UserEntityMapper {
     public User toDomain(UserEntity userEntity) {
-        Result<User> result = User.load(
+        Either<User, List<Error>> result = User.load(
                 userEntity.getId().toString(),
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
@@ -28,10 +31,14 @@ public class UserEntityMapperImpl implements UserEntityMapper {
                 userEntity.getQrFileName(),
                 userEntity.getCreatedAt()
         );
-        if (result.isFailure()) {
-            throw new IllegalArgumentException("Data do not match : " + result.getError());
+        if (result.isRight()) {
+            throw new UserIntegrity(
+                    "User integrity error: " + result.getRight().stream()
+                            .map(Error::getMessage)
+                            .collect(Collectors.joining(", "))
+            , 409);
         }
-        return result.getValue();
+        return result.getLeft();
     }
 
     public UserEntity toEntity(User user) {

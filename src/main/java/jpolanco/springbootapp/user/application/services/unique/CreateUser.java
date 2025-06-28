@@ -1,45 +1,49 @@
 package jpolanco.springbootapp.user.application.services.unique;
 
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.application.AppError;
+import jpolanco.springbootapp.shared.domain.utils.Error;
+import jpolanco.springbootapp.shared.utils.Either;
 import jpolanco.springbootapp.user.application.ports.input.EncoderProvider;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
+import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.unique.CreateUserUC;
-import jpolanco.springbootapp.user.application.utils.UserValidation;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 
-// TODO: Update the builder to return a Report of the operation instead of a Result.
 public class CreateUser implements CreateUserUC {
+    private final UserQueryRepository queryRepository;
     private final UserCommandRepository commandRepository;
     private final EncoderProvider passwordEncoder;
     private final QRProvider qrProvider;
-    private final UserValidation userValidation;
 
     @Override
-    public Result<User> create(RegisterRequest request) {
-        var valid = userValidation.onCreateUserIsValid(request.email());
-        if (valid.isFailure()) {
-            return Result.failure(valid.getError());
+    public Either<User, List<Error>> create(RegisterRequest request) {
+        if (queryRepository.findByEmail(request.email()).isPresent()) {
+            return Either.right(List.of(AppError.CONFLICT
+                    .withField("Email")
+                    .withMessage("Email already exists: " + request.email()).convertToError()));
         }
         var encodedPassword = passwordEncoder.encode(request.password());
-        var maybeNewUser = User.create(
+        var either = User.create(
                 request.firstName(),
                 request.lastName(),
                 request.email(),
                 encodedPassword
         );
-        if (maybeNewUser.isFailure()) {
-            return Result.failure(maybeNewUser.getError());
+        if (either.isRight()) {
+            return Either.right(either.getRight());
         }
-        var newUser = maybeNewUser.getValue();
+        var newUser = either.getLeft();
         qrProvider.generate(newUser.getQRFileName(), newUser.getEmail());
         var savedUser = commandRepository.save(newUser);
-        return Result.success(savedUser);
+        return Either.left(savedUser);
     }
 }

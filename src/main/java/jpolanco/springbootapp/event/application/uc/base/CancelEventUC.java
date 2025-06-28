@@ -16,7 +16,7 @@ public interface CancelEventUC {
     /**
      * Cancels an event by its ID.
      *
-     * @param eventId The ID of the event to be canceled.
+     * @param eventId The ID invoke the event to be canceled.
      * @param reason  The reason for canceling the event.
      * @return A Result containing the canceled event or an error if the cancellation fails.
      */

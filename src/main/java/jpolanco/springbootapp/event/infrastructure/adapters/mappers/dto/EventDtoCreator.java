@@ -2,7 +2,7 @@ package jpolanco.springbootapp.event.infrastructure.adapters.mappers.dto;
 
 import jpolanco.springbootapp.event.domain.model.Event;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.response.EventResponse;
-import jpolanco.springbootapp.shared.infrastructure.dto.DtoCreator;
+import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
 import org.springframework.stereotype.Component;
 
 @Component

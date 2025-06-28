@@ -13,8 +13,8 @@ public interface CreateEventUC {
     /**
      * Creates a new event with the provided details.
      *
-     * @param request The details of the event to be created.
-     * @param creatorId The ID of the user creating the event.
+     * @param request The details invoke the event to be created.
+     * @param creatorId The ID invoke the user creating the event.
      * @return A Result containing the created Event or an error if creation fails.
      */
     Result<Event> create(
