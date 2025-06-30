@@ -1,9 +1,13 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.utils.SuperResult;
+import jpolanco.springbootapp.shared.utils.Validators;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class FullName {
     private final String firstName;
@@ -14,57 +18,46 @@ public class FullName {
         this.lastName = lastName;
     }
 
-    public static Result<FullName> create(String firstName, String lastName) {
-        var namesResult = namesValidated(firstName, lastName);
-        if (namesResult.isFailure()) {
-            return Result.failure(namesResult.getError());
+    public static SuperResult<FullName, Report> create(String firstName, String lastName) {
+        Report report = Report.empty();
+        var firstNameFormated = validate(firstName, "firstName");
+        var lastNameFormated = validate(lastName, "lastName");
+        if (firstNameFormated.isFailure()) {
+            report.addError(firstNameFormated.getError());
         }
-        var first = namesResult.getValue()[0];
-        var last = namesResult.getValue()[1];
-        return Result.success(new FullName(first, last));
+        if (lastNameFormated.isFailure()) {
+            report.addError(lastNameFormated.getError());
+        }
+        if (report.hasErrors()) return SuperResult.failure(report);
+        return SuperResult.success(new FullName(firstNameFormated.getValue(), lastNameFormated.getValue()));
     }
 
-    private static DomainError ensureValueIsValid(String value) {
-        if (value == null || value.isEmpty()) {
-            return DomainError.NULL_VALUE;
+    private static Result<String> validate(String value, String fieldName) {
+        Optional<DomainError> error = Validators.notBlank(fieldName, value);
+        if (error.isPresent()) return Result.failure(error.get());
+
+        var formatValue = format(value);
+
+        error = Validators.minLength(fieldName, formatValue, 2);
+        if (error.isPresent()) return Result.failure(error.get());
+
+        error = Validators.maxLength(fieldName, formatValue, 100);
+        if (error.isPresent()) return Result.failure(error.get());
+
+        if (!formatValue.replaceAll(" ", "").matches("^\\p{L}+$")) {
+            return Result.failure(DomainError.INVALID_FORMAT
+                    .withField(fieldName)
+                    .withDetails("must contain only letters, failed to match: " + formatValue));
         }
-        if (value.length() < 2) {
-            return DomainError.TOO_SHORT
-                    .withDetails("Must be at least 2 characters long");
-        }
-        if (value.length() > 100) {
-            return DomainError.TOO_LONG
-                    .withDetails("Must be at most 100 characters long");
-        }
-        var split = value.split(" ");
+        var split = formatValue.split(" ");
         for (String part : split) {
-            if (part.length() < 2) {
-                return DomainError.TOO_SHORT
-                        .withDetails("Each part invoke the name must be at least 2 characters long");
-            }
-            if (!part.matches("^\\p{L}+$")) {
-                return DomainError.INVALID_FORMAT
-                        .withDetails("Can only contain letters");
+            error = Validators.minLength(fieldName, part, 2);
+            if (error.isPresent()) {
+                return Result.failure(error.get()
+                        .withDetails("Each part of the name must be at least 2 characters long, found: " + part));
             }
         }
-        return null;
-    }
-
-    private static Result<String[]> namesValidated(String firstName, String lastName) {
-        var formatedFirstName = format(firstName);
-        var formatedLastName = format(lastName);
-        var firstNameResult = ensureValueIsValid(formatedFirstName);
-        var lastNameResult = ensureValueIsValid(formatedLastName);
-        if (firstNameResult != null) {
-            return Result.failure(firstNameResult.getError().withField("firstName"));
-        } else if (lastNameResult != null) {
-            return Result.failure(lastNameResult.getError().withField("lastName"));
-        } else {
-            return Result.success(new String[]{
-                    formatedFirstName,
-                    formatedLastName
-            });
-        }
+        return Result.success(formatValue);
     }
 
     private static String format(String value) {

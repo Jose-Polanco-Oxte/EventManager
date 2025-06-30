@@ -1,16 +1,14 @@
-package jpolanco.springbootapp.unit.application;
+package jpolanco.springbootapp.unit.application.user.use_case;
 
 import jpolanco.springbootapp.event.application.ports.input.request.CursorPaginationRequest;
 import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
-import jpolanco.springbootapp.shared.utils.CursorPageResult;
-import jpolanco.springbootapp.shared.utils.PageResult;
-import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
+import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.services.unique.GetUserByEmail;
 import jpolanco.springbootapp.user.application.services.unique.GetUserById;
 import jpolanco.springbootapp.user.application.services.unique.GetUsers;
 import jpolanco.springbootapp.user.domain.model.User;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 @ExtendWith(MockitoExtension.class)
 public class UserQueryUCTest {
     /**
@@ -31,14 +32,14 @@ public class UserQueryUCTest {
      * It tests the following use cases:
      * - GetUserById: retrieves a user by their ID.
      * - GetUserByEmail: retrieves a user by their email.
-     * - GetUsers: retrieves a paginated list of users using both page-based and cursor-based pagination.
+     * - GetUsers: retrieves a paginated list invoke users using both page-based and cursor-based pagination.
      * These tests ensure that the use cases correctly interact with the UserQueryRepository
      * and return the expected results.
      * * The tests use Mockito to mock the UserQueryRepository and verify that the methods
      * are called with the correct parameters.
      * * The tests also verify that the returned results match the expected User objects.
-     * * The tests cover both the retrieval of a single user by ID and email, as well as
-     * the retrieval of multiple users with pagination.
+     * * The tests cover both the retrieval invoke a single user by ID and email, as well as
+     * the retrieval invoke multiple users with pagination.
      * * The tests are organized into nested classes for better readability and organization.
      */
 
@@ -69,12 +70,12 @@ public class UserQueryUCTest {
         // Creating simulated user data
         Optional<User> simulatedUser = Optional.of(User
                 .of(testId, "John", "Doe", "johnDoe@gmail.com", "password123")
-                .getValue());
+                .getSuccess());
 
         // Expected user creation
         Optional<User> expectedUser = Optional.of(User
                 .of(testId, "John", "Doe", "johnDoe@gmail.com", "password123")
-                .getValue());
+                .getSuccess());
 
         // Mocking the repository call
         Mockito.when(userQueryRepository.findById(testId))
@@ -97,12 +98,12 @@ public class UserQueryUCTest {
         // Creating simulated user data
         Optional<User> simulatedUser = Optional.of(User
                 .of(testId, "John", "Doe", testEmail, "password123")
-                .getValue());
+                .getSuccess());
 
         // Expected user creation
         Optional<User> expectedUser = Optional.of(User
                 .of(testId, "John", "Doe", testEmail, "password123")
-                .getValue());
+                .getSuccess());
 
         // Mocking the repository call
         Mockito.when(userQueryRepository.findByEmail(testEmail))
@@ -125,12 +126,12 @@ public class UserQueryUCTest {
         @BeforeEach
         public void setUp() {
             this.users = List.of(
-                    User.of(UUID.randomUUID().toString(), "Alice", "Smith", "alice@gmail.com", "7fawfwa89").getValue(),
-                    User.of(UUID.randomUUID().toString(), "Bob", "Smith", "bob@gmail.com", "0awfawfa12").getValue()
+                    User.of(UUID.randomUUID().toString(), "Alice", "Smith", "alice@gmail.com", "7fawfwa89").getSuccess(),
+                    User.of(UUID.randomUUID().toString(), "Bob", "Smith", "bob@gmail.com", "0awfawfa12").getSuccess()
             );
         }
         @Test
-        @DisplayName("When getUsers is called, it should return a PageResult of Users")
+        @DisplayName("When getUsers is called, it should return a PageResult invoke Users")
         public void getUsersByPages() {
             // Generating a PagePaginationRequest
             PagePaginationRequest request = new PagePaginationRequest(
@@ -162,10 +163,10 @@ public class UserQueryUCTest {
             PageResult<User> result = getUsers.getByPages(request);
 
             // Verifying the interaction with the repository
-            assertEquals(expectedPageResult, result);
-            assertEquals(1, result.getTotalPages());
-            assertEquals(2, result.getTotalElements());
-            assertFalse(result.isHasNext());
+            assertEquals(expectedPageResult, result, "PageResult should match expected");
+            assertEquals(1, result.totalPages(), "Total pages should be 1");
+            assertEquals(2, result.totalElements(), "Total elements should be 2");
+            assertFalse(result.hasNext(), "Should not have next page");
             Mockito.verify(userQueryRepository, Mockito.times(1)).findAll(
                     request.page(),
                     request.size(),
@@ -175,7 +176,7 @@ public class UserQueryUCTest {
         }
 
         @Test
-        @DisplayName("When getUsers is called, it should return CursorPageResult of Users")
+        @DisplayName("When getUsers is called, it should return CursorPageResult invoke Users")
         public void getUsersByCursor() {
             // Generating a CursorPaginationRequest
             String cursor = UUID.randomUUID().toString();

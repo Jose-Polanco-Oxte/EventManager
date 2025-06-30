@@ -1,8 +1,9 @@
 package jpolanco.springbootapp.shared.infrastructure.controllers;
 
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.utils.Error;
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.Dto;
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
@@ -12,6 +13,7 @@ import jpolanco.springbootapp.shared.infrastructure.dto.response.ErrorResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.SimpleResponse;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
 import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.ComposedDtoCreator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,11 +36,11 @@ public class ResponseHandler {
         }
     }
 
-    public static <T, D extends Dto> ResponseEntity<D> handleEither(Either<T, List<Error>> either, DtoCreator<T, D> creator, HttpStatus status) {
-        if (either.isRight()) {
-            throw new BusinessRuleException(either.getRight());
+    public static <T, D extends Dto> ResponseEntity<D> handleSuperResult(SuperResult<T, Report> result, DtoCreator<T, D> creator, HttpStatus status) {
+        if (result.isFailure()) {
+            throw new BusinessRuleException(result.getFailure().getErrors());
         } else {
-            var dto = creator.create(either.getLeft());
+            var dto = creator.create(result.getSuccess());
             return new ResponseEntity<>(dto, status);
         }
     }
@@ -92,10 +94,10 @@ public class ResponseHandler {
                         new ErrorResponse(error.getField(), error.getMessage(), error.getCode(),
                                 (error instanceof DomainError e) ? e.getDetails() : null))
                 .toList();
-        return new ResponseEntity<>(errorResponses, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponses, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    public static ResponseEntity<ChangesResponse> handleReport(Report report, String message) {
+    public static ResponseEntity<ChangesResponse> handleReport(UpdateReport report, String message) {
         if (report.isFailure()) {
             throw new BusinessRuleException(report.getErrors());
         } else {

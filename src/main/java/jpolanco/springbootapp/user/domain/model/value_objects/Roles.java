@@ -2,8 +2,10 @@ package jpolanco.springbootapp.user.domain.model.value_objects;
 
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.Validators;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,10 +17,9 @@ public class Roles {
     }
 
     public static Result<Roles> create(List<String> values) {
-        if (values == null || values.isEmpty()) {
-            return Result.failure(DomainError.NULL_VALUE
-                    .withField("List invoke roles"));
-        }
+        Optional<DomainError> error = Validators.notEmptyList("Roles", values);
+        if (error.isPresent()) return Result.failure(error.get());
+
         var result = isValidRole(values);
         if (result.isFailure()) {
             return Result.failure(result.getError());
@@ -92,5 +93,12 @@ public class Roles {
     @Override
     public int hashCode() {
         return values.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return values.stream()
+                .map(UserRoles::getValue)
+                .collect(Collectors.joining(", "));
     }
 }

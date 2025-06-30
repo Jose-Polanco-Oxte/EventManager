@@ -3,7 +3,9 @@ package jpolanco.springbootapp.user.domain.model.value_objects;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.Validators;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class UserId extends IdObject {
@@ -13,10 +15,9 @@ public class UserId extends IdObject {
     }
 
     public static Result<UserId> create(String value) {
-        if (value == null || value.isEmpty()) {
-            return Result.failure(DomainError.NULL_VALUE
-                    .withField("UserId"));
-        }
+        Optional<DomainError> error = Validators.notBlank("UserId", value);
+        if (error.isPresent()) return Result.failure(error.get());
+
         try {
             UUID.fromString(value);
         } catch (IllegalArgumentException e) {
@@ -36,5 +37,10 @@ public class UserId extends IdObject {
     @Override
     public int hashCode() {
         return this.getValue().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue();
     }
 }

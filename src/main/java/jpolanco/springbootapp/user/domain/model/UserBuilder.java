@@ -1,9 +1,10 @@
 package jpolanco.springbootapp.user.domain.model;
 
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 import lombok.RequiredArgsConstructor;
 
@@ -25,13 +26,20 @@ public class UserBuilder {
     private final List<Error> errors = new ArrayList<>();
 
     private <T> T checker(Result<T> result) {
-        System.out.println("Errors quantity: " + errors.size());
         if (result.isFailure()) {
             errors.add(result.getError());
             return null;
         } else {
             return result.getValue();
         }
+    }
+
+    private <S> S checker(SuperResult<S, Report> result) {
+        if (result.isFailure()) {
+            errors.addAll(result.getFailure().getErrors());
+            return null;
+        }
+        return result.getSuccess();
     }
 
     public UserBuilder userId(String userId) {
@@ -85,9 +93,9 @@ public class UserBuilder {
         return this;
     }
 
-    public Either<User, List<Error>> build() {
+    public SuperResult<User, Report> build() {
         if (!errors.isEmpty()) {
-            return Either.right(List.copyOf(errors));
+            return SuperResult.failure(Report.failure(errors));
         }
 
         var user = new User(
@@ -101,6 +109,6 @@ public class UserBuilder {
                 createdAt
         );
         user.recordEvent(eventNotification);
-        return Either.left(user);
+        return SuperResult.success(user);
     }
 }

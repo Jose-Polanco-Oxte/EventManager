@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.application.services.base;
 
 import jpolanco.springbootapp.shared.application.AppError;
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.user.application.ports.input.EncoderProvider;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
@@ -22,10 +22,10 @@ public class UpdateUser implements UpdateUserUC {
     private final QRProvider qrProvider;
 
     @Override
-    public Report setChanges(User user, AllFieldsUserUpdate request) {
+    public UpdateReport setChanges(User user, AllFieldsUserUpdate request) {
         if (queryRepository.findByEmail(request.email()).isPresent()
                 && !user.getEmail().equals(request.email())) {
-            return Report.failure(AppError.CONFLICT
+            return UpdateReport.failure(AppError.CONFLICT
                     .withField("Email")
                     .concatMessage("with " + request.email() + " is already in use"));
         }
@@ -50,9 +50,9 @@ public class UpdateUser implements UpdateUserUC {
     }
 
     @Override
-    public Report setChanges(String userId, AllFieldsUserUpdate request) {
+    public UpdateReport setChanges(String userId, AllFieldsUserUpdate request) {
         var OptionalUser = queryRepository.findById(userId);
-        if (OptionalUser.isEmpty()) return Report.failure(AppError.idNotFound(userId, "User"));
+        if (OptionalUser.isEmpty()) return UpdateReport.failure(AppError.idNotFound(userId, "User"));
 
         var user = OptionalUser.get();
         return setChanges(user, request);

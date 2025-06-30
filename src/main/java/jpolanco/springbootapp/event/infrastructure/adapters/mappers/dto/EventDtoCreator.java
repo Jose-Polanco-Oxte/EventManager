@@ -22,4 +22,8 @@ public class EventDtoCreator implements DtoCreator<Event, EventResponse> {
                 payload.getCreatorId()
         );
     }
+
+    public static EventDtoCreator getInstance() {
+        return new EventDtoCreator();
+    }
 }

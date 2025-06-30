@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.application.uc.derived.*;
@@ -35,7 +35,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Report changeName(String userId, ChangeNameRequest request) {
+    public UpdateReport changeName(String userId, ChangeNameRequest request) {
         var result = updateProfileNameUC.setName(userId, request);
         if (result.isFailure()) return result;
         var domainEvents = result.getNotifications();

@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.domain.model.value_objects;
 
-import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.Validators;
 
 public class QRFileName {
     private final String value;
@@ -11,15 +11,12 @@ public class QRFileName {
     }
 
     public static Result<QRFileName> create(String value) {
-        if (value == null || value.isBlank()) {
-            return Result.failure(DomainError.NULL_VALUE
-                    .withField("QRFileName"));
-        }
-        if (value.contains(".")) {
-            return Result.failure(DomainError.INVALID_FORMAT
-                    .withDetails("QR file name cannot contain a dot")
-                    .withField("QRFileName"));
-        }
+        var error = Validators.notBlank("QRFileName", value);
+        if (error.isPresent()) return Result.failure(error.get());
+
+        error = Validators.mustNotContain("QRFileName", value, ".");
+        if (error.isPresent()) return Result.failure(error.get());
+
         return Result.success(new QRFileName(value.trim().replaceAll(" ", "_")));
     }
 
@@ -37,5 +34,10 @@ public class QRFileName {
     @Override
     public int hashCode() {
         return value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return value;
     }
 }

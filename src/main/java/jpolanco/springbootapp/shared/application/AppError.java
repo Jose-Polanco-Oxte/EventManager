@@ -43,10 +43,6 @@ public class AppError extends Error {
         return new AppError(error.getCode(), error.getMessage(), error.getField());
     }
 
-    public Error convertToError() {
-        return new Error(getCode(), getMessage(), getField());
-    }
-
     public AppError withCode(int code) {
         return new AppError(code, getMessage(), getField());
     }

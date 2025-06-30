@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc.base;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllFieldsUserUpdate;
 
@@ -11,7 +11,7 @@ public interface UpdateUserUC {
      * @param request the request containing the changes to apply
      * @return a Report containing the updated User or an error if the update fails
      */
-    Report setChanges(User user, AllFieldsUserUpdate request);
+    UpdateReport setChanges(User user, AllFieldsUserUpdate request);
 
     /**
      * Updates the user identified by userId with the given request.
@@ -19,5 +19,5 @@ public interface UpdateUserUC {
      * @param request the request containing the changes to apply
      * @return a Report containing the updated User or an error if the update fails
      */
-    Report setChanges(String userId,  AllFieldsUserUpdate request);
+    UpdateReport setChanges(String userId, AllFieldsUserUpdate request);
 }

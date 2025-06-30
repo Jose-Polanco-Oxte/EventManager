@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.utils.cases;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 
-public interface ReportCase<P> extends UseCase<P, Report> {
+public interface ReportCase<P> extends UseCase<P, UpdateReport> {
 }

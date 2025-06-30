@@ -1,10 +1,10 @@
 package jpolanco.springbootapp.user.domain.model;
 
 
-import jpolanco.springbootapp.shared.domain.utils.Error;
+import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.domain.domain_events.*;
 import jpolanco.springbootapp.user.domain.model.value_objects.*;
 
@@ -43,7 +43,7 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public static Either<User, List<Error>> create(
+    public static SuperResult<User, Report> create(
             String firstName,
             String lastName,
             String email,
@@ -63,7 +63,7 @@ public class User {
                 .build();
     }
 
-    public static Either<User, List<Error>> of(
+    public static SuperResult<User, Report> of(
             String id,
             String firstName,
             String lastName,
@@ -83,7 +83,7 @@ public class User {
                 .build();
     }
 
-    public static Either<User, List<Error>> load(
+    public static SuperResult<User, Report> load(
             String userId,
             String firstName,
             String lastName,
@@ -133,19 +133,19 @@ public class User {
     public Result<FullName> changeFirstName(String firstName) {
         var result = FullName.create(firstName, this.name.getLastName());
         if (result.isFailure()) {
-            return result;
+            return Result.failure(result.getFailure().getErrors().getFirst());
         }
-        this.name = result.getValue();
-        return result;
+        this.name = result.getSuccess();
+        return Result.success(result.getSuccess());
     }
 
     public Result<FullName> changeLastName(String lastName) {
         var result = FullName.create(this.name.getFirstName(), lastName);
         if (result.isFailure()) {
-            return result;
+            return Result.failure(result.getFailure().getErrors().getFirst());
         }
-        this.name = result.getValue();
-        return result;
+        this.name = result.getSuccess();
+        return Result.success(result.getSuccess());
     }
 
     // Email domain

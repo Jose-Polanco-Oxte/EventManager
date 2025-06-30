@@ -7,9 +7,9 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.Us
 import java.util.Map;
 
 public interface JwtService {
-    Result<Map<String, String>> createTokens(User user);
+    Result<UserTokenResponse> createTokens(User user);
 
-    Result<Map<String, String>> authenticate(User user, String password);
+    Result<UserTokenResponse> authenticate(User user, String password);
 
-    Result<Map<String, String>> refreshTokens(String refreshToken);
+    Result<UserTokenResponse> refreshTokens(String refreshToken);
 }

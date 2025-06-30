@@ -5,7 +5,7 @@ import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;
-import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.TokenDtoCreator;
+import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserTokenDuplicator;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -23,17 +23,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserTokenResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseHandler.handleEither(authService.register(request),
-                TokenDtoCreator.getInstance(), HttpStatus.CREATED);
+        return ResponseHandler.handleSuperResult(authService.register(request),
+                UserTokenDuplicator.getInstance(), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserTokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseHandler.handleResult(authService.login(request), TokenDtoCreator.getInstance());
+        return ResponseHandler.handleResult(authService.login(request), UserTokenDuplicator.getInstance());
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<UserTokenResponse> refresh(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        return ResponseHandler.handleResult(authService.refresh(authorizationHeader), TokenDtoCreator.getInstance());
+        return ResponseHandler.handleResult(authService.refresh(authorizationHeader), UserTokenDuplicator.getInstance());
     }
 }

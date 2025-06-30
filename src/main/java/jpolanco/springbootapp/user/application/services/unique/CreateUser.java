@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.user.application.services.unique;
 
 import jpolanco.springbootapp.shared.application.AppError;
-import jpolanco.springbootapp.shared.domain.utils.Error;
-import jpolanco.springbootapp.shared.utils.Either;
+import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.application.ports.input.EncoderProvider;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
@@ -12,8 +12,6 @@ import jpolanco.springbootapp.user.domain.model.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,25 +23,25 @@ public class CreateUser implements CreateUserUC {
     private final QRProvider qrProvider;
 
     @Override
-    public Either<User, List<Error>> create(RegisterRequest request) {
+    public SuperResult<User, Report> create(RegisterRequest request) {
         if (queryRepository.findByEmail(request.email()).isPresent()) {
-            return Either.right(List.of(AppError.CONFLICT
+            return SuperResult.failure(Report.failure(AppError.CONFLICT
                     .withField("Email")
-                    .withMessage("Email already exists: " + request.email()).convertToError()));
+                    .withMessage("Email already exists: " + request.email())));
         }
         var encodedPassword = passwordEncoder.encode(request.password());
-        var either = User.create(
+        var result = User.create(
                 request.firstName(),
                 request.lastName(),
                 request.email(),
                 encodedPassword
         );
-        if (either.isRight()) {
-            return Either.right(either.getRight());
+        if (result.isFailure()) {
+            return SuperResult.failure(result.getFailure());
         }
-        var newUser = either.getLeft();
+        var newUser = result.getSuccess();
         qrProvider.generate(newUser.getQRFileName(), newUser.getEmail());
         var savedUser = commandRepository.save(newUser);
-        return Either.left(savedUser);
+        return SuperResult.success(savedUser);
     }
 }

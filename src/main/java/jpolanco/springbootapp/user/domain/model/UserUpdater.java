@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.domain.model;
 
 import jpolanco.springbootapp.event.application.utils.Changes;
 import jpolanco.springbootapp.shared.domain.utils.Error;
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +51,7 @@ public class UserUpdater {
     }
 
     public UserUpdater password(String encodedPassword) {
-        return update("password", user.getEncodedPassword(),
+        return update("encodedPassword", user.getEncodedPassword(),
                 () -> user.changeEncodedPassword(encodedPassword),
                 user::getEncodedPassword);
     }
@@ -115,8 +115,8 @@ public class UserUpdater {
         return this;
     }
 
-    public Report update() {
-        if (!errors.isEmpty()) return Report.failure(new ArrayList<>(errors.values()));
-        return Report.success(new ArrayList<>(changes.values()), user.pullEvents());
+    public UpdateReport update() {
+        if (!errors.isEmpty()) return UpdateReport.failure(new ArrayList<>(errors.values()));
+        return UpdateReport.success(new ArrayList<>(changes.values()), user.pullEvents());
     }
 }

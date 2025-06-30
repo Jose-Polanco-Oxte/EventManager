@@ -43,7 +43,13 @@ public class GlobalAdviceController {
         if (e.getErrors().size() == 1) {
             // If there's only one error, return it directly
             var error = e.getErrors().getFirst();
-            return ResponseHandler.handleError(error.getField(), error.getMessage(), error.getCode(), (error instanceof DomainError d) ? d.getDetails() : null);
+            if (error instanceof DomainError de) {
+                return ResponseHandler.handleError(
+                        de.getField(), de.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value(), de.getDetails());
+            } else {
+                return ResponseHandler.handleError(
+                        error.getField(), error.getMessage(), error.getCode(), null);
+            }
         } else {
             return ResponseHandler.handleErrors(e.getErrors());
         }

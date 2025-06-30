@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
 import jpolanco.springbootapp.user.application.uc.base.*;
@@ -22,7 +22,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Transactional
     @Override
-    public Report update(AllFieldsUserUpdate request, String userId) {
+    public UpdateReport update(AllFieldsUserUpdate request, String userId) {
         var report = updateUser.setChanges(userId, request);
         if (report.isFailure()) return report;
         var domainEvents = report.getNotifications();

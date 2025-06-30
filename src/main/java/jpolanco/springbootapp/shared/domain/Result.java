@@ -164,4 +164,13 @@ public class Result<T> {
     public int hashCode() {
         return Objects.hash(value, error, IsSuccess);
     }
+
+    @Override
+    public String toString() {
+        if (IsSuccess) {
+            return "Result{value=" + value + ", IsSuccess=" + IsSuccess + ", error=" + error + '}';
+        } else {
+            return "Result{IsSuccess=" + IsSuccess + ", error=" + error + '}';
+        }
+    }
 }

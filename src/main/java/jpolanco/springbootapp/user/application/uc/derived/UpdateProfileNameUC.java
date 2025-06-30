@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc.derived;
 
-import jpolanco.springbootapp.shared.domain.Report;
+import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;
 
 public interface UpdateProfileNameUC {
@@ -11,5 +11,5 @@ public interface UpdateProfileNameUC {
      * @param request the request containing the new name
      * @return a Report containing the changes or an error if the operation fails
      */
-    Report setName(String userId, ChangeNameRequest request);
+    UpdateReport setName(String userId, ChangeNameRequest request);
 }
