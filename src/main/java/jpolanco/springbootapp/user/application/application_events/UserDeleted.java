@@ -1,16 +1,14 @@
 package jpolanco.springbootapp.user.application.application_events;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-public class UserDeleted extends EventNotification {
-    private final String userId;
-    private final String reason;
+import java.util.UUID;
 
-    public UserDeleted(String userId, String reason) {
-        super();
-        this.userId = userId;
-        this.reason = reason;
-    }
+@Getter
+@AllArgsConstructor
+public class UserDeleted extends EventNotification {
+    private final UUID userId;
+    private final String reason;
 }

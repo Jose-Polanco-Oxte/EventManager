@@ -20,7 +20,7 @@ public class EventAppError extends Error {
             new EventAppError(404, "Event not found");
 
     public static final EventAppError EVENT_NOT_BELONG_TO_USER =
-            new EventAppError(403, "The event does not belong to the user");
+            new EventAppError(403, "The event does not belong to the userId");
 
     public static final EventAppError OVERLAPPING_EVENT_SCHEDULE =
             new EventAppError(409, "The event schedule overlaps with another event");

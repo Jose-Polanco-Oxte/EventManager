@@ -37,7 +37,7 @@ public class ProfileController {
             @AuthenticationPrincipal MyUserDetails userDetails,
             @Valid @RequestBody ChangeNameRequest request
     ) {
-        return ResponseHandler.handleReport(
+        return ResponseHandler.handleUpdateReport(
                 profileService.changeName(userDetails.getId(), request),
                 "Name updated successfully");
     }

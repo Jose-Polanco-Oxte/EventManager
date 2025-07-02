@@ -7,43 +7,65 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jpolanco.springbootapp.shared.infrastructure.errors.ProviderException;
 import jpolanco.springbootapp.user.application.ports.input.QRProvider;
+import jpolanco.springbootapp.user.application.utils.QRResult;
 import jpolanco.springbootapp.user.infrastructure.components.utils.QRToSVG;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Component
+@RequiredArgsConstructor
 public class Zxing implements QRProvider {
 
     @Value("${QRPATH}")
     private String contextPath;
 
     @Override
-    public void generate(String fileName, String content) throws RuntimeException {
-        fileName = fileName + ".png";
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        int width = 1000; // ancho del QR
-        int height = 1000; // alto del QR
+    public QRResult generate(String content) throws RuntimeException {
+        int width = 512;
+        int height = 512;
         try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
-            Path path = FileSystems.getDefault().getPath(contextPath + fileName);
-            MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
+
+            // BufferedImage generado en memoria
+            BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+
+            // SVG generado en memoria
             String svg = QRToSVG.generateSVG(content, width, height);
-            String svgFileName = fileName.replace(".png", ".svg");
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(contextPath + svgFileName))) {
-                writer.write(svg);
-            } catch (IOException e) {
-                throw new ProviderException("Image QR save error", 500,e);
-            }
-        } catch (WriterException | IOException e) {
+
+            // Devolver el record con ambos formatos, sin guardar en disco
+            return new QRResult(svg, bufferedImage);
+
+        } catch (WriterException e) {
             throw new ProviderException("Image QR generation error", 500, e);
+        }
+    }
+
+    @Override
+    public void save(QRResult qr, String fileName) {
+        try {
+            // Save png as file
+            File outputImage = new File(contextPath + fileName + ".png");
+            ImageIO.write(qr.image(), "png", outputImage);
+
+            // save svg as file
+            File outputSvg = new File(contextPath + fileName + ".svg");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputSvg))) {
+                writer.write(qr.svg());
+            }
+
+        } catch (IOException e) {
+            throw new ProviderException("Failed to save QR files", 500, e);
         }
     }
 

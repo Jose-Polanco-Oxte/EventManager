@@ -10,6 +10,8 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.Cha
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UpdateProfileName implements UpdateProfileNameUC {
@@ -17,13 +19,13 @@ public class UpdateProfileName implements UpdateProfileNameUC {
     private final UserCommandRepository commandRepository;
 
     @Override
-    public UpdateReport setName(String userId, ChangeNameRequest request) {
-        var maybeUser = queryRepository.findById(userId);
+    public UpdateReport setName(UUID userId, ChangeNameRequest request) {
+        var maybeUser = queryRepository.findByUuid(userId);
         if (maybeUser.isEmpty()) return UpdateReport.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();
         if (user.isSuspended()) return UpdateReport.failure(AppError.INVALID_OPERATION
-                .withMessage("Cannot update name invoke a suspended user."));
+                .withMessage("Cannot update name invoke a suspended userId."));
 
         var report = UserUpdater.updater(user)
                 .firstName(request.firstName())

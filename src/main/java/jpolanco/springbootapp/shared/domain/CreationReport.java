@@ -1,37 +1,30 @@
 package jpolanco.springbootapp.shared.domain;
 
-import jpolanco.springbootapp.shared.application.AppError;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 
 import java.util.List;
 
 public class CreationReport extends Report {
-    private final boolean created;
-    private final AppError appError;
+    private final List<EventNotification> notifications;
 
-    private CreationReport(List<Error> errors, boolean created, AppError appError) {
+    private CreationReport(List<EventNotification> notifications, List<Error> errors) {
         super(errors);
-        this.created = created;
-        this.appError = appError;
+        this.notifications = notifications != null ? notifications : List.of();
     }
 
-    public static CreationReport created() {
-        return new CreationReport(List.of(), true, null);
+    public static  CreationReport created(List<EventNotification> notifications) {
+        return new CreationReport(notifications, List.of());
     }
 
     public static CreationReport failed(List<Error> errors) {
-        return new CreationReport(errors != null ? errors : List.of(), false, null);
+        return new CreationReport(List.of(), errors != null ? errors : List.of());
     }
 
-    public static CreationReport failed(List<Error> errors, AppError appError) {
-        return new CreationReport(errors != null ? errors: List.of(), false, appError);
+    public static CreationReport failed(Error error) {
+        return new CreationReport(List.of(), error != null ? List.of(error) : List.of());
     }
 
-    public boolean isCreated() {
-        return created;
-    }
-
-    public AppError getAppError() {
-        return appError;
+    public List<EventNotification> getNotifications() {
+        return notifications;
     }
 }

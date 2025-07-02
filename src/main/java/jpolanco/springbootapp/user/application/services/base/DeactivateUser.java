@@ -6,11 +6,12 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.base.DeactivateUserUC;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,8 @@ public class DeactivateUser implements DeactivateUserUC {
     }
 
     @Override
-    public Result<List<EventNotification>> deactivateById(String userId, String reason) {
-        var maybeUser = queryRepository.findById(userId);
+    public Result<List<EventNotification>> deactivateById(UUID userId, String reason) {
+        var maybeUser = queryRepository.findByUuid(userId);
         if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();

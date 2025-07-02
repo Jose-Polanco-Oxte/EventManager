@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
@@ -25,7 +27,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Void> changeEmail(String userId, ChangeEmailRequest request) {
+    public Result<Void> changeEmail(UUID userId, ChangeEmailRequest request) {
         var result = updateProfileEmailUC.setEmail(userId, request);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -35,7 +37,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public UpdateReport changeName(String userId, ChangeNameRequest request) {
+    public UpdateReport changeName(UUID userId, ChangeNameRequest request) {
         var result = updateProfileNameUC.setName(userId, request);
         if (result.isFailure()) return result;
         var domainEvents = result.getNotifications();
@@ -45,7 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Void> delete(String userId, String reason) {
+    public Result<Void> delete(UUID userId, String reason) {
         var result = deleteProfileUC.delete(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -55,7 +57,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Transactional
     @Override
-    public Result<Void> changePassword(String userId, ChangePasswordRequest dto) {
+    public Result<Void> changePassword(UUID userId, ChangePasswordRequest dto) {
         var result = updateProfilePasswordUC.setPassword(userId, dto);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -63,8 +65,9 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success();
     }
 
+    @Transactional
     @Override
-    public Result<Void> deactivate(String userId, String reason) {
+    public Result<Void> deactivate(UUID userId, String reason) {
         var result = deactivateProfileUC.deactivate(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -72,8 +75,9 @@ public class ProfileServiceImpl implements ProfileService {
         return Result.success();
     }
 
+    @Transactional
     @Override
-    public Result<Void> reactivate(String userId) {
+    public Result<Void> reactivate(UUID userId) {
         var result = reactivateProfileUC.reactivate(userId);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();

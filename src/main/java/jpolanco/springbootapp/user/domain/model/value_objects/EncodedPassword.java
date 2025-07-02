@@ -23,6 +23,10 @@ public class EncodedPassword {
         return Result.success(new EncodedPassword(value));
     }
 
+    protected static EncodedPassword loadUnchecked(String value) {
+        return new EncodedPassword(value);
+    }
+
     public String getValue() {
         return value;
     }

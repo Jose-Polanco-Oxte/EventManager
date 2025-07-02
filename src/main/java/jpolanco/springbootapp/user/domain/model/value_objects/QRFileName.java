@@ -20,6 +20,10 @@ public class QRFileName {
         return Result.success(new QRFileName(value.trim().replaceAll(" ", "_")));
     }
 
+    protected static QRFileName loadUnchecked(String value) {
+        return new QRFileName(value);
+    }
+
     public String getValue() {
         return value;
     }

@@ -1,9 +1,7 @@
 package jpolanco.springbootapp.unit.domain.user.update;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
-import net.bytebuddy.utility.RandomString;
-import org.apache.commons.text.RandomStringGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +18,7 @@ public class ChangesTest {
 
     @BeforeEach
     public void setUp() {
-        // Initialize a sample user for testing
+        // Initialize a sample userId for testing
         user = User.create(
                 "JohnDoe",
                 "DOE",

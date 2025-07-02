@@ -1,16 +1,14 @@
 package jpolanco.springbootapp.user.domain.domain_events;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-public class UserSuspended extends EventNotification {
-    private final String userId;
-    private final String reason;
+import java.util.UUID;
 
-    public UserSuspended(String userId, String reason) {
-        super();
-        this.userId = userId;
-        this.reason = reason;
-    }
+@Getter
+@AllArgsConstructor
+public class UserSuspended extends EventNotification {
+    private final UUID userId;
+    private final String reason;
 }

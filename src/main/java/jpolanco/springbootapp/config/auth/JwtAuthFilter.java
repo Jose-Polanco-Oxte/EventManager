@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
-import jpolanco.springbootapp.user.infrastructure.components.utils.JwtManager;
+import jpolanco.springbootapp.user.infrastructure.components.implementation.JwtManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

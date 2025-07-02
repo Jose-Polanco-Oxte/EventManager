@@ -8,7 +8,7 @@ import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.services.unique.GetUserByEmail;
 import jpolanco.springbootapp.user.application.services.unique.GetUserById;
 import jpolanco.springbootapp.user.application.services.unique.GetUsers;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,15 +30,15 @@ public class UserQueryUCTest {
     /**
      * This class contains unit tests for the UserQuery Use Cases.
      * It tests the following use cases:
-     * - GetUserById: retrieves a user by their ID.
-     * - GetUserByEmail: retrieves a user by their email.
+     * - GetUserById: retrieves a userId by their ID.
+     * - GetUserByEmail: retrieves a userId by their email.
      * - GetUsers: retrieves a paginated list invoke users using both page-based and cursor-based pagination.
      * These tests ensure that the use cases correctly interact with the UserQueryRepository
      * and return the expected results.
      * * The tests use Mockito to mock the UserQueryRepository and verify that the methods
      * are called with the correct parameters.
      * * The tests also verify that the returned results match the expected User objects.
-     * * The tests cover both the retrieval invoke a single user by ID and email, as well as
+     * * The tests cover both the retrieval invoke a single userId by ID and email, as well as
      * the retrieval invoke multiple users with pagination.
      * * The tests are organized into nested classes for better readability and organization.
      */
@@ -48,7 +48,8 @@ public class UserQueryUCTest {
     private UserQueryRepository userQueryRepository;
 
     // Utils
-    private String testId;
+    private UUID testId;
+    private Long testLongId;
 
     // Use case to be tested
     private GetUserById getUserById;
@@ -61,24 +62,26 @@ public class UserQueryUCTest {
         getUserByEmail = new GetUserByEmail(userQueryRepository);
         getUsers = new GetUsers(userQueryRepository);
         // Common UUID for testing
-        testId = UUID.randomUUID().toString();
+        testId = UUID.randomUUID();
+        // Common Long ID for testing
+        testLongId = 3L;
     }
 
     @Test
     @DisplayName("When getUserById is called, it should return an optional User")
     public void getUserById() {
-        // Creating simulated user data
+        // Creating simulated userId data
         Optional<User> simulatedUser = Optional.of(User
-                .of(testId, "John", "Doe", "johnDoe@gmail.com", "password123")
+                .of(testLongId, testId, "John", "Doe", "johnDoe@gmail.com", "password123")
                 .getSuccess());
 
-        // Expected user creation
+        // Expected userId creation
         Optional<User> expectedUser = Optional.of(User
-                .of(testId, "John", "Doe", "johnDoe@gmail.com", "password123")
+                .of(testLongId, testId, "John", "Doe", "johnDoe@gmail.com", "password123")
                 .getSuccess());
 
         // Mocking the repository call
-        Mockito.when(userQueryRepository.findById(testId))
+        Mockito.when(userQueryRepository.findById(testLongId))
                 .thenReturn(simulatedUser);
 
         // Calling the use case method
@@ -86,7 +89,7 @@ public class UserQueryUCTest {
 
         // Verifying the interaction with the repository
         assertEquals(expectedUser, result);
-        Mockito.verify(userQueryRepository, Mockito.times(1)).findById(testId);
+        Mockito.verify(userQueryRepository, Mockito.times(1)).findById(testLongId);
     }
 
     @Test
@@ -95,14 +98,14 @@ public class UserQueryUCTest {
         // Common email for testing
         String testEmail = "johnDoe@gmail.com";
 
-        // Creating simulated user data
+        // Creating simulated userId data
         Optional<User> simulatedUser = Optional.of(User
-                .of(testId, "John", "Doe", testEmail, "password123")
+                .of(testLongId, testId, "John", "Doe", testEmail, "password123")
                 .getSuccess());
 
-        // Expected user creation
+        // Expected userId creation
         Optional<User> expectedUser = Optional.of(User
-                .of(testId, "John", "Doe", testEmail, "password123")
+                .of(testLongId, testId, "John", "Doe", testEmail, "password123")
                 .getSuccess());
 
         // Mocking the repository call
@@ -126,8 +129,8 @@ public class UserQueryUCTest {
         @BeforeEach
         public void setUp() {
             this.users = List.of(
-                    User.of(UUID.randomUUID().toString(), "Alice", "Smith", "alice@gmail.com", "7fawfwa89").getSuccess(),
-                    User.of(UUID.randomUUID().toString(), "Bob", "Smith", "bob@gmail.com", "0awfawfa12").getSuccess()
+                    User.of(4L, UUID.randomUUID(), "Alice", "Smith", "alice@gmail.com", "7fawfwa89").getSuccess(),
+                    User.of(1L, UUID.randomUUID(), "Bob", "Smith", "bob@gmail.com", "0awfawfa12").getSuccess()
             );
         }
         @Test
@@ -179,8 +182,8 @@ public class UserQueryUCTest {
         @DisplayName("When getUsers is called, it should return CursorPageResult invoke Users")
         public void getUsersByCursor() {
             // Generating a CursorPaginationRequest
-            String cursor = UUID.randomUUID().toString();
-            CursorPaginationRequest <String> request = new CursorPaginationRequest<>(
+            UUID cursor = UUID.randomUUID();
+            CursorPaginationRequest <UUID> request = new CursorPaginationRequest<>(
                     cursor,
                     10,
                     "name",
@@ -188,9 +191,9 @@ public class UserQueryUCTest {
             );
 
             // Expected CursorPageResult creation
-            CursorPageResult<User, String> expectedCursorPageResult = new CursorPageResult<>(
+            CursorPageResult<User, UUID> expectedCursorPageResult = new CursorPageResult<>(
                     List.copyOf(users),
-                    users.getLast().getId(),
+                    users.getLast().getUUID(),
                     false
             );
 
@@ -203,11 +206,11 @@ public class UserQueryUCTest {
             )).thenReturn(expectedCursorPageResult);
 
             // Calling the use case method
-            CursorPageResult<User, String> result = getUsers.getByCursor(request);
+            CursorPageResult<User, UUID> result = getUsers.getByCursor(request);
 
             // Verifying the interaction with the repository
             assertEquals(expectedCursorPageResult, result);
-            assertEquals(users.getLast().getId(), result.lastItemId());
+            assertEquals(users.getLast().getUUID(), result.lastItemId());
             assertFalse(result.hasNextPage());
             Mockito.verify(userQueryRepository, Mockito.times(1)).findAll(
                     request.cursor(),

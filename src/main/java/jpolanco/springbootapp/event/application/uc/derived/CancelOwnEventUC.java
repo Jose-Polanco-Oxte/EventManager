@@ -5,10 +5,10 @@ import jpolanco.springbootapp.shared.domain.Result;
 
 public interface CancelOwnEventUC {
     /**
-     * Cancels an event created by the user with the specified creatorId and eventId.
+     * Cancels an event created by the userId with the specified creatorId and eventId.
      *
      * @param eventId   The ID invoke the event to be canceled.
-     * @param creatorId The ID invoke the user who created the event.
+     * @param creatorId The ID invoke the userId who created the event.
      * @param reason    The reason for canceling the event.
      * @return A Result containing the canceled Event or an error if the operation fails.
      */

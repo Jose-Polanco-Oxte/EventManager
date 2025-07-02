@@ -7,11 +7,13 @@ import jpolanco.springbootapp.user.application.ports.input.QRProvider;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllFieldsUserUpdate;
 import jpolanco.springbootapp.user.application.uc.base.UpdateUserUC;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,13 +47,14 @@ public class UpdateUser implements UpdateUserUC {
 
         var userSaved = commandRepository.save(user);
         qrProvider.delete(oldQRFileName);
-        qrProvider.generate(userSaved.getQRFileName(), userSaved.getEmail());
+        var qr = qrProvider.generate(userSaved.getEmail());
+        qrProvider.save(qr, userSaved.getQRFileName());
         return report;
     }
 
     @Override
-    public UpdateReport setChanges(String userId, AllFieldsUserUpdate request) {
-        var OptionalUser = queryRepository.findById(userId);
+    public UpdateReport setChanges(UUID userId, AllFieldsUserUpdate request) {
+        var OptionalUser = queryRepository.findByUuid(userId);
         if (OptionalUser.isEmpty()) return UpdateReport.failure(AppError.idNotFound(userId, "User"));
 
         var user = OptionalUser.get();

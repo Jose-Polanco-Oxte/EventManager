@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.update;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +25,7 @@ public class ReportTest {
     @Test
     @DisplayName("Test verifying report errors")
     public void testReportErrors() {
-        // Simulate an error in the user update process
+        // Simulate an error in the userId update process
         var report = userUpdater
                 .firstName("f") // Invalid first name (too short)
                 .email(null) // Invalid email (null)
@@ -54,7 +54,7 @@ public class ReportTest {
     }
 
     @Test
-    @DisplayName("Test updating user with invalid data")
+    @DisplayName("Test updating userId with invalid data")
     public void testUpdateUserWithInvalidData() {
         String invalidEmail = "invalidEmail"; // Invalid email format
         String shortFirstName = "A"; // Too short first name

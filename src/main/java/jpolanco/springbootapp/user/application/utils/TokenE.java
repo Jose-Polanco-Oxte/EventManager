@@ -1,25 +1,22 @@
 package jpolanco.springbootapp.user.application.utils;
 
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Setter
 @Getter
+@AllArgsConstructor
 public class TokenE {
     private String token;
-    private String userId;
+    private Long userId;
     private TokenStatus status;
     private Instant createdAt;
-
-    public TokenE(String token, String userId, TokenStatus status, Instant createdAt) {
-        this.token = token;
-        this.userId = userId;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
 
     public TokenE() {
         // Default constructor for serialization/deserialization
@@ -29,7 +26,7 @@ public class TokenE {
     public String toString() {
         return "TokenE{" +
                 "token='" + token + '\'' +
-                ", userId='" + userId + '\'' +
+                ", userId='" + (userId != null ? userId : "null") + '\'' +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';

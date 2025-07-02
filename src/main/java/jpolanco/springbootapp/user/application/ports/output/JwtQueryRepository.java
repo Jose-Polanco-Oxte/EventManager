@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface JwtQueryRepository {
     Optional<TokenE> findByToken(String token);
-    List<TokenE> findAllByUserId(String userId);
-    int countSessionsByUserId(String userId);
+    List<TokenE> findAllByUserId(Long userId);
+    int countSessionsByUserId(Long userId);
     List<TokenE> findAll();
 }

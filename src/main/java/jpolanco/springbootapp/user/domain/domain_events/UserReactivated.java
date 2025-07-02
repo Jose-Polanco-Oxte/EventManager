@@ -1,13 +1,13 @@
 package jpolanco.springbootapp.user.domain.domain_events;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-public class UserReactivated extends EventNotification {
-    private final String userId;
+import java.util.UUID;
 
-    public UserReactivated(String userId) {
-        this.userId = userId;
-    }
+@Getter
+@AllArgsConstructor
+public class UserReactivated extends EventNotification {
+    private final UUID userId;
 }

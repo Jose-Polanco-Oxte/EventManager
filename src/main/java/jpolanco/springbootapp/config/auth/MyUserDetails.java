@@ -4,16 +4,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 public class MyUserDetails implements UserDetails {
-    private String id;
+    private UUID id;
     private String email;
     private String password;
     private boolean isActive;
     private List<GrantedAuthority> authorities;
 
-    public MyUserDetails(String id, String email, String password, boolean isActive, List<String> roles) {
+    public MyUserDetails(UUID id, String email, String password, boolean isActive, List<String> roles) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -24,7 +25,7 @@ public class MyUserDetails implements UserDetails {
     }
 
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 

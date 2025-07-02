@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
+import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.OwnEventQueryService;
@@ -43,7 +43,7 @@ public class MyEventsController {
             @RequestPart ("image") MultipartFile image
     ) throws IOException {
         var commandResult = ownCommandService.updateEvent(
-                myUserDetails.getId(),
+                myUserDetails.getId().toString(),
                 eventId,
                 eventUpdateDto,
                 image.getInputStream()
@@ -63,7 +63,7 @@ public class MyEventsController {
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
         var response = ownQueryService.getEventsByPages(
-                myUserDetails.getId(),
+                myUserDetails.getId().toString(),
                 page,
                 size,
                 sortBy.getValue(),
@@ -84,7 +84,7 @@ public class MyEventsController {
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
         var response = ownQueryService.getEventsByCursorBased(
-                myUserDetails.getId(),
+                myUserDetails.getId().toString(),
                 cursor,
                 size,
                 sortBy.getValue(),
@@ -102,7 +102,7 @@ public class MyEventsController {
             @ValidUUID @PathVariable String eventId,
             @Valid @RequestBody CommandReasonRequest request
     ) {
-        var commandResult = ownCommandService.deleteEvent(myUserDetails.getId(), eventId, request.reason());
+        var commandResult = ownCommandService.deleteEvent(myUserDetails.getId().toString(), eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
@@ -115,7 +115,7 @@ public class MyEventsController {
             @ValidUUID @PathVariable String eventId,
             @Valid @RequestBody CommandReasonRequest request
     ) {
-        var commandResult = ownCommandService.cancelEvent(myUserDetails.getId(), eventId, request.reason());
+        var commandResult = ownCommandService.cancelEvent(myUserDetails.getId().toString(), eventId, request.reason());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
@@ -128,7 +128,7 @@ public class MyEventsController {
             @ValidUUID @PathVariable String eventId,
             @Valid @RequestBody MessageRequest request
     ) {
-        var commandResult = ownCommandService.restoreEvent(myUserDetails.getId(), eventId, request.message());
+        var commandResult = ownCommandService.restoreEvent(myUserDetails.getId().toString(), eventId, request.message());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }
@@ -141,7 +141,7 @@ public class MyEventsController {
             @RequestParam String query,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size
     ) {
-        var result = searchEventService.searchMyEventsByName(query, myUserDetails.getId(), size);
+        var result = searchEventService.searchMyEventsByName(query, myUserDetails.getId().toString(), size);
         if (result.isEmpty()) {
             return ResponseHandler.noContent();
         }

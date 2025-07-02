@@ -2,7 +2,7 @@ package jpolanco.springbootapp.unit.domain.user.entity;
 
 import jpolanco.springbootapp.user.domain.domain_events.UserAddedRoles;
 import jpolanco.springbootapp.user.domain.domain_events.UserRemovedRoles;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ public class RolesTest {
         List<String> newRoles = List.of(UserRoles.ADMIN.getValue(), UserRoles.ORGANIZER.getValue());
         userEntity.addRoles(newRoles);
         assertFalse(userEntity.getRoles().isEmpty(), "Roles should not be empty after adding");
-        assertTrue(userEntity.isUser(), "User should be user");
+        assertTrue(userEntity.isUser(), "User should be userId");
         assertTrue(userEntity.isAdmin(), "User should have admin role");
         assertTrue(userEntity.isOrganizer(), "User should have organizer role");
         assertFalse(userEntity.pullEvents().isEmpty(), "Pull events should not be empty");
@@ -59,7 +59,7 @@ public class RolesTest {
         List<String> invalidRoles = Arrays.asList("", UserRoles.ADMIN.getValue(), null);
         userEntity.addRoles(invalidRoles);
         assertFalse(userEntity.getRoles().isEmpty(), "Roles should not be empty after adding");
-        assertTrue(userEntity.isUser(), "User should have user role");
+        assertTrue(userEntity.isUser(), "User should have userId role");
         assertTrue(userEntity.isAdmin(), "User should have admin role");
         assertFalse(userEntity.isOrganizer(), "User should have organizer role");
         assertFalse(userEntity.pullEvents().isEmpty(), "Pull events should not be empty");
@@ -76,7 +76,7 @@ public class RolesTest {
     void shouldNotAddInvalidRoles() {
         List<String> invalidRoles = Arrays.asList("", "NON_EXISTENT_ROLE", null);
         userEntity.addRoles(invalidRoles);
-        assertTrue(userEntity.isUser(), "User should have user role");
+        assertTrue(userEntity.isUser(), "User should have userId role");
         assertTrue(userEntity.pullEvents().isEmpty(), "Pull events should not be empty");
     }
 
@@ -87,7 +87,7 @@ public class RolesTest {
         userEntity.clearEvents();
         List<String> rolesToRemove = List.of(UserRoles.ORGANIZER.getValue());
         userEntity.removeRoles(rolesToRemove);
-        assertTrue(userEntity.isUser(), "User should have user role");
+        assertTrue(userEntity.isUser(), "User should have userId role");
         assertTrue(userEntity.isAdmin(), "User should have admin role");
         assertFalse(userEntity.isOrganizer(), "User should not have organizer role");
         assertFalse(userEntity.pullEvents().isEmpty(), "Pull events should not be empty");
@@ -106,7 +106,7 @@ public class RolesTest {
         userEntity.clearEvents();
         List<String> invalidRolesToRemove = Arrays.asList("", "NON_EXISTENT_ROLE", null, UserRoles.ADMIN.getValue());
         userEntity.removeRoles(invalidRolesToRemove);
-        assertTrue(userEntity.isUser(), "User should have user role");
+        assertTrue(userEntity.isUser(), "User should have userId role");
         assertTrue(userEntity.isOrganizer(), "User should have organizer role");
         assertFalse(userEntity.isAdmin(), "User should not have admin role");
         assertFalse(userEntity.pullEvents().isEmpty(), "Pull events should not be empty");
@@ -125,14 +125,14 @@ public class RolesTest {
         userEntity.clearEvents();
         List<String> invalidRolesToRemove = Arrays.asList("", "NON_EXISTENT_ROLE", null);
         userEntity.removeRoles(invalidRolesToRemove);
-        assertTrue(userEntity.isUser(), "User should have user role");
+        assertTrue(userEntity.isUser(), "User should have userId role");
         assertTrue(userEntity.isAdmin(), "User should have admin role");
         assertTrue(userEntity.isOrganizer(), "User should have organizer role");
         assertTrue(userEntity.pullEvents().isEmpty(), "Pull events should be empty");
     }
 
     @Test
-    @DisplayName("Should not remove user role")
+    @DisplayName("Should not remove userId role")
     void shouldNotRemoveUserRole() {
         userEntity.addRoles(List.of(UserRoles.ADMIN.getValue()));
         userEntity.clearEvents();
@@ -143,7 +143,7 @@ public class RolesTest {
     }
 
     @Test
-    @DisplayName("Should not remove user role when removing all roles")
+    @DisplayName("Should not remove userId role when removing all roles")
     void shouldNotRemoveUserRoleWhenRemovingAllRoles() {
         userEntity.addRoles(List.of(UserRoles.ADMIN.getValue(), UserRoles.ORGANIZER.getValue()));
         userEntity.clearEvents();

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +22,8 @@ public class UpdateProfileEmail implements UpdateProfileEmailUC {
     private final JwtCommandRepository jwtCommandRepository;
 
     @Override
-    public Result<List<EventNotification>> setEmail(String userId, ChangeEmailRequest request) {
-        var OptionalUser = queryRepository.findById(userId);
+    public Result<List<EventNotification>> setEmail(UUID userId, ChangeEmailRequest request) {
+        var OptionalUser = queryRepository.findByUuid(userId);
         if (OptionalUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = OptionalUser.get();
@@ -34,7 +35,7 @@ public class UpdateProfileEmail implements UpdateProfileEmailUC {
         }
 
         if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
-                .withMessage("cannot be changed while the user is suspended"));
+                .withMessage("cannot be changed while the userId is suspended"));
 
         var result = user.changeEmail(request.email());
         if (result.isFailure()) return Result.failure(result.getError());

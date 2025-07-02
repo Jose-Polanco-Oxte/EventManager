@@ -15,6 +15,6 @@ public class UserSuspendedListener {
     @EventListener
     public void handleUserSuspended(UserSuspended event) {
         logger.info("User suspended: userId= {}, suspensionDate= {}", event.getUserId(), event.getTimeStamp());
-        // Additional logic for handling user suspension can be added here
+        // Additional logic for handling userId suspension can be added here
     }
 }

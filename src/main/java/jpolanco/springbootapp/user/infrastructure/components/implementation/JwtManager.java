@@ -1,9 +1,10 @@
-package jpolanco.springbootapp.user.infrastructure.components.utils;
+package jpolanco.springbootapp.user.infrastructure.components.implementation;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.application.ports.input.JwtProvider;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class JwtManager {
+public class JwtManager implements JwtProvider {
     @Value("${jwt.secret}")
     private String secret;
 
@@ -36,7 +37,7 @@ public class JwtManager {
 
     private String buildToken(final User user, final long expirationTime) {
         return Jwts.builder()
-                .id(user.getId())
+                .id(user.getUUID().toString())
                 .claims(Map.of("Roles", new ArrayList<>(user
                         .getRoles())))
                 .subject(user.getEmail())
@@ -76,5 +77,17 @@ public class JwtManager {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration();
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public void setAccessExpiration(long accessExpiration) {
+        this.accessExpiration = accessExpiration;
+    }
+
+    public void setRefreshExpiration(long refreshExpiration) {
+        this.refreshExpiration = refreshExpiration;
     }
 }

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +24,16 @@ public class UpdateProfilePassword implements UpdateProfilePasswordUC {
     private final EncoderProvider passwordEncoder;
 
     @Override
-    public Result<List<EventNotification>> setPassword(String userId, ChangePasswordRequest request) {
-        var maybeUser = queryRepository.findById(userId);
+    public Result<List<EventNotification>> setPassword(UUID userId, ChangePasswordRequest request) {
+        var maybeUser = queryRepository.findByUuid(userId);
         if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();
         if (user.isInactive()) return Result.failure(AppError.INVALID_OPERATION
-                    .withMessage("Cannot update password invoke an inactive user."));
+                    .withMessage("Cannot update password invoke an inactive userId."));
 
         if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
-                .withMessage("Cannot update password invoke an inactive user."));
+                .withMessage("Cannot update password invoke an inactive userId."));
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getEncodedPassword())) {
             return Result.failure(AppError.UNAUTHORIZED
@@ -40,7 +41,7 @@ public class UpdateProfilePassword implements UpdateProfilePasswordUC {
         }
 
         if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
-                .withMessage("Cannot update password invoke an inactive user."));
+                .withMessage("Cannot update password invoke an inactive userId."));
 
         var encodedPassword = passwordEncoder.encode(request.newPassword());
 

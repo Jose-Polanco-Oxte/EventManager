@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.application.services.unique;
 
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.unique.GetUserByEmailUC;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

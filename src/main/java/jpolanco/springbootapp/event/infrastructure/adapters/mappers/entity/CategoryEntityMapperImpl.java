@@ -31,7 +31,7 @@ public class CategoryEntityMapperImpl implements CategoryEntityMapper {
     }
 
     @Override
-    public List<String> toDomain(List<CategoryEntity> entity) {
+    public List<String> load(List<CategoryEntity> entity) {
         var categories = new ArrayList<String>();
         for (var categoryEntity : entity) {
             categories.add(categoryEntity.getName());

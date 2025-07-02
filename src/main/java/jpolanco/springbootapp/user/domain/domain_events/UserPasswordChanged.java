@@ -1,16 +1,14 @@
 package jpolanco.springbootapp.user.domain.domain_events;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-public class UserPasswordChanged extends EventNotification {
-    private final String userId;
-    private final String email;
+import java.util.UUID;
 
-    public UserPasswordChanged(String userId, String email) {
-        super();
-        this.userId = userId;
-        this.email = email;
-    }
+@Getter
+@AllArgsConstructor
+public class UserPasswordChanged extends EventNotification {
+    private final UUID userId;
+    private final String email;
 }

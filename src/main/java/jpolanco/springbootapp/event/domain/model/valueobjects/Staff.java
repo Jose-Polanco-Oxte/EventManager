@@ -5,6 +5,8 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserId;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class Staff {
     private final UserId userId;
@@ -19,7 +21,7 @@ public class Staff {
     }
 
     public static Result<Staff> create(String userId, String role, boolean assistanceClerk) {
-        Result<UserId> maybeUserId = UserId.create(userId);
+        Result<UserId> maybeUserId = UserId.create(UUID.fromString(userId));
         if (maybeUserId.isFailure()) {
             return Result.failure(maybeUserId.getError());
         }

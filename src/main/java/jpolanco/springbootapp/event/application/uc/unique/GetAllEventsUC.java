@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GetAllEventsUC {
     /**
-     * Retrieves all events for a specific user.
+     * Retrieves all events for a specific userId.
      *
      * @return A list invoke all events.
      */

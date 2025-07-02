@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +19,13 @@ public class DeactivateProfile implements DeactivateProfileUC {
     private final DeactivateUserUC deactivateUserUC;
 
     @Override
-    public Result<List<EventNotification>> deactivate(String userId, String reason) {
-        var maybeUser = queryRepository.findById(userId);
+    public Result<List<EventNotification>> deactivate(UUID userId, String reason) {
+        var maybeUser = queryRepository.findByUuid(userId);
         if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();
         if (user.isSuspended()) return Result.failure(AppError.INVALID_OPERATION
-                .withMessage("user is suspended and cannot be deactivated"));
+                .withMessage("userId is suspended and cannot be deactivated"));
 
         return deactivateUserUC.deactivate(user, reason);
     }

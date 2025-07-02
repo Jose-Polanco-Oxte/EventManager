@@ -5,14 +5,15 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangePasswordRequest;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UpdateProfilePasswordUC {
     /**
-     * Updates the user's password.
+     * Sets a new password for the user identified by the given UUID.
      *
-     * @param userId  The ID of the user whose password is to be updated.
-     * @param request The request containing the new password.
-     * @return A Result containing a list of EventNotifications if successful, or an error if it fails.
+     * @param userId  The UUID of the user whose password is to be changed.
+     * @param request The request containing the old and new passwords.
+     * @return A Result containing a list of EventNotifications if successful, or an error if not.
      */
-    Result<List<EventNotification>> setPassword(String userId, ChangePasswordRequest request);
+    Result<List<EventNotification>> setPassword(UUID userId, ChangePasswordRequest request);
 }

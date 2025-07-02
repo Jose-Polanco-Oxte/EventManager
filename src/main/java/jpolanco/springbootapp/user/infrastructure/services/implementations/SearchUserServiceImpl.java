@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
 import jpolanco.springbootapp.user.application.uc.unique.search.SearchUserByEmailUC;
 import jpolanco.springbootapp.user.application.uc.unique.search.SearchUserByNameUC;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.SearchUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

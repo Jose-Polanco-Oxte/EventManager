@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +19,8 @@ public class DeleteProfile implements DeleteProfileUC {
     private final DeleteUserUC deleteUserUC;
 
     @Override
-    public Result<List<EventNotification>> delete(String userId, String reason) {
-        var maybeUser = queryRepository.findById(userId);
+    public Result<List<EventNotification>> delete(UUID userId, String reason) {
+        var maybeUser = queryRepository.findByUuid(userId);
         if (maybeUser.isEmpty()) return Result.failure(AppError.idNotFound(userId, "User"));
 
         var user = maybeUser.get();

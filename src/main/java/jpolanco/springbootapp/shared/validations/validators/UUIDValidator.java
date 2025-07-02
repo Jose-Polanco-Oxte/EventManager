@@ -1,8 +1,8 @@
-package jpolanco.springbootapp.event.infrastructure.adapters.input.validations.validators;
+package jpolanco.springbootapp.shared.validations.validators;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
+import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 
 public class UUIDValidator implements ConstraintValidator<ValidUUID, String> {
     @Override

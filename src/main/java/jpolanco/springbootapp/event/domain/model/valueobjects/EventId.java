@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class EventId extends IdObject {
     private EventId(String value) {
-        super(value);
+        super(UUID.fromString(value), null);
     }
 
     public static Result<EventId> create(String value) {

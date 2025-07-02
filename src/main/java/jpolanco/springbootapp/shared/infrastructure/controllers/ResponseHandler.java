@@ -12,7 +12,6 @@ import jpolanco.springbootapp.shared.infrastructure.dto.response.ChangesResponse
 import jpolanco.springbootapp.shared.infrastructure.dto.response.ErrorResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.SimpleResponse;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
-import jpolanco.springbootapp.shared.utils.Either;
 import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.ComposedDtoCreator;
 import org.springframework.http.HttpStatus;
@@ -28,24 +27,11 @@ import java.util.function.Function;
 @Component
 public class ResponseHandler {
 
-    public static ResponseEntity<SimpleResponse> handleVoidResult(Result<Void> result, String message) {
-        if (result.isFailure()) {
-            throw new BusinessRuleException(result.getError());
-        } else {
-            return new ResponseEntity<>(new SimpleResponse(message), HttpStatus.OK);
-        }
-    }
-
-    public static <T, D extends Dto> ResponseEntity<D> handleSuperResult(SuperResult<T, Report> result, DtoCreator<T, D> creator, HttpStatus status) {
-        if (result.isFailure()) {
-            throw new BusinessRuleException(result.getFailure().getErrors());
-        } else {
-            var dto = creator.create(result.getSuccess());
-            return new ResponseEntity<>(dto, status);
-        }
-    }
-
+    /* Result handlers */
     public static <Payload, D extends Dto> ResponseEntity<D> handleResult(Result<Payload> result, DtoCreator<Payload, D> creator) {
+        if (result == null || creator == null) {
+            throw new ResponseHandlerException("Result or creator cannot be null");
+        }
         if (result.isFailure()) {
             throw new BusinessRuleException(result.getError());
         } else {
@@ -59,6 +45,9 @@ public class ResponseHandler {
     }
 
     public static <Payload, D extends Dto> ResponseEntity<D> handleResult(Result<Payload> result, DtoCreator<Payload, D> creator, HttpStatus status) {
+        if (result == null || creator == null || status == null) {
+            throw new ResponseHandlerException("Result or creator cannot be null");
+        }
         if (result.isFailure()) {
             throw new BusinessRuleException(result.getError());
         } else {
@@ -71,12 +60,45 @@ public class ResponseHandler {
         }
     }
 
+    public static ResponseEntity<SimpleResponse> handleVoidResult(Result<Void> result, String message) {
+        if (result == null || message == null) {
+            throw new ResponseHandlerException("Result or message cannot be null");
+        }
+        if (result.isFailure()) {
+            throw new BusinessRuleException(result.getError());
+        } else {
+            return new ResponseEntity<>(new SimpleResponse(message), HttpStatus.OK);
+        }
+    }
+
+    public static <T, D extends Dto> ResponseEntity<D> handleSuperResult(SuperResult<T, Report> result, DtoCreator<T, D> creator, HttpStatus status) {
+        if (result == null || creator == null || status == null) {
+            throw new ResponseHandlerException("Result, creator or status cannot be null");
+        }
+        if (result.isFailure()) {
+            throw new BusinessRuleException(result.getFailure().getErrors());
+        } else {
+            var dto = creator.create(result.getSuccess());
+            return new ResponseEntity<>(dto, status);
+        }
+    }
+
+    /* Optional handler */
+
     public static <T, D extends Dto> ResponseEntity<D> handleOptional(Optional<T> optional, DtoCreator<T, D> creator) {
+        if (optional == null || creator == null) {
+            throw new ResponseHandlerException("Optional or creator cannot be null");
+        }
         return optional.map(value -> new ResponseEntity<>(creator.create(value), HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    /* List handler */
+
     public static <E, D extends Dto> ResponseEntity<List<D>> handleList(List<E> list, DtoCreator<E, D> creator) {
+        if (list == null || creator == null) {
+            throw new ResponseHandlerException("List or creator cannot be null");
+        }
         if (list.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
@@ -84,20 +106,11 @@ public class ResponseHandler {
         }
     }
 
-    public static ResponseEntity<ErrorResponse> handleError(String field, String message, int code, String details) {
-        return new ResponseEntity<>(new ErrorResponse(field, message, code, details), HttpStatus.valueOf(code));
-    }
-
-    public static ResponseEntity<List<ErrorResponse>> handleErrors(List<Error> errors) {
-        List<ErrorResponse> errorResponses = errors.stream()
-                .map(error ->
-                        new ErrorResponse(error.getField(), error.getMessage(), error.getCode(),
-                                (error instanceof DomainError e) ? e.getDetails() : null))
-                .toList();
-        return new ResponseEntity<>(errorResponses, HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
-    public static ResponseEntity<ChangesResponse> handleReport(UpdateReport report, String message) {
+    /* Reports handlers */
+    public static ResponseEntity<ChangesResponse> handleUpdateReport(UpdateReport report, String message) {
+        if (report == null || message == null) {
+            throw new ResponseHandlerException("Report or message cannot be null");
+        }
         if (report.isFailure()) {
             throw new BusinessRuleException(report.getErrors());
         } else {
@@ -107,6 +120,8 @@ public class ResponseHandler {
                     : ResponseEntity.noContent().build();
         }
     }
+
+    /* Collection handlers */
 
     public static <
             Entity,
@@ -118,7 +133,9 @@ public class ResponseHandler {
             Input input,
             ComposedDtoCreator<Entity, Input, EntityDto, Creator, Response> composedCreator,
             Creator creator) {
-
+        if (input == null || composedCreator == null || creator == null) {
+            throw new ResponseHandlerException("Input, composedCreator or creator cannot be null");
+        }
         return input.hasContent()
                 ? ResponseEntity.ok(composedCreator.create(input, creator))
                 : ResponseEntity.noContent().build();
@@ -127,15 +144,39 @@ public class ResponseHandler {
     public static <
             Input extends EntityCollection,
             Response extends Dto>
-    ResponseEntity<Response> handleMapper(
+    ResponseEntity<Response> handleCollectionMapper(
             Input input,
             Function<Input, Response> mapper) {
-
+        if (input == null || mapper == null) {
+            throw new ResponseHandlerException("Input or mapper cannot be null");
+        }
         return input.hasContent()
                 ? ResponseEntity.ok(mapper.apply(input))
                 : ResponseEntity.noContent().build();
     }
 
+    /* Error handlers */
+
+    public static ResponseEntity<ErrorResponse> handleError(String field, String message, int code, String details) {
+        if (field == null || message == null || code <= 0) {
+            throw new ResponseHandlerException("Field, message or code cannot be null or invalid");
+        }
+        return new ResponseEntity<>(new ErrorResponse(field, message, code, details), HttpStatus.valueOf(code));
+    }
+
+    public static ResponseEntity<List<ErrorResponse>> handleErrors(List<Error> errors) {
+        if (errors == null || errors.isEmpty()) {
+            throw new ResponseHandlerException("Errors list cannot be null or empty");
+        }
+        List<ErrorResponse> errorResponses = errors.stream()
+                .map(error ->
+                        new ErrorResponse(error.getField(), error.getMessage(), error.getCode(),
+                                (error instanceof DomainError e) ? e.getDetails() : null))
+                .toList();
+        return new ResponseEntity<>(errorResponses, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    /* Builds */
 
     public static ResponseEntity<Object> error(String message, HttpStatus status) {
         return buildResponse(message, status, null);

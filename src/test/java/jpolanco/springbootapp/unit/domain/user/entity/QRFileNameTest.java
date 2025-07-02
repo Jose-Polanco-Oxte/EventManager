@@ -1,12 +1,10 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.user.domain.model.User;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

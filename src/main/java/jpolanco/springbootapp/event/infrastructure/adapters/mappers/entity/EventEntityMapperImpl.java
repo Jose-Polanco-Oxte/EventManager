@@ -27,11 +27,11 @@ public class EventEntityMapperImpl implements EventEntityMapper {
 
 
     private int validScheduleForStaff(String eventId, Staff staff, Instant date, long duration) {
-        var basic = jpaStaffRepository.findByUserIdAndEventId(UUID.fromString(staff.getUserId().getValue()), UUID.fromString(eventId));
+        var basic = jpaStaffRepository.findByUserIdAndEventId(staff.getUserId().getUUID(), UUID.fromString(eventId));
         if (basic.isEmpty()) {
-            return 0; // No staff found for the user in this event
+            return 0; // No staff found for the userId in this event
         }
-        var eventsForStaff = jpaStaffRepository.findAllByUserId(UUID.fromString(staff.getUserId().getValue()));
+        var eventsForStaff = jpaStaffRepository.findAllByUserId(staff.getUserId().getUUID());
         if (eventsForStaff.isEmpty()) {
             return 0; // No events found for the staff member
         }
@@ -87,9 +87,9 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                         }
                         switch (validScheduleForStaff(domain.getEventId(), staff, domain.getSchedule(), domain.getDurationInSeconds())) {
                             case 1:
-                                throw new EventIntegrity("Staff member already has an event at the same schedule: " + staff.getUserId().getValue(), 401);
+                                throw new EventIntegrity("Staff member already has an event at the same schedule: " + staff.getUserId().getUUID().toString(), 401);
                             case 2:
-                                throw new EventIntegrity("Staff member has overlapping schedules: " + staff.getUserId().getValue(), 401);
+                                throw new EventIntegrity("Staff member has overlapping schedules: " + staff.getUserId().getUUID().toString(), 401);
                             case 0:
                                 // No conflicts found, proceed
                                 break;
@@ -104,7 +104,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
                         }
                         staffEntity.setRole(role.get());
 
-                        var userEntity = jpaUserRepository.findById(UUID.fromString(staff.getUserId().getValue()));
+                        var userEntity = jpaUserRepository.findById(staff.getUserId().getId());
                         userEntity.ifPresent(staffEntity::setUser);
 
                         return staffEntity;
@@ -123,7 +123,7 @@ public class EventEntityMapperImpl implements EventEntityMapper {
         eventEntity.setDurationInSeconds(domain.getDurationInSeconds());
         eventEntity.setStatus(domain.getStatus());
         eventEntity.setPicture_path(domain.getPictureFileName());
-        eventEntity.setCreator(jpaUserRepository.findById(UUID.fromString(domain.getCreatorId()))
+        eventEntity.setCreator(jpaUserRepository.findById(2L) // Its a placeholder, should be replaced with the actual creator ID
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + domain.getCreatorId())));
         eventEntity.setLocation(location);
         eventEntity.setPreferences(preferences);
@@ -134,8 +134,8 @@ public class EventEntityMapperImpl implements EventEntityMapper {
     }
 
     @Override
-    public Event toDomain(EventEntity entity) {
-        var categories = categoryEntityMapper.toDomain(new ArrayList<>(entity.getCategories()));
+    public Event load(EventEntity entity) {
+        var categories = categoryEntityMapper.load(new ArrayList<>(entity.getCategories()));
         var maybeEvent = Event.load(
                 entity.getId().toString(),
                 entity.getTitle(),

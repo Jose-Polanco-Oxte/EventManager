@@ -1,7 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.shared.domain.utils.DomainError;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,9 +51,9 @@ public class CreationTest {
         String encodedPassword = "encodedPassword123";
         var startTime = Instant.now();
         var maybeUser = User.create(firstName, lastName, email, encodedPassword);
-        System.out.println("Time taken to create user: " + (Instant.now().toEpochMilli() - startTime.toEpochMilli()) + " ms");
+        System.out.println("Time taken to create userId: " + (Instant.now().toEpochMilli() - startTime.toEpochMilli()) + " ms");
         assertTrue(maybeUser.isSuccess(), "User creation should succeed with valid parameters: ");
-        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for user creation");
+        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for userId creation");
         for (var event : maybeUser.getSuccess().pullEvents()) {
             assertEquals("UserRegistered", event.getClass().getSimpleName(), "Event should be UserRegistered");
         }
@@ -66,7 +65,7 @@ public class CreationTest {
         encodedPassword = "encoded_452";
         maybeUser = User.create(firstName, lastName, email, encodedPassword);
         assertTrue(maybeUser.isSuccess(), "User creation should succeed with valid parameters");
-        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for user creation");
+        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for userId creation");
         for (var event : maybeUser.getSuccess().pullEvents()) {
             assertEquals("UserRegistered", event.getClass().getSimpleName(), "Event should be UserRegistered");
         }
@@ -78,7 +77,7 @@ public class CreationTest {
         encodedPassword = "encoded_1234";
         maybeUser = User.create(firstName, lastName, email, encodedPassword);
         assertTrue(maybeUser.isSuccess(), "User creation should succeed with valid parameters:");
-        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for user creation");
+        assertEquals(1, maybeUser.getSuccess().pullEvents().size(), "One event should be recorded for userId creation");
         for (var event : maybeUser.getSuccess().pullEvents()) {
             assertEquals("UserRegistered", event.getClass().getSimpleName(), "Event should be UserRegistered");
         }
@@ -110,7 +109,7 @@ public class CreationTest {
         encodedPassword = null;
         var startTime = Instant.now();
         maybeUser = User.create(firstName, lastName, email, encodedPassword);
-        System.out.println("Time taken to create user with null values: " + (Instant.now().toEpochMilli() - startTime.toEpochMilli()) + " ms");
+        System.out.println("Time taken to create userId with null values: " + (Instant.now().toEpochMilli() - startTime.toEpochMilli()) + " ms");
         assertTrue(maybeUser.isFailure(), "User creation should fail with null values");
     }
 
@@ -124,7 +123,7 @@ public class CreationTest {
         String encodedPassword = "encodedPassword123";
         var maybeUser = User.create(firstName, lastName, email, encodedPassword);
         assertTrue(maybeUser.isFailure(), "User creation should fail with empty values");
-        assertEquals(1, maybeUser.getFailure().getErrors().size(), "One event should be recorded for user creation");
+        assertEquals(1, maybeUser.getFailure().getErrors().size(), "One event should be recorded for userId creation");
 
         // Empty values
         firstName = "";
@@ -133,7 +132,7 @@ public class CreationTest {
         encodedPassword = "validEncodedPassword123";
         maybeUser = User.create(firstName, lastName, email, encodedPassword);
         assertTrue(maybeUser.isFailure(), "User creation should fail with empty values");
-        assertEquals(3, maybeUser.getFailure().getErrors().size(), "One event should be recorded for user creation");
+        assertEquals(3, maybeUser.getFailure().getErrors().size(), "One event should be recorded for userId creation");
 
         // Null values
         firstName = null;
@@ -143,7 +142,7 @@ public class CreationTest {
         maybeUser = User.create(firstName, lastName, email, encodedPassword);
         assertTrue(maybeUser.isFailure(), "User creation should fail with null values");
         assertTrue(maybeUser.isFailure(), "User creation should fail with null values");
-        assertEquals(4, maybeUser.getFailure().getErrors().size(), "One event should be recorded for user creation");
+        assertEquals(4, maybeUser.getFailure().getErrors().size(), "One event should be recorded for userId creation");
     }
 
     @Test
@@ -152,7 +151,7 @@ public class CreationTest {
         // Not null entity
         assertNotNull(userEntity, "User entity should not be null");
 
-        // Check if the user entity has the correct properties
+        // Check if the userId entity has the correct properties
         assertNotNull(userEntity.getFirstName(), "Last name should not be null");
         assertEquals(firstName, userEntity.getFirstName(), "First name should match");
         assertNotNull(userEntity.getLastName(), "Last name should not be null");
@@ -181,8 +180,8 @@ public class CreationTest {
         assertEquals(createdAt, userEntity.getCreatedAt(), "Created at should match the initialized value");
 
         // Check ID
-        assertNotNull(userEntity.getId(), "ID should not be null");
-        var  checkIDUUID = UUID.fromString(userEntity.getId());
+        assertNotNull(userEntity.getUUID(), "ID should not be null");
+        var  checkIDUUID = userEntity.getUUID();
         assertNotNull(checkIDUUID, "ID should be a valid UUID");
     }
 
@@ -205,12 +204,12 @@ public class CreationTest {
         @Test
         @DisplayName("Should create UserEntity within acceptable time limits")
         void shouldCreateUserEntityWithinAcceptableTimeLimits() {
-            // Measure time taken to create a user entity
+            // Measure time taken to create a userId entity
             var startTime = Instant.now();
             var maybeUser = User.create(firstName, lastName, email, encodedPassword);
             var endTime = Instant.now();
             long duration = endTime.toEpochMilli() - startTime.toEpochMilli();
-            System.out.println("Time taken to create user: " + duration + " ms");
+            System.out.println("Time taken to create userId: " + duration + " ms");
             assertTrue(maybeUser.isSuccess(), "User creation should succeed with valid parameters");
             assertTrue(duration < 30, "User creation should be fast enough (less than 30 ms)");
         }

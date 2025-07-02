@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.update;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,7 @@ public class UserUpdaterTest {
 
     @BeforeEach
     public void setUp() {
-        // Initialize a sample user for testing
+        // Initialize a sample userId for testing
         user = User.create(
                 "JohnDoe",
                 "DOE",
@@ -28,7 +28,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user first name")
+    @DisplayName("Test updating userId first name")
     public void testUpdateUserFirstName() {
         String newFirstName = "Jane";
         var report = userUpdater.firstName(newFirstName).update();
@@ -38,7 +38,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user last name")
+    @DisplayName("Test updating userId last name")
     public void testUpdateUserLastName() {
         String newLastName = "Smith";
         var report = userUpdater.lastName(newLastName).update();
@@ -48,7 +48,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user email")
+    @DisplayName("Test updating userId email")
     public void testUpdateUserEmail() {
         String newEmail = "newEmail@outlook.com";
         var report = userUpdater.email(newEmail).update();
@@ -58,7 +58,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user password")
+    @DisplayName("Test updating userId password")
     public void testUpdateUserPassword() {
         var encodedPassword = "encodedNewPassword"; // Simulate encoded password
         userUpdater.password(encodedPassword);
@@ -69,7 +69,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user status")
+    @DisplayName("Test updating userId status")
     public void testUpdateUserStatus() {
         String newStatus = "SUSPENDED";
         var report = userUpdater.status(newStatus).update();
@@ -99,7 +99,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Test updating user roles")
+    @DisplayName("Test updating userId roles")
     public void testUpdateUserRoles() {
         var addRoles = List.of("ADMIN", "ORGANIZER");
         var removeRoles = List.of("ADMIN");
@@ -120,7 +120,7 @@ public class UserUpdaterTest {
     }
 
     @Test
-    @DisplayName("Time performance for updating user")
+    @DisplayName("Time performance for updating userId")
     public void testUpdateUserPerformance() {
         String firstName = "Tony";
         String lastName = "Mari";

@@ -6,7 +6,7 @@ import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.EventCreationRequest;
 import jpolanco.springbootapp.event.infrastructure.adapters.input.dto.request.UpdateEventRequest;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
+import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventCommandService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
@@ -156,7 +156,7 @@ public class EventController {
             @RequestPart("image") MultipartFile image,
             EventCommandService commandService
     ) throws IOException {
-        var commandResult = commandService.createEvent(myUserDetails.getId(), request, image.getInputStream());
+        var commandResult = commandService.createEvent(myUserDetails.getId().toString(), request, image.getInputStream());
         if (commandResult.isFailure()) {
             return ResponseHandler.error(commandResult.getMessage(), commandResult.getErrorCode());
         }

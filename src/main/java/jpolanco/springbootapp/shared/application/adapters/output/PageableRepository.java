@@ -24,5 +24,5 @@ public interface PageableRepository<E, ID> {
      * @param sortOrder the order invoke sorting (e.g., "asc" or "desc")
      * @return a cursor-based paginated result invoke entities
      */
-    CursorPageResult<E, ID> findAll(String cursor, int size, String sortBy, String sortOrder);
+    CursorPageResult<E, ID> findAll(ID cursor, int size, String sortBy, String sortOrder);
 }

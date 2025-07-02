@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ public class StatusTest {
     }
 
     @Test
-    @DisplayName("Suspend user status successfully")
+    @DisplayName("Suspend userId status successfully")
     void shouldChangeStatusSuccessfully() {
         userEntity.suspend("User suspended by admin");
         assertEquals(UserStatus.SUSPENDED, userEntity.getStatus(), "Status should be updated");
@@ -40,7 +40,7 @@ public class StatusTest {
     }
 
     @Test
-    @DisplayName("Deactivate user status successfully")
+    @DisplayName("Deactivate userId status successfully")
     void shouldDeactivateStatusSuccessfully() {
         userEntity.deactivate("User deactivated by admin");
         assertEquals(UserStatus.INACTIVE, userEntity.getStatus(), "Status should be updated");
@@ -51,7 +51,7 @@ public class StatusTest {
     }
 
     @Test
-    @DisplayName("Reactivate user status successfully")
+    @DisplayName("Reactivate userId status successfully")
     void shouldReactivateStatusSuccessfully() {
         userEntity.reactivate();
         assertEquals(UserStatus.ACTIVE, userEntity.getStatus(), "Status should be updated");

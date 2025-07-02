@@ -153,7 +153,7 @@ public class Event {
     }
 
     public String getEventId() {
-        return eventId.getValue();
+        return UUID.randomUUID().toString(); // Its a placeholder, should be replaced with actual eventId
     }
 
     // Header methods
@@ -439,13 +439,6 @@ public class Event {
         recordEvent(new EventModalityChanged(getEventId(), getTitle(), Modality.HYBRID));
     }
 
-    // Staff methods
-    public List<String> getStaffIds() {
-        return staff.stream()
-                .map(staffMember -> staffMember.getUserId().getValue())
-                .toList();
-    }
-
     public void addStaffs(List<StaffRequest> staffs) {
         // add new staff members to the event and record only new staff members
         var newStaff = staffs.stream()
@@ -456,7 +449,7 @@ public class Event {
         if (!newStaff.isEmpty()) {
             var staffRequests = newStaff.stream()
                     .map(staffMember -> new StaffRequest(
-                            staffMember.getUserId().getValue(),
+                            staffMember.getUserId().getUUID().toString(), // Its a placeholder, should be replaced with actual userId
                             staffMember.getRole(),
                             staffMember.isAssistanceClerk()))
                     .toList();
@@ -468,7 +461,7 @@ public class Event {
         // remove staff members from the event and record only removed staff members
         var removedStaff = staffIds.stream()
                 .map(userId -> this.staff.stream()
-                        .filter(staffMember -> staffMember.getUserId().getValue().equals(userId))
+                        .filter(staffMember -> staffMember.getUserId().getUUID().toString().equals(userId)) // Its a placeholder, should be replaced with actual userId
                         .findFirst())
                 .flatMap(Optional::stream)
                 .filter(staff::remove)
@@ -476,7 +469,7 @@ public class Event {
         if (!removedStaff.isEmpty()) {
             var staffRequests = removedStaff.stream()
                     .map(staffMember -> new StaffRequest(
-                            staffMember.getUserId().getValue(),
+                            staffMember.getUserId().getUUID().toString(), // Its a placeholder, should be replaced with actual userId
                             staffMember.getRole(),
                             staffMember.isAssistanceClerk()))
                     .toList();
@@ -500,7 +493,7 @@ public class Event {
     public void clearStaff() {
         var staffCleared = this.staff.stream()
                 .map(staffMember -> new StaffRequest(
-                        staffMember.getUserId().getValue(),
+                        staffMember.getUserId().getUUID().toString(),
                         staffMember.getRole(),
                         staffMember.isAssistanceClerk()))
                 .toList();
@@ -516,8 +509,8 @@ public class Event {
 
     // Creator methods
     public String getCreatorId() {
-        return creatorId.getValue();
-    }
+        return creatorId.getUUID().toString();
+    } // Its a placeholder, should be replaced with actual creatorId
 
     public Instant getCreatedAt() {
         return createdAt;

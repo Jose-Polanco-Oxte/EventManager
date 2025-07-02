@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.event.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.constraints.Min;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
+import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.event.infrastructure.components.utils.EventSortField;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.EventQueryService;
 import jpolanco.springbootapp.event.infrastructure.services.interfaces.SearchEventService;

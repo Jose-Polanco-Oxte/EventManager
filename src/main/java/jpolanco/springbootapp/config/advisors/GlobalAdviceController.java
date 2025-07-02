@@ -6,9 +6,9 @@ import jakarta.validation.ConstraintViolationException;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
 import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
+import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandlerException;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
-import jpolanco.springbootapp.user.application.errors.IllegalUserOperation;
 import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,19 +37,19 @@ public class GlobalAdviceController {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
 
+    @ExceptionHandler(ResponseHandlerException.class)
+    public ResponseEntity<Object> handleResponseHandlerException(ResponseHandlerException e) {
+        logger.error("Response handler exception: {}", e.getMessage(), e);
+        return ResponseEntity.internalServerError().body("Response handler exception occurred");
+    }
+
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<?> handleBusinessRuleException(BusinessRuleException e) {
         logger.error("Business rule violation: {}", e.getMessage(), e);
         if (e.getErrors().size() == 1) {
             // If there's only one error, return it directly
             var error = e.getErrors().getFirst();
-            if (error instanceof DomainError de) {
-                return ResponseHandler.handleError(
-                        de.getField(), de.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value(), de.getDetails());
-            } else {
-                return ResponseHandler.handleError(
-                        error.getField(), error.getMessage(), error.getCode(), null);
-            }
+            return ResponseHandler.handleError(error.getField(), error.getMessage(), error.getCode(), (error instanceof DomainError de) ? de.getDetails() : null);
         } else {
             return ResponseHandler.handleErrors(e.getErrors());
         }
@@ -58,7 +58,7 @@ public class GlobalAdviceController {
     @ExceptionHandler(SecurityAuth.class)
     public ResponseEntity<Object> handleSecurityAuthException(SecurityAuth e) {
         logger.error("Security authentication error: {}", e.getMessage(), e);
-        return ResponseHandler.error(e.getMessage(), e.getCode());
+        return ResponseEntity.internalServerError().body("Security authentication error occurred");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -76,7 +76,7 @@ public class GlobalAdviceController {
         }
         errors.put("status", "400");
         logger.error("Constraint violation occurred: {}", errors, e);
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -122,18 +122,11 @@ public class GlobalAdviceController {
         return ResponseHandler.methodNotAllowed(response);
     }
 
-    @ExceptionHandler(IllegalUserOperation.class)
-    public ResponseEntity<Object> handleIllegalUserOperation(IllegalUserOperation e) {
-        logger.error("Illegal user operation: {}", e.getMessage(), e);
-        String response = "Illegal user operation: " + e.getMessage();
-        return ResponseHandler.badRequest(response);
-    }
-
     @ExceptionHandler(UserIntegrity.class)
     public ResponseEntity<Object> handleDataFailure(UserIntegrity e) {
-        logger.error("Data failure occurred: {}", e.getMessage(), e);
-        String response = "Data failure occurred: " + e.getMessage();
-        return ResponseHandler.serverError(response);
+        logger.error("User integrity error: {}", e.getMessage(), e);
+        String response = "User integrity error: " + e.getMessage();
+        return ResponseHandler.conflict(response);
     }
 
     @ExceptionHandler(AuthenticationServiceException.class)
@@ -161,7 +154,7 @@ public class GlobalAdviceController {
     public ResponseEntity<Object> handleNullPointerException(NullPointerException e) {
         logger.error("Null pointer exception occurred: {}", e.getMessage(), e);
         String response = "Null pointer exception occurred";
-        return ResponseHandler.serverError(response);
+        return ResponseEntity.internalServerError().body(response);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

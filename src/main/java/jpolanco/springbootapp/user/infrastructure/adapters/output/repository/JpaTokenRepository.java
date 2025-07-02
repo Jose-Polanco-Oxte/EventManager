@@ -9,16 +9,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface JpaTokenRepository extends JpaRepository<TokenEntity, Long> {
     Optional<TokenEntity> findByToken(String token);
-    void deleteAllByUserId(UUID user_id);
 
-    List<TokenEntity> findAllByUserId(UUID user_id);
+    void deleteAllByUserId(Long userId);
+
+    List<TokenEntity> findAllByUserId(Long userId);
 
     @Query("SELECT COUNT(t) FROM tokens t WHERE t.user.id = ?1 AND t.status = 'ACTIVE'")
-    int countByUserIdAndStatusIsActive(UUID uuid);
+    int countByUserIdAndStatusIsActive(Long userId);
 
     void deleteAllByStatus(TokenStatus status);
 
@@ -26,7 +26,7 @@ public interface JpaTokenRepository extends JpaRepository<TokenEntity, Long> {
     @Query("""
               UPDATE tokens t SET t.status = 'REVOKED' WHERE t.user.id = ?1
     """)
-    int revokeAllByUserId(UUID userId);
+    int revokeAllByUserId(Long userId);
 
     void deleteByToken(String token);
 }

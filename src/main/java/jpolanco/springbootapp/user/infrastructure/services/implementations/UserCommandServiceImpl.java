@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
@@ -22,7 +24,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Transactional
     @Override
-    public UpdateReport update(AllFieldsUserUpdate request, String userId) {
+    public UpdateReport update(UUID userId, AllFieldsUserUpdate request) {
         var report = updateUser.setChanges(userId, request);
         if (report.isFailure()) return report;
         var domainEvents = report.getNotifications();
@@ -32,7 +34,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Transactional
     @Override
-    public Result<Void> deleteById(String userId, String reason) {
+    public Result<Void> deleteById(UUID userId, String reason) {
         var result = deleteUserUC.deleteById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -40,8 +42,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         return Result.success();
     }
 
+    @Transactional
     @Override
-    public Result<Void> reactivateById(String userId) {
+    public Result<Void> reactivateById(UUID userId) {
         var result = reactivateUserUC.reactivateById(userId);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -49,8 +52,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         return Result.success();
     }
 
+    @Transactional
     @Override
-    public Result<Void> deactivateById(String userId, String reason) {
+    public Result<Void> deactivateById(UUID userId, String reason) {
         var result = deactivateUserUC.deactivateById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
@@ -58,8 +62,9 @@ public class UserCommandServiceImpl implements UserCommandService {
         return Result.success();
     }
 
+    @Transactional
     @Override
-    public Result<Void> suspendById(String userId, String reason) {
+    public Result<Void> suspendById(UUID userId, String reason) {
         var result = suspendUserUC.suspendById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();

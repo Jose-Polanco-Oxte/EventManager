@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.user.domain.model;
+package jpolanco.springbootapp.user.domain.model.value_objects;
 
 
 import jpolanco.springbootapp.shared.domain.Report;
@@ -6,8 +6,6 @@ import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.utils.SuperResult;
 import jpolanco.springbootapp.user.domain.domain_events.*;
-import jpolanco.springbootapp.user.domain.model.value_objects.*;
-
 import java.time.Instant;
 import java.util.*;
 
@@ -49,8 +47,8 @@ public class User {
             String email,
             String encodedPassword
     ) {
-        var userId = UUID.randomUUID().toString();
-        return builder()
+        var userId = UUID.randomUUID();
+        return UserValidatorBuilder.builder()
                 .userId(userId)
                 .fullName(firstName, lastName)
                 .email(email)
@@ -64,56 +62,60 @@ public class User {
     }
 
     public static SuperResult<User, Report> of(
-            String id,
+            Long userId,
+            UUID uuid,
             String firstName,
             String lastName,
             String email,
             String encodedPassword
     ) {
-        return builder()
-                .userId(id)
-                .fullName(firstName, lastName)
-                .email(email)
-                .encodedPassword(encodedPassword)
-                .roles(List.of("USER"))
-                .status(UserStatus.ACTIVE)
-                .qrFileName(UUID.randomUUID().toString())
-                .createdAt(Instant.now())
-                .addEvent(new UserRegistered(id, email))
-                .build();
+        var user = new User(
+                UserId.loadUnchecked(userId, uuid),
+                FullName.loadUnchecked(firstName, lastName),
+                Email.loadUnchecked(email),
+                EncodedPassword.loadUnchecked(encodedPassword),
+                Roles.loadUnchecked(Set.of(UserRoles.USER)),
+                UserStatus.ACTIVE,
+                QRFileName.loadUnchecked(UUID.randomUUID().toString()),
+                Instant.now());
+        user.recordEvent(new UserRegistered(user.getUUID(), user.getEmail()));
+        return SuperResult.success(user);
     }
 
-    public static SuperResult<User, Report> load(
-            String userId,
+    public static User fromPersisted(
+            Long userId,
+            UUID uuid,
             String firstName,
             String lastName,
             String email,
             String encodedPassword,
-            List<String> roles,
+            Set<UserRoles> roles,
             UserStatus status,
             String qrFileName,
             Instant createdAt
     ) {
-        return builder()
-                .userId(userId)
-                .fullName(firstName, lastName)
-                .email(email)
-                .encodedPassword(encodedPassword)
-                .roles(roles)
-                .status(status)
-                .qrFileName(qrFileName)
-                .createdAt(createdAt)
-                .build();
-    }
-
-    // Private builder constructor
-    private static UserBuilder builder() {
-        return new UserBuilder();
+        return new User(
+                UserId.loadUnchecked(userId, uuid),
+                FullName.loadUnchecked(firstName, lastName),
+                Email.loadUnchecked(email),
+                EncodedPassword.loadUnchecked(encodedPassword),
+                Roles.loadUnchecked(roles),
+                status,
+                QRFileName.loadUnchecked(qrFileName),
+                createdAt
+        );
     }
 
     // Identificator
-    public String getId() {
-        return userId.getValue();
+    public Long getId() {
+        if (userId.getId() == null) {
+            throw new IllegalStateException("userId is null");
+        }
+        return userId.getId();
+    }
+
+    public UUID getUUID() {
+        return userId.getUUID();
     }
 
     // Date invoke creation
@@ -162,7 +164,7 @@ public class User {
         }
         this.email = result.getValue();
         recordEvent(new UserEmailChanged(
-                getId(),
+                getUUID(),
                 oldEmail,
                 getEmail()
         ));
@@ -176,7 +178,7 @@ public class User {
             return result;
         }
         this.encodedPassword = result.getValue();
-        recordEvent(new UserPasswordChanged(getId(), getEmail()));
+        recordEvent(new UserPasswordChanged(getUUID(), getEmail()));
         return result;
     }
 
@@ -192,14 +194,14 @@ public class User {
     public void addRoles(List<String> roles) {
         var addedRoles = this.roles.addAll(roles);
         if (!addedRoles.isEmpty()) {
-            recordEvent(new UserAddedRoles(getId(), getEmail(), addedRoles));
+            recordEvent(new UserAddedRoles(getUUID(), getEmail(), addedRoles));
         }
     }
 
     public void removeRoles(List<String> roles) {
         var removedRoles = this.roles.removeAll(roles);
         if (!removedRoles.isEmpty()) {
-            recordEvent(new UserRemovedRoles(getId(), getEmail(), removedRoles));
+            recordEvent(new UserRemovedRoles(getUUID(), getEmail(), removedRoles));
         }
     }
 
@@ -237,7 +239,7 @@ public class User {
         }
         this.status = UserStatus.SUSPENDED;
         recordEvent(new UserSuspended(
-                getId(),
+                getUUID(),
                 reason == null ? " " : reason
         ));
     }
@@ -248,7 +250,7 @@ public class User {
         }
         this.status = UserStatus.INACTIVE;
         recordEvent(new UserDeactivated(
-                getId(),
+                getUUID(),
                 reason == null ? " " : reason
         ));
     }
@@ -259,7 +261,7 @@ public class User {
         }
         this.status = UserStatus.ACTIVE;
         recordEvent(new UserReactivated(
-                getId()
+                getUUID()
         ));
     }
 

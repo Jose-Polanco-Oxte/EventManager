@@ -15,6 +15,6 @@ public class UserDeletedListener {
     @EventListener
     public void handleUserDeleted(UserDeleted event) {
         logger.info("User deleted: userId= {}, deletionDate= {}", event.getUserId(), event.getTimeStamp());
-        // Additional logic for handling user deletion can be added here
+        // Additional logic for handling userId deletion can be added here
     }
 }

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,26 +51,28 @@ public class ObjectTest {
     @Test
     @DisplayName("Should have same hash code for equal objects")
     void shouldHaveSameHashCodeForEqualObjects() {
-        String testId = UUID.randomUUID().toString();
-        User user = User.of(testId, firstName, lastName, email, encodedPassword).getSuccess();
-        User anotherUser = User.of(testId, firstName, lastName, email, encodedPassword).getSuccess();
-        assertEquals(user.hashCode(), anotherUser.hashCode(), "Hash codes invoke equal user entities should match");
+        UUID testId = UUID.randomUUID();
+        Long testIdLong = 2L;
+        User user = User.of(testIdLong, testId, firstName, lastName, email, encodedPassword).getSuccess();
+        User anotherUser = User.of(testIdLong, testId, firstName, lastName, email, encodedPassword).getSuccess();
+        assertEquals(user.hashCode(), anotherUser.hashCode(), "Hash codes invoke equal userId entities should match");
     }
 
     @Test
     @DisplayName("Two UserEntities with the same ID should be equal")
     void twoUserEntitiesWithSameIdShouldBeEqual() {
-        String testId = UUID.randomUUID().toString();
-        User user1 = User.of(testId, firstName, lastName, email, encodedPassword).getSuccess();
-        User user2 = User.of(testId, firstName, lastName, email, encodedPassword).getSuccess();
+        UUID testId = UUID.randomUUID();
+        Long testIdLong = 2L;
+        User user1 = User.of(testIdLong, testId, firstName, lastName, email, encodedPassword).getSuccess();
+        User user2 = User.of(testIdLong, testId, firstName, lastName, email, encodedPassword).getSuccess();
         assertEquals(user1, user2, "Two UserEntities with the same ID should be equal");
     }
 
     @Test
     @DisplayName("Two UserEntities with different IDs should not be equal")
     void twoUserEntitiesWithDifferentIdsShouldNotBeEqual() {
-        User user1 = User.of(UUID.randomUUID().toString(), firstName, lastName, email, encodedPassword).getSuccess();
-        User user2 = User.of(UUID.randomUUID().toString(), firstName, lastName, email, encodedPassword).getSuccess();
+        User user1 = User.of(4L, UUID.randomUUID(), firstName, lastName, email, encodedPassword).getSuccess();
+        User user2 = User.of(1L, UUID.randomUUID(), firstName, lastName, email, encodedPassword).getSuccess();
         assertNotEquals(user1, user2, "Two UserEntities with different IDs should not be equal");
     }
 }

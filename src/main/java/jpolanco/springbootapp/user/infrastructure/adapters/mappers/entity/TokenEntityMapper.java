@@ -7,5 +7,5 @@ import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.Us
 
 public interface TokenEntityMapper extends EntityMapper<TokenEntity, TokenE> {
     TokenEntity toEntity(TokenE token, UserEntity user);
-    TokenE toDomain(TokenEntity entity);
+    TokenE load(TokenEntity entity);
 }

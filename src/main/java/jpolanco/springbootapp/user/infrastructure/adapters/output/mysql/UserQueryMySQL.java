@@ -4,7 +4,7 @@ import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
 import jpolanco.springbootapp.shared.application.CursorPageResult;
 import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapper;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
@@ -24,21 +24,27 @@ public class UserQueryMySQL implements UserQueryRepository {
     private final UserEntityMapper mapper;
 
     @Override
-    public Optional<User> findById(String id) {
-        return jpaUserRepository.findById(UUID.fromString(id))
-                .map(mapper::toDomain);
+    public Optional<User> findById(Long userId) {
+        return jpaUserRepository.findById(userId)
+                .map(mapper::load);
+    }
+
+    @Override
+    public Optional<User> findByUuid(UUID uuid) {
+        return jpaUserRepository.findByUuid(uuid)
+                .map(mapper::load);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpaUserRepository.findByEmail(email).map(mapper::toDomain);
+        return jpaUserRepository.findByEmail(email).map(mapper::load);
     }
 
     @Override
     public List<User> searchByName(String name, int size) {
         return jpaUserRepository.searchByName(name, PageRequest.of(0, size))
                 .stream()
-                .map(mapper::toDomain)
+                .map(mapper::load)
                 .toList();
     }
 
@@ -46,7 +52,7 @@ public class UserQueryMySQL implements UserQueryRepository {
     public List<User> searchByEmail(String email, int size) {
         return jpaUserRepository.searchByEmail(email, PageRequest.of(0, size))
                 .stream()
-                .map(mapper::toDomain)
+                .map(mapper::load)
                 .toList();
     }
 
@@ -57,7 +63,7 @@ public class UserQueryMySQL implements UserQueryRepository {
 
         var users = jpaUserRepository.findAll(pageRequest);
         return new PageResult<>(
-                users.get().map(mapper::toDomain).toList(),
+                users.get().map(mapper::load).toList(),
                 users.getNumber(),
                 users.getSize(),
                 users.getTotalElements(),
@@ -67,31 +73,30 @@ public class UserQueryMySQL implements UserQueryRepository {
     }
 
     @Override
-    public CursorPageResult<User, String> findAll(String cursor, int size, String sortBy, String sortOrder) {
+    public CursorPageResult<User, UUID> findAll(UUID cursor, int size, String sortBy, String sortOrder) {
         var sort = PageAux.resolveSort(sortBy, sortOrder);
         var pageRequest = PageRequest.of(0, size, sort);
-
         Slice<UserEntity> slice;
-        if (cursor.equalsIgnoreCase("none")) {
+        if (cursor == null) {
             slice = jpaUserRepository.findAll(pageRequest);
         } else {
-            var cursorData = PageAux.decodeCursor(cursor);
-            slice = jpaUserRepository.findAllByCursorIdAndCreatedAt(
-                    cursorData.id(),
-                    cursorData.date(),
+            var userEntity = jpaUserRepository.findByUuid(cursor);
+            if (userEntity.isEmpty()) {
+                return new CursorPageResult<>(List.of(), null, false);
+            }
+            slice = jpaUserRepository.findByIdGreaterThan(
+                    userEntity.get().getId(),
                     pageRequest
             );
         }
         if (slice.isEmpty()) {
             return new CursorPageResult<>(List.of(), null, false);
         }
-        var users = slice.get().map(mapper::toDomain).toList();
-        var date = slice.getContent().getLast().getCreatedAt();
-        var lastId = slice.getContent().getLast().getId();
-        String nextCursor = PageAux.encodeCursor(date, lastId);
+        var users = slice.get().map(mapper::load).toList();
+        var lastId = slice.getContent().getLast().getUuid();
         return new CursorPageResult<>(
                 users,
-                nextCursor,
+                lastId,
                 slice.hasNext()
         );
     }

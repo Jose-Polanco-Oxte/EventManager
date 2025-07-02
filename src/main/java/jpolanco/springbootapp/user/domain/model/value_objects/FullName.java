@@ -32,6 +32,10 @@ public class FullName {
         return SuperResult.success(new FullName(firstNameFormated.getValue(), lastNameFormated.getValue()));
     }
 
+    protected static FullName loadUnchecked(String firstName, String lastName) {
+        return new FullName(firstName, lastName);
+    }
+
     private static Result<String> validate(String value, String fieldName) {
         Optional<DomainError> error = Validators.notBlank(fieldName, value);
         if (error.isPresent()) return Result.failure(error.get());

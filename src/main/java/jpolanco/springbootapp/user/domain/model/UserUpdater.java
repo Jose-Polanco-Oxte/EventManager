@@ -4,6 +4,7 @@ import jpolanco.springbootapp.event.application.utils.Changes;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import lombok.RequiredArgsConstructor;
 

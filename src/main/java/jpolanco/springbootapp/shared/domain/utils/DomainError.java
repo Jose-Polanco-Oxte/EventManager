@@ -4,11 +4,11 @@ import java.util.Objects;
 
 public class DomainError extends Error {
     private String details;
-    public static final DomainError NULL_VALUE = new DomainError(400, "value cannot be null or empty");
-    public static final DomainError TOO_LONG = new DomainError(400, "value is too long");
-    public static final DomainError TOO_SHORT = new DomainError(400, "value is too short");
-    public static final DomainError INVALID_PARAMETER = new DomainError(400, "invalid parameter");
-    public static final DomainError INVALID_FORMAT = new DomainError(400, "invalid format");
+    public static final DomainError NULL_VALUE = new DomainError(422, "value cannot be null or empty");
+    public static final DomainError TOO_LONG = new DomainError(422, "value is too long");
+    public static final DomainError TOO_SHORT = new DomainError(422, "value is too short");
+    public static final DomainError INVALID_PARAMETER = new DomainError(422, "invalid parameter");
+    public static final DomainError INVALID_FORMAT = new DomainError(422, "invalid format");
 
     public DomainError(int code, String message) {
         super(code, message);

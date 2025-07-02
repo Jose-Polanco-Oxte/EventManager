@@ -28,7 +28,7 @@ public class EventQueryMySQL implements EventQueryRepository {
     @Override
     public Optional<Event> findById(String id) {
         return jpaEventRepository.findById(UUID.fromString(id))
-                .map(eventEntityMapper::toDomain);
+                .map(eventEntityMapper::load);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class EventQueryMySQL implements EventQueryRepository {
     public List<Event> searchByName(String name, int size) {
         return jpaEventRepository.searchByName(name, PageRequest.of(0, size))
                 .stream()
-                .map(eventEntityMapper::toDomain)
+                .map(eventEntityMapper::load)
                 .toList();
     }
 
@@ -53,14 +53,14 @@ public class EventQueryMySQL implements EventQueryRepository {
     public List<Event> searchMyEventsByName(String name, String creatorId, int size) {
         return jpaEventRepository.searchMyEventsByName(name, UUID.fromString(creatorId), PageRequest.of(0, size))
                 .stream()
-                .map(eventEntityMapper::toDomain)
+                .map(eventEntityMapper::load)
                 .toList();
     }
 
     @Override
     public Optional<Event> findFirstConflictingEvent(Instant date, Instant endDate, String creatorId) {
         return jpaEventRepository.findFirstConflictingEvent(date, endDate, UUID.fromString(creatorId))
-                .map(eventEntityMapper::toDomain);
+                .map(eventEntityMapper::load);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class EventQueryMySQL implements EventQueryRepository {
             pageRequest = jpaEventRepository.findByCreator_Id(UUID.fromString(creatorId), PageRequest.of(page, size, sort));
         }
         return new PageResult<>(
-                pageRequest.get().map(eventEntityMapper::toDomain).toList(),
+                pageRequest.get().map(eventEntityMapper::load).toList(),
                 pageRequest.getNumber(),
                 pageRequest.getSize(),
                 pageRequest.hasNext()
@@ -115,7 +115,7 @@ public class EventQueryMySQL implements EventQueryRepository {
             pageRequest = jpaEventRepository.findByPreferencesPublic(PageRequest.of(page, size, sort));
         }
         return new PageResult<>(
-                pageRequest.get().map(eventEntityMapper::toDomain).toList(),
+                pageRequest.get().map(eventEntityMapper::load).toList(),
                 pageRequest.getNumber(),
                 pageRequest.getSize(),
                 pageRequest.hasNext()
@@ -153,7 +153,7 @@ public class EventQueryMySQL implements EventQueryRepository {
             pageRequest = jpaEventRepository.findAll(PageRequest.of(page, size, sort));
         }
         return new PageResult<>(
-                pageRequest.get().map(eventEntityMapper::toDomain).toList(),
+                pageRequest.get().map(eventEntityMapper::load).toList(),
                 pageRequest.getNumber(),
                 pageRequest.getSize(),
                 pageRequest.hasNext()
@@ -183,7 +183,7 @@ public class EventQueryMySQL implements EventQueryRepository {
         if (slice.isEmpty()) {
             return new CursorPageResult<>(List.of(), null, false);
         }
-        var events = slice.get().map(eventEntityMapper::toDomain).toList();
+        var events = slice.get().map(eventEntityMapper::load).toList();
         var date = slice.getContent().getLast().getCreatedAt();
         var lastId = slice.getContent().getLast().getId();
         String nextCursor = PageAux.encodeCursor(date, lastId);

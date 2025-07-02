@@ -6,11 +6,13 @@ import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.Cha
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangePasswordRequest;
 
+import java.util.UUID;
+
 public interface ProfileService {
-    Result<Void> changeEmail(String userId, ChangeEmailRequest request);
-    UpdateReport changeName(String userId, ChangeNameRequest request);
-    Result<Void> delete(String userId, String reason);
-    Result<Void> changePassword(String userId, ChangePasswordRequest dto);
-    Result<Void> deactivate(String userId, String reason);
-    Result<Void> reactivate(String userId);
+    Result<Void> changeEmail(UUID userId, ChangeEmailRequest request);
+    UpdateReport changeName(UUID userId, ChangeNameRequest request);
+    Result<Void> delete(UUID userId, String reason);
+    Result<Void> changePassword(UUID userId, ChangePasswordRequest dto);
+    Result<Void> deactivate(UUID userId, String reason);
+    Result<Void> reactivate(UUID userId);
 }

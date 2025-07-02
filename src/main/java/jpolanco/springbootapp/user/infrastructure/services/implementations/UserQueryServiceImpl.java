@@ -7,12 +7,13 @@ import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.user.application.uc.unique.GetUserByEmailUC;
 import jpolanco.springbootapp.user.application.uc.unique.GetUserByIdUC;
 import jpolanco.springbootapp.user.application.uc.unique.GetUsersUC;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final GetUsersUC getUsersUC;
 
     @Override
-    public Optional<User> getById(String userId) {
+    public Optional<User> getById(UUID userId) {
         return getUserByIdUC.get(userId);
     }
 
@@ -37,7 +38,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     @Override
-    public CursorPageResult<User, String> getByCursor(String cursor, int size, String sortBy, String orderBy) {
+    public CursorPageResult<User, UUID> getByCursor(UUID cursor, int size, String sortBy, String orderBy) {
         return getUsersUC.getByCursor(new CursorPaginationRequest<>(cursor, size, sortBy, orderBy));
     }
 }

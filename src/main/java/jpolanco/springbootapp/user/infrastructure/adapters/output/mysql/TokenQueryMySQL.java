@@ -20,27 +20,27 @@ public class TokenQueryMySQL implements JwtQueryRepository {
     @Override
     public Optional<TokenE> findByToken(String token) {
         return jpaTokenRepository.findByToken(token)
-                .map(tokenEntityMapper::toDomain);
+                .map(tokenEntityMapper::load);
     }
 
     @Override
-    public List<TokenE> findAllByUserId(String userId) {
-        return jpaTokenRepository.findAllByUserId(UUID.fromString(userId))
+    public List<TokenE> findAllByUserId(Long userId) {
+        return jpaTokenRepository.findAllByUserId(userId)
                 .stream()
-                .map(tokenEntityMapper::toDomain)
+                .map(tokenEntityMapper::load)
                 .toList();
     }
 
     @Override
-    public int countSessionsByUserId(String userId) {
-        return jpaTokenRepository.countByUserIdAndStatusIsActive(UUID.fromString(userId));
+    public int countSessionsByUserId(Long userId) {
+        return jpaTokenRepository.countByUserIdAndStatusIsActive(userId);
     }
 
     @Override
     public List<TokenE> findAll() {
         return jpaTokenRepository.findAll()
                 .stream()
-                .map(tokenEntityMapper::toDomain)
+                .map(tokenEntityMapper::load)
                 .toList();
     }
 }

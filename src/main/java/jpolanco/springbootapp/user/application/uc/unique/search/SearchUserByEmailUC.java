@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.uc.unique.search;
 
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 
 import java.util.List;
 

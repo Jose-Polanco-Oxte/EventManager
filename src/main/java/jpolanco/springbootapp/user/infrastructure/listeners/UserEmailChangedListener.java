@@ -16,6 +16,6 @@ public class UserEmailChangedListener {
     public void handleUserEmailChanged(UserEmailChanged event) {
         logger.info("User email changed: userId= {}, oldEmail= {}, newEmail= {}, changeDate= {}",
                     event.getUserId(), event.getOldEmail(), event.getNewEmail(), event.getTimeStamp());
-        // Additional logic for handling user email change can be added here
+        // Additional logic for handling userId email change can be added here
     }
 }

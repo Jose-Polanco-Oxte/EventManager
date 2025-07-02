@@ -35,7 +35,7 @@ public class Email {
         var userName = split[0];
         var domain = split[1];
 
-        error = Validators.mustNotStartWith("email user name", userName, ".");
+        error = Validators.mustNotStartWith("email userId name", userName, ".");
         if (error.isPresent()) return Result.failure(error.get());
 
         if (SPECIAL_CHARACTERS_PATTERN.matcher(userName).matches() || SPECIAL_CHARACTERS_PATTERN.matcher(domain).matches()) {
@@ -50,7 +50,7 @@ public class Email {
         error = Validators.mustNotContain("email", userName, " ");
         if (error.isPresent()) return Result.failure(error.get());
 
-        error = Validators.maxLength("email user name", userName, 64);
+        error = Validators.maxLength("email userId name", userName, 64);
         if (error.isPresent()) return Result.failure(error.get());
 
         if (!validDomains.contains(domain)) {
@@ -67,6 +67,10 @@ public class Email {
             return Result.failure(valid.getError());
         }
         return Result.success(new Email(value));
+    }
+
+    protected static Email loadUnchecked(String email) {
+        return new Email(email);
     }
 
     public String getValue() {

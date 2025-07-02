@@ -1,8 +1,8 @@
-package jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations;
+package jpolanco.springbootapp.shared.validations.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.validators.UUIDValidator;
+import jpolanco.springbootapp.shared.validations.validators.UUIDValidator;
 
 import java.lang.annotation.*;
 

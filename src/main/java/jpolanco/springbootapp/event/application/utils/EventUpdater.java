@@ -208,7 +208,7 @@ public class EventUpdater {
 
     public EventUpdater staff(StaffChangeRequest staffs) {
         var oldStaff = event.getStaff().stream()
-                .map(staff -> new StaffRequest(staff.getUserId().getValue(), staff.getRole(), staff.isAssistanceClerk()))
+                .map(staff -> new StaffRequest(staff.getUserId().getUUID().toString(), staff.getRole(), staff.isAssistanceClerk()))
                 .toList();
         if (staffs.clear()) {
             event.clearStaff();
@@ -228,7 +228,7 @@ public class EventUpdater {
             newStaff = List.of();
         } else {
             newStaff = event.getStaff().stream()
-                    .map(staff -> new StaffRequest(staff.getUserId().getValue(), staff.getRole(), staff.isAssistanceClerk()))
+                    .map(staff -> new StaffRequest(staff.getUserId().getUUID().toString(), staff.getRole(), staff.isAssistanceClerk()))
                     .toList();
         }
         changes.add(new Changes("staff", oldStaff, newStaff));

@@ -33,7 +33,7 @@ public class AppConfig {
                     .orElseThrow(() -> new SecurityAuth("User not found", 404));
             List<String> roles = user.getRoles().stream().toList();
             return new MyUserDetails(
-                    user.getId(),
+                    user.getUUID(),
                     user.getEmail(),
                     user.getEncodedPassword(),
                     user.isActive(),

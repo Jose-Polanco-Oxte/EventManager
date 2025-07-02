@@ -1,10 +1,11 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.ChangesResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
-import jpolanco.springbootapp.event.infrastructure.adapters.input.validations.annotations.ValidUUID;
+import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.PageResponse;
@@ -23,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @Validated
@@ -34,14 +37,14 @@ public class UserController {
     @PutMapping("/{userId}")
     public ResponseEntity<ChangesResponse> update(
             @Valid @RequestBody AllFieldsUserUpdate request,
-            @ValidUUID @PathVariable String userId
+            @PathVariable UUID userId
     ) {
-        return ResponseHandler.handleReport(commandService.update(request, userId),
+        return ResponseHandler.handleUpdateReport(commandService.update(userId, request),
                 "User updated successfully");
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUser(@ValidUUID @PathVariable String userId) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
         return ResponseHandler.handleOptional(
                 queryService.getById(userId),
                 UserDtoCreator.getInstance()
@@ -49,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping("/{email}/email")
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserResponse> getUserByEmail(@Email @PathVariable String email) {
         return ResponseHandler.handleOptional(
                 queryService.getByEmail(email),
                 UserDtoCreator.getInstance()
@@ -58,8 +61,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<SimpleResponse> delete(
-            @PathVariable @ValidUUID String userId,
-            @Valid @RequestBody CommandReasonRequest request
+            @Valid @RequestBody CommandReasonRequest request,
+            @PathVariable UUID userId
             ) {
         return ResponseHandler.handleVoidResult(
                 commandService.deleteById(userId, request.reason()),
@@ -81,8 +84,8 @@ public class UserController {
     }
 
     @GetMapping("/cursor")
-    public ResponseEntity<CursorPageResponse<UserResponse, String>> getUsersByCursor(
-            @RequestParam(defaultValue = "NONE", required = false) String cursor,
+    public ResponseEntity<CursorPageResponse<UserResponse, UUID>> getUsersByCursor(
+            @RequestParam(required = false) UUID cursor,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) UserSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
@@ -95,8 +98,8 @@ public class UserController {
 
     @PutMapping("/{userId}/deactivate")
     public ResponseEntity<SimpleResponse> deactivateUser(
-            @ValidUUID @PathVariable String userId,
-            @Valid @RequestBody CommandReasonRequest request
+            @Valid @RequestBody CommandReasonRequest request,
+            @PathVariable UUID userId
     ) {
         return ResponseHandler.handleVoidResult(
                 commandService.deactivateById(userId, request.reason()),
@@ -106,7 +109,7 @@ public class UserController {
 
     @PutMapping("/{userId}/reactivate")
     public ResponseEntity<SimpleResponse> reactivateUser(
-            @ValidUUID @PathVariable String userId
+            @PathVariable UUID userId
     ) {
         return ResponseHandler.handleVoidResult(
                 commandService.reactivateById(userId),

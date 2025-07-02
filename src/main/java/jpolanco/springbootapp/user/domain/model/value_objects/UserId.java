@@ -5,42 +5,46 @@ import jpolanco.springbootapp.shared.domain.IdObject;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.utils.Validators;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 public class UserId extends IdObject {
 
-    private UserId(String value) {
-        super(value);
+    private UserId(Long userId, UUID uuid) {
+        super(uuid, userId);
     }
 
-    public static Result<UserId> create(String value) {
-        Optional<DomainError> error = Validators.notBlank("UserId", value);
-        if (error.isPresent()) return Result.failure(error.get());
-
-        try {
-            UUID.fromString(value);
-        } catch (IllegalArgumentException e) {
-            return Result.failure(DomainError.INVALID_PARAMETER
-                    .withDetails(e.getMessage())
+    public static Result<UserId> create(UUID uuid) {
+        if (uuid == null) {
+            return Result.failure(DomainError.NULL_VALUE
+                    .withDetails("UserId and UUID cannot be null")
                     .withField("UserId"));
         }
-        return Result.success(new UserId(value));
+        return Result.success(new UserId(null, uuid));
+    }
+
+    protected static UserId loadUnchecked(Long userId, UUID uuid) {
+        return new UserId(userId, uuid);
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof UserId that)) return false;
-        return this.getValue().equals(that.getValue());
+        return Objects.equals(this.id, that.id) &&
+               Objects.equals(this.uuid, that.uuid);
     }
 
     @Override
     public int hashCode() {
-        return this.getValue().hashCode();
+        return Objects.hash(id, uuid);
     }
 
     @Override
     public String toString() {
-        return this.getValue();
+        return "UserId{" +
+                "id=" + id +
+                ", uuid=" + uuid +
+                '}';
     }
 }

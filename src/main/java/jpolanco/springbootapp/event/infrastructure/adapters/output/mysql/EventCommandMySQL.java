@@ -18,7 +18,7 @@ public class EventCommandMySQL implements EventCommandRepository {
     @Override
     public Event save(Event entity) {
         var event = jpaEventRepository.save(eventEntityMapper.toEntity(entity));
-        return eventEntityMapper.toDomain(event);
+        return eventEntityMapper.load(event);
     }
 
     @Override

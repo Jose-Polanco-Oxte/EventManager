@@ -1,18 +1,17 @@
-package jpolanco.springbootapp.user.domain.model;
+package jpolanco.springbootapp.user.domain.model.value_objects;
 
 import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.utils.SuperResult;
-import jpolanco.springbootapp.user.domain.model.value_objects.*;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
 import java.util.*;
 
 @RequiredArgsConstructor
-public class UserBuilder {
+public class UserValidatorBuilder {
     private UserId userId;
     private FullName fullName;
     private Email email;
@@ -24,6 +23,10 @@ public class UserBuilder {
     private EventNotification eventNotification;
 
     private final List<Error> errors = new ArrayList<>();
+
+    public static UserValidatorBuilder builder() {
+        return new UserValidatorBuilder();
+    }
 
     private <T> T checker(Result<T> result) {
         if (result.isFailure()) {
@@ -42,53 +45,53 @@ public class UserBuilder {
         return result.getSuccess();
     }
 
-    public UserBuilder userId(String userId) {
-        var result = UserId.create(userId);
+    public UserValidatorBuilder userId(UUID uuid) {
+        var result = UserId.create(uuid);
         this.userId = checker(result);
         return this;
     }
 
-    public UserBuilder fullName(String firstName, String lastName) {
+    public UserValidatorBuilder fullName(String firstName, String lastName) {
         var result = FullName.create(firstName, lastName);
         this.fullName = checker(result);
         return this;
     }
 
-    public UserBuilder email(String email) {
+    public UserValidatorBuilder email(String email) {
         var result = Email.create(email);
         this.email = checker(result);
         return this;
     }
 
-    public UserBuilder encodedPassword(String encodedPassword) {
+    public UserValidatorBuilder encodedPassword(String encodedPassword) {
         var result = EncodedPassword.create(encodedPassword);
         this.encodedPassword = checker(result);
         return this;
     }
 
-    public UserBuilder roles(List<String> roles) {
+    public UserValidatorBuilder roles(List<String> roles) {
         var result = Roles.create(roles);
         this.roles = checker(result);
         return this;
     }
 
-    public UserBuilder status(UserStatus status) {
+    public UserValidatorBuilder status(UserStatus status) {
         this.status = status;
         return this;
     }
 
-    public UserBuilder qrFileName(String qrFileName) {
+    public UserValidatorBuilder qrFileName(String qrFileName) {
         var result = QRFileName.create(qrFileName);
         this.qrFileName = checker(result);
         return this;
     }
 
-    public UserBuilder createdAt(Instant createdAt) {
+    public UserValidatorBuilder createdAt(Instant createdAt) {
         this.createdAt = createdAt;
         return this;
     }
 
-    public UserBuilder addEvent(EventNotification event) {
+    public UserValidatorBuilder addEvent(EventNotification event) {
         this.eventNotification = event;
         return this;
     }

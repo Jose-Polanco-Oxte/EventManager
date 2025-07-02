@@ -4,13 +4,14 @@ import jpolanco.springbootapp.shared.domain.EventNotification;
 import jpolanco.springbootapp.shared.domain.Result;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ReactivateProfileUC {
     /**
-     * Reactivates a user's profile.
+     * Reactivates a user profile with the given user UUID.
      *
-     * @param userId The ID of the user whose profile is to be reactivated.
-     * @return A Result containing a list of EventNotifications if successful, or an error if it fails.
+     * @param userId the UUID of the user profile to reactivate
+     * @return a Result containing a list of EventNotifications if the reactivation is successful
      */
-    Result<List<EventNotification>> reactivate(String userId);
+    Result<List<EventNotification>> reactivate(UUID userId);
 }

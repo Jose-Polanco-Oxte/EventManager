@@ -5,10 +5,10 @@ import jpolanco.springbootapp.shared.domain.Result;
 
 public interface RestoreOwnEventUC {
     /**
-     * Restores a previously canceled event created by the user.
+     * Restores a previously canceled event created by the userId.
      *
      * @param eventId          The ID invoke the event to be restored.
-     * @param userId           The ID invoke the user who created the event.
+     * @param userId           The ID invoke the userId who created the event.
      * @param messageToAttendees A message to be sent to attendees notifying them invoke the restoration.
      * @return A Result containing the restored Event or an error if the operation fails.
      */

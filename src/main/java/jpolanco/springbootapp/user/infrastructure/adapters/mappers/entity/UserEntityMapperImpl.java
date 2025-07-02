@@ -1,51 +1,39 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.shared.domain.Report;
-import jpolanco.springbootapp.shared.domain.utils.Error;
-import jpolanco.springbootapp.shared.utils.Either;
-import jpolanco.springbootapp.shared.utils.SuperResult;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 
+import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
-import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class UserEntityMapperImpl implements UserEntityMapper {
-    public User toDomain(UserEntity userEntity) {
-        SuperResult<User, Report> result = User.load(
-                userEntity.getId().toString(),
+    public User load(UserEntity userEntity) {
+        return User.fromPersisted(
+                userEntity.getId(),
+                userEntity.getUuid(),
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
                 userEntity.getEmail(),
                 userEntity.getPassword(),
                 userEntity.getRoles()
                         .stream()
-                        .map(RoleEntity::getName)
-                        .toList(),
+                        .map(r -> UserRoles.fromString(r.getName()))
+                        .collect(Collectors.toSet()),
                 userEntity.getStatus(),
                 userEntity.getQrFileName(),
                 userEntity.getCreatedAt()
         );
-        if (result.isFailure()) {
-            throw new UserIntegrity(
-                    "User integrity error: " + result.getFailure().getErrors().stream()
-                            .map(Error::getMessage)
-                            .collect(Collectors.joining(", "))
-            , 409);
-        }
-        return result.getSuccess();
     }
 
     public UserEntity toEntity(User user) {
         return new UserEntity(
-                UUID.fromString(user.getId()),
+                user.getId(),
+                user.getUUID(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),

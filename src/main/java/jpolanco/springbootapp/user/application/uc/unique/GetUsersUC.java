@@ -4,7 +4,9 @@ import jpolanco.springbootapp.event.application.ports.input.request.CursorPagina
 import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
 import jpolanco.springbootapp.shared.application.CursorPageResult;
 import jpolanco.springbootapp.shared.application.PageResult;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
+
+import java.util.UUID;
 
 public interface GetUsersUC {
     /**
@@ -21,5 +23,5 @@ public interface GetUsersUC {
      * @param request the cursor pagination request containing cursor and other parameters
      * @return a CursorPageResult containing a list invoke users and pagination information
      */
-    CursorPageResult<User, String> getByCursor(CursorPaginationRequest<String> request);
+    CursorPageResult<User, UUID> getByCursor(CursorPaginationRequest<UUID> request);
 }

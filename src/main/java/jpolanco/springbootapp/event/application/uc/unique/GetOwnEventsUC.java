@@ -8,20 +8,20 @@ import jpolanco.springbootapp.shared.application.PageResult;
 
 public interface GetOwnEventsUC {
     /**
-     * Retrieves a paginated list invoke events created by the user.
+     * Retrieves a paginated list invoke events created by the userId.
      *
      * @param pagePaginationRequest the pagination request containing page number, size, and sorting option
-     * @param creatorId the ID invoke the user who created the events
-     * @return a PageResult containing a list invoke events created by the user
+     * @param creatorId the ID invoke the userId who created the events
+     * @return a PageResult containing a list invoke events created by the userId
      */
     PageResult<Event> get(PagePaginationRequest pagePaginationRequest, String creatorId);
 
     /**
-     * Retrieves a cursor-based paginated list invoke events created by the user.
+     * Retrieves a cursor-based paginated list invoke events created by the userId.
      *
      * @param cursorPaginationRequest the cursor pagination request containing cursor, size, and sorting options
-     * @param creatorId the ID invoke the user who created the events
-     * @return a CursorPageResult containing a list invoke events created by the user
+     * @param creatorId the ID invoke the userId who created the events
+     * @return a CursorPageResult containing a list invoke events created by the userId
      */
     CursorPageResult<Event, String> get(CursorPaginationRequest<String> cursorPaginationRequest, String creatorId);
 }

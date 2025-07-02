@@ -25,11 +25,11 @@ public class EmailTest {
                 "a@gmail.com.",     // Trailing dot
                 "-a@gmail.c",       // Leading hyphen
                 "b$a@gmail.c",      // Invalid character
-                ("a").repeat(65) + "@gmail.com", // Too long user part
+                ("a").repeat(65) + "@gmail.com", // Too long userId part
                 "a@@gmail.c",       // Double '@'
                 "a@b.c d",          // Contains whitespace
                 "a@b.c@d",          // Multiple '@' signs
-                "gmail.com",        // Missing user part
+                "gmail.com",        // Missing userId part
                 "g_t@example.com"   // Invalid domain
         );
 
@@ -46,7 +46,7 @@ public class EmailTest {
                 "juan.perez@gmail.com",
                 "maria_lopez89@yahoo.com",
                 "admin@hotmail.com",
-                "user+registro@outlook.com",
+                "userId+registro@outlook.com",
                 "nombre.apellido@icloud.com",
                 "cliente123@gmail.com",
                 "correo.test+alias@yahoo.com",

@@ -4,6 +4,7 @@ import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.shared.utils.Validators;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +27,10 @@ public class Roles {
         }
         var validRoles = result.getValue();
         return Result.success(new Roles(validRoles));
+    }
+
+    protected static Roles loadUnchecked(Set<UserRoles> values) {
+        return new Roles(values);
     }
 
     private static Result<Set<UserRoles>> isValidRole(List<String> roles) {

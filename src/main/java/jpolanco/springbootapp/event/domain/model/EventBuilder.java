@@ -7,10 +7,7 @@ import jpolanco.springbootapp.shared.domain.Result;
 import jpolanco.springbootapp.user.domain.model.value_objects.UserId;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class EventBuilder {
     private EventId eventId;
@@ -125,7 +122,7 @@ public class EventBuilder {
     }
 
     public EventBuilder creatorId(String creatorId) {
-        var maybeId = UserId.create(creatorId);
+        var maybeId = UserId.create(UUID.randomUUID()); // Its a placeholder, should be replaced with actual logic
         this.creatorId = checker(maybeId);
         return this;
     }

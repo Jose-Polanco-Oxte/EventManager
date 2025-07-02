@@ -6,9 +6,11 @@ import jpolanco.springbootapp.shared.application.CursorPageResult;
 import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
 import jpolanco.springbootapp.user.application.uc.unique.GetUsersUC;
-import jpolanco.springbootapp.user.domain.model.User;
+import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class GetUsers implements GetUsersUC {
     }
 
     @Override
-    public CursorPageResult<User, String> getByCursor(CursorPaginationRequest<String> request) {
+    public CursorPageResult<User, UUID> getByCursor(CursorPaginationRequest<UUID> request) {
         return queryRepository.findAll(
                 request.cursor(),
                 request.size(),
