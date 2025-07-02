@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.event.application.ports.input.request;
+package jpolanco.springbootapp.shared.infrastructure.dto.request;
 
 public record CursorPaginationRequest<C>(
     C cursor,

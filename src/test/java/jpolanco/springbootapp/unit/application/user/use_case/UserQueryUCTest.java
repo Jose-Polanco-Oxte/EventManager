@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.application.user.use_case;
 
-import jpolanco.springbootapp.event.application.ports.input.request.CursorPaginationRequest;
-import jpolanco.springbootapp.event.application.ports.input.request.PagePaginationRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.request.CursorPaginationRequest;
+import jpolanco.springbootapp.shared.infrastructure.dto.request.PagePaginationRequest;
 import jpolanco.springbootapp.shared.application.CursorPageResult;
 import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;

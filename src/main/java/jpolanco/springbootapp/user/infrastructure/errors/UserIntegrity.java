@@ -7,7 +7,7 @@ public class UserIntegrity extends ProviderException {
         super(message, code, cause);
     }
 
-    public UserIntegrity(String message, int code) {
-        super(message, code);
+    public UserIntegrity(String message) {
+        super(message, 422);
     }
 }

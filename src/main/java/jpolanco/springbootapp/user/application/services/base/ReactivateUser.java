@@ -21,6 +21,10 @@ public class ReactivateUser implements ReactivateUserUC {
 
     @Override
     public Result<List<EventNotification>> reactivate(User user) {
+        if (user.isActive()) {
+            return Result.failure(AppError.INVALID_OPERATION
+                    .withMessage("is already active and cannot be reactivated"));
+        }
         user.reactivate();
         var savedUser = commandRepository.save(user);
         return Result.success(savedUser.pullEvents());

@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.infrastructure.http;
 
-import jpolanco.springbootapp.event.application.utils.Changes;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.Changes;
 import jpolanco.springbootapp.shared.application.PageResult;
 import jpolanco.springbootapp.shared.domain.Report;
 import jpolanco.springbootapp.shared.domain.Result;

@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.event.application.utils;
+package jpolanco.springbootapp.shared.infrastructure.dto.response;
 
 import java.util.Objects;
 

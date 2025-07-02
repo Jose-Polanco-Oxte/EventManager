@@ -4,7 +4,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
-import jpolanco.springbootapp.event.infrastructure.errors.EventIntegrity;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandlerException;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
@@ -31,9 +30,6 @@ import java.util.Objects;
 
 @ControllerAdvice
 public class GlobalAdviceController {
-    // This class is used to handle global exceptions and provide a consistent response format
-    // for all controllers in the application. It can be extended to include specific exception
-    // handling methods as needed.
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalAdviceController.class);
 
@@ -99,13 +95,6 @@ public class GlobalAdviceController {
         logger.error("Missing request parameter: {}", e.getMessage(), e);
         String response = "Missing request parameter: " + e.getParameterName();
         return ResponseHandler.badRequest(response);
-    }
-
-    @ExceptionHandler(EventIntegrity.class)
-    public ResponseEntity<Object> handleEventIntegrity(EventIntegrity e) {
-        logger.error("Event integrity error: {}", e.getMessage(), e);
-        String response = "Event integrity error: " + e.getMessage();
-        return ResponseHandler.conflict(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

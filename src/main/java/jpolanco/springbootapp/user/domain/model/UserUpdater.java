@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.domain.model;
 
-import jpolanco.springbootapp.event.application.utils.Changes;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.Changes;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.domain.UpdateReport;
 import jpolanco.springbootapp.shared.domain.Result;

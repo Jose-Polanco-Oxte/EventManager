@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 @Entity(name = "tokens")
 @Table(name = "tokens", indexes = {
-        @Index(name = "idx_token_value", columnList = "token"),
         @Index(name = "idx_user_id", columnList = "user_id")
 })
 @Data
@@ -23,7 +22,7 @@ public class TokenEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 1000, nullable = false, unique = true)
+    @Column(length = 1000, nullable = false)
     private String token;
 
     @Enumerated(EnumType.STRING)

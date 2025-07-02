@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.ChangesResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
-import jpolanco.springbootapp.shared.validations.annotations.ValidUUID;
 import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.PageResponse;
@@ -85,13 +84,13 @@ public class UserController {
 
     @GetMapping("/cursor")
     public ResponseEntity<CursorPageResponse<UserResponse, UUID>> getUsersByCursor(
-            @RequestParam(required = false) UUID cursor,
+            @RequestParam(required = false) UUID last,
             @Min(1) @RequestParam(defaultValue = "10", required = false) int size,
             @RequestParam(defaultValue = "NONE", required = false) UserSortField sortBy,
             @RequestParam(defaultValue = "NONE", required = false) OrderField orderBy
     ) {
         return ResponseHandler.handleCollection(
-                queryService.getByCursor(cursor, size, sortBy.getField(), orderBy.getValue()),
+                queryService.getByCursor(last, size, sortBy.getField(), orderBy.getValue()),
                 CursorPageCreator.getInstance(), UserDtoCreator.getInstance()
         );
     }
@@ -114,6 +113,17 @@ public class UserController {
         return ResponseHandler.handleVoidResult(
                 commandService.reactivateById(userId),
                 "User reactivated successfully"
+        );
+    }
+
+    @PutMapping("/{userId}/suspend")
+    public ResponseEntity<SimpleResponse> suspendUser(
+            @Valid @RequestBody CommandReasonRequest request,
+            @PathVariable UUID userId
+    ) {
+        return ResponseHandler.handleVoidResult(
+                commandService.suspendById(userId, request.reason()),
+                "User suspended successfully"
         );
     }
 }

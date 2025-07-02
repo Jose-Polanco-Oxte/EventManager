@@ -13,6 +13,8 @@ import jpolanco.springbootapp.user.domain.model.value_objects.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +31,7 @@ public class DeleteUser implements DeleteUserUC {
         jwtCommandRepository.deleteAllByUserId(user.getId());
         commandRepository.deleteById(user.getId());
         qrProvider.delete(user.getQRFileName());
-        return Result.success(List.of(new UserDeleted(user.getUUID(), reason)));
+        return Result.success(new ArrayList<>(List.of(new UserDeleted(user.getUUID(), reason))));
     }
 
     @Override

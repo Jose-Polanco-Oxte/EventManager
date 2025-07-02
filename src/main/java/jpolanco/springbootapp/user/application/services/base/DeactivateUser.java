@@ -21,6 +21,10 @@ public class DeactivateUser implements DeactivateUserUC {
 
     @Override
     public Result<List<EventNotification>> deactivate(User user, String reason) {
+        if (user.isInactive()) {
+            return Result.failure(AppError.INVALID_OPERATION
+                    .withMessage("is already inactive and cannot be deactivated"));
+        }
         user.deactivate(reason);
         var savedUser = commandRepository.save(user);
         return Result.success(savedUser.pullEvents());

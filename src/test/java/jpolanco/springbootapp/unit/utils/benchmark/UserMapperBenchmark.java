@@ -46,7 +46,7 @@ public class UserMapperBenchmark {
 
             // 🔥 Warmup (ignored)
             for (int i = 0; i < warmupRounds; i++) {
-                mapper.load(entity);
+                mapper.toDomain(entity);
             }
 
             System.out.println("Starting timed benchmark...");
@@ -58,7 +58,7 @@ public class UserMapperBenchmark {
 
             for (int i = 0; i < testRounds; i++) {
                 long start = System.nanoTime();
-                mapper.load(entity);
+                mapper.toDomain(entity);
                 long duration = System.nanoTime() - start;
 
                 totalTime += duration;
@@ -68,7 +68,7 @@ public class UserMapperBenchmark {
 
             long average = totalTime / testRounds;
 
-            System.out.println("Benchmark results (load without validation)");
+            System.out.println("Benchmark results (toDomain without validation)");
             System.out.println("--------------------------------------------");
             System.out.println("Warmup rounds: " + warmupRounds);
             System.out.println("Test rounds:   " + testRounds);
@@ -112,7 +112,7 @@ public class UserMapperBenchmark {
 
             long average = totalTime / testRounds;
 
-            System.out.println("Benchmark results (toEntity)");
+            System.out.println("Benchmark results (fromDomain)");
             System.out.println("-----------------------------");
             System.out.println("Warmup rounds: " + warmupRounds);
             System.out.println("Test rounds:   " + testRounds);

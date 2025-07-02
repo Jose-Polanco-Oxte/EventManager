@@ -108,9 +108,6 @@ public class User {
 
     // Identificator
     public Long getId() {
-        if (userId.getId() == null) {
-            throw new IllegalStateException("userId is null");
-        }
         return userId.getId();
     }
 

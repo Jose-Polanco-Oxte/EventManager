@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserPasswordChangedListener {
-    private static final Logger logger = LoggerFactory.getLogger(UserRegisteredListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserPasswordChangedListener.class);
 
     @EventListener
     public void handleUserPasswordChanged(UserPasswordChanged event) {

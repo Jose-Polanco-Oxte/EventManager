@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.domain;
 
-import jpolanco.springbootapp.event.application.utils.Changes;
+import jpolanco.springbootapp.shared.infrastructure.dto.response.Changes;
 import jpolanco.springbootapp.shared.domain.utils.Error;
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.EntityCollection;
 import lombok.Getter;

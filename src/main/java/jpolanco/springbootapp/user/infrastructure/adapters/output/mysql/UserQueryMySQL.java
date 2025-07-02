@@ -26,25 +26,25 @@ public class UserQueryMySQL implements UserQueryRepository {
     @Override
     public Optional<User> findById(Long userId) {
         return jpaUserRepository.findById(userId)
-                .map(mapper::load);
+                .map(mapper::fromPersistence);
     }
 
     @Override
     public Optional<User> findByUuid(UUID uuid) {
         return jpaUserRepository.findByUuid(uuid)
-                .map(mapper::load);
+                .map(mapper::fromPersistence);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpaUserRepository.findByEmail(email).map(mapper::load);
+        return jpaUserRepository.findByEmail(email).map(mapper::fromPersistence);
     }
 
     @Override
     public List<User> searchByName(String name, int size) {
         return jpaUserRepository.searchByName(name, PageRequest.of(0, size))
                 .stream()
-                .map(mapper::load)
+                .map(mapper::fromPersistence)
                 .toList();
     }
 
@@ -52,7 +52,7 @@ public class UserQueryMySQL implements UserQueryRepository {
     public List<User> searchByEmail(String email, int size) {
         return jpaUserRepository.searchByEmail(email, PageRequest.of(0, size))
                 .stream()
-                .map(mapper::load)
+                .map(mapper::fromPersistence)
                 .toList();
     }
 
@@ -63,7 +63,7 @@ public class UserQueryMySQL implements UserQueryRepository {
 
         var users = jpaUserRepository.findAll(pageRequest);
         return new PageResult<>(
-                users.get().map(mapper::load).toList(),
+                users.get().map(mapper::fromPersistence).toList(),
                 users.getNumber(),
                 users.getSize(),
                 users.getTotalElements(),
@@ -92,7 +92,7 @@ public class UserQueryMySQL implements UserQueryRepository {
         if (slice.isEmpty()) {
             return new CursorPageResult<>(List.of(), null, false);
         }
-        var users = slice.get().map(mapper::load).toList();
+        var users = slice.get().map(mapper::fromPersistence).toList();
         var lastId = slice.getContent().getLast().getUuid();
         return new CursorPageResult<>(
                 users,

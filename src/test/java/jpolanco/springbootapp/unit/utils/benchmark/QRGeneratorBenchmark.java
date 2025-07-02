@@ -40,7 +40,7 @@ public class QRGeneratorBenchmark {
 
             long average = totalTime / TEST_ROUNDS;
 
-            System.out.println("Benchmark results (load without validation)");
+            System.out.println("Benchmark results (toDomain without validation)");
             System.out.println("--------------------------------------------");
             System.out.println("Warmup rounds: " + WARMUP_ROUNDS);
             System.out.println("Test rounds:   " + TEST_ROUNDS);

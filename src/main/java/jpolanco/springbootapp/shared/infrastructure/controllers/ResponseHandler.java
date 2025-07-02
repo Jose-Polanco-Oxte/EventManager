@@ -158,9 +158,6 @@ public class ResponseHandler {
     /* Error handlers */
 
     public static ResponseEntity<ErrorResponse> handleError(String field, String message, int code, String details) {
-        if (field == null || message == null || code <= 0) {
-            throw new ResponseHandlerException("Field, message or code cannot be null or invalid");
-        }
         return new ResponseEntity<>(new ErrorResponse(field, message, code, details), HttpStatus.valueOf(code));
     }
 

@@ -23,6 +23,7 @@ public class UserEntityMapperTest {
     private UserEntityMapperImpl userEntityMapperImpl;
     private User validUser;
     private UserEntity userEntity;
+    private Set<RoleEntity> roles;
 
     @BeforeEach
     void setUp() {
@@ -39,10 +40,10 @@ public class UserEntityMapperTest {
     }
 
     @Nested
-    @DisplayName("toEntity Method Tests")
+    @DisplayName("fromDomain Method Tests")
     class UserToDomainTests {
         @Test
-        @DisplayName("Test toEntity method with valid User")
+        @DisplayName("Test fromDomain method with valid User")
         void testToEntityWithValidUser() {
             UserEntity entity = userEntityMapperImpl.toEntity(validUser);
             assertNotNull(entity);
@@ -64,24 +65,24 @@ public class UserEntityMapperTest {
         }
 
         @Test
-        @DisplayName("Time performance test for toEntity method")
+        @DisplayName("Time performance test for fromDomain method")
         void testToEntityPerformance() {
             long startTime = System.nanoTime();
             UserEntity entity = userEntityMapperImpl.toEntity(validUser);
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
-            assertTrue(duration < 1000000, "toEntity method took too long: " + duration + " nanoseconds");
-            System.out.println("toEntity method performance: " + duration + " nanoseconds");
+            assertTrue(duration < 1000000, "fromDomain method took too long: " + duration + " nanoseconds");
+            System.out.println("fromDomain method performance: " + duration + " nanoseconds");
         }
     }
 
     @Nested
-    @DisplayName("load Method Tests")
+    @DisplayName("toDomain Method Tests")
     class UserEntityToDomainTests {
         @Test
-        @DisplayName("Test load method with valid UserEntity")
+        @DisplayName("Test toDomain method with valid UserEntity")
         void testToDomainWithValidUserEntity() {
-            User user = userEntityMapperImpl.load(userEntity);
+            User user = userEntityMapperImpl.toDomain(userEntity);
             assertNotNull(user);
             assertEquals(userEntity.getId(), user.getId());
             assertEquals(userEntity.getFirstName(), user.getFirstName());

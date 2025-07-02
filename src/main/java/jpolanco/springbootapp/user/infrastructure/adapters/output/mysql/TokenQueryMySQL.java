@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,14 +19,14 @@ public class TokenQueryMySQL implements JwtQueryRepository {
     @Override
     public Optional<TokenE> findByToken(String token) {
         return jpaTokenRepository.findByToken(token)
-                .map(tokenEntityMapper::load);
+                .map(tokenEntityMapper::fromPersistence);
     }
 
     @Override
     public List<TokenE> findAllByUserId(Long userId) {
         return jpaTokenRepository.findAllByUserId(userId)
                 .stream()
-                .map(tokenEntityMapper::load)
+                .map(tokenEntityMapper::fromPersistence)
                 .toList();
     }
 
@@ -40,7 +39,7 @@ public class TokenQueryMySQL implements JwtQueryRepository {
     public List<TokenE> findAll() {
         return jpaTokenRepository.findAll()
                 .stream()
-                .map(tokenEntityMapper::load)
+                .map(tokenEntityMapper::fromPersistence)
                 .toList();
     }
 }

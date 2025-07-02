@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.infrastructure.mappers;
 
-public interface EntityMapper<E, D> {
+public interface TestableMapper<E, D> {
     E toEntity(D domain);
-    D load(E entity);
+    D toDomain(E entity);
 }

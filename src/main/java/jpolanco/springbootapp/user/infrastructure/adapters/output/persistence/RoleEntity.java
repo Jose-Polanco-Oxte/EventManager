@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @Table(name = "roles", indexes = {
+        @Index(name = "idx_role_name", columnList = "name", unique = true),
         @Index(name = "idx_role_name_lower", columnList = "name_lower", unique = true)
 })
 @AllArgsConstructor
