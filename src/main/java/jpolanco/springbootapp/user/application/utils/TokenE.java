@@ -1,20 +1,19 @@
 package jpolanco.springbootapp.user.application.utils;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Setter
 @Getter
 @AllArgsConstructor
 public class TokenE {
     private String token;
-    private Long userId;
+    private User user;
     private TokenStatus status;
     private Instant createdAt;
 
@@ -26,7 +25,7 @@ public class TokenE {
     public String toString() {
         return "TokenE{" +
                 "token='" + token + '\'' +
-                ", userId='" + (userId != null ? userId : "null") + '\'' +
+                ", userId='" + (user != null ? user : "null") + '\'' +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 '}';
@@ -36,11 +35,11 @@ public class TokenE {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TokenE tokenE)) return false;
-        return token.equals(tokenE.token) && userId.equals(tokenE.userId);
+        return token.equals(tokenE.token) && user.equals(tokenE.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(token, userId);
+        return Objects.hash(token, user);
     }
 }

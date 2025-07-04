@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,8 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
+import jpolanco.springbootapp.user.infrastructure.adapters.output.context.UserContext;
 import jpolanco.springbootapp.user.application.ports.output.UserCommandRepository;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapper;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaRoleRepository;
@@ -19,6 +20,8 @@ public class UserCommandMySQL implements UserCommandRepository {
     private final JpaUserRepository jpaUserRepository;
     private final JpaRoleRepository jpaRoleRepository;
     private final UserEntityMapper mapper;
+//    private final UserAggregateContext context;
+    private final UserContext context;
 
     @Override
     public User save(User user) {
@@ -28,8 +31,9 @@ public class UserCommandMySQL implements UserCommandRepository {
                 .collect(Collectors.toSet());
 
         var userEntity = mapper.fromDomain(user, roles);
-        var savedEntity = jpaUserRepository.save(userEntity);
-        return mapper.fromPersistence(savedEntity).replaceEventsFrom(user);
+        var savedUser = mapper.fromPersistence(jpaUserRepository.save(userEntity)).replaceEventsFrom(user);
+        context.track(savedUser, userEntity);
+        return savedUser;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.shared.infrastructure.mappers.TestableMapper;
 import jpolanco.springbootapp.user.application.utils.TokenE;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.TokenEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
@@ -11,28 +10,8 @@ import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
-public class TokenEntityMapperImpl implements TokenEntityMapper, TestableMapper<TokenEntity, TokenE> {
-
-    @Override
-    public TokenEntity toEntity(TokenE domain) {
-        TokenEntity tokenEntity = new TokenEntity();
-        tokenEntity.setToken(domain.getToken());
-        tokenEntity.setStatus(domain.getStatus());
-        var userEntity = new UserEntity();
-        userEntity.setId(domain.getUserId());
-        tokenEntity.setUser(userEntity);
-        return tokenEntity;
-    }
-
-    @Override
-    public TokenE toDomain(TokenEntity entity) {
-        return new TokenE(
-                entity.getToken(),
-                entity.getId(),
-                entity.getStatus(),
-                Instant.EPOCH
-        );
-    }
+public class TokenEntityMapperImpl implements TokenEntityMapper {
+    private final UserEntityMapper userEntityMapper;
 
     @Override
     public TokenEntity fromDomain(TokenE token, UserEntity user) {
@@ -47,7 +26,7 @@ public class TokenEntityMapperImpl implements TokenEntityMapper, TestableMapper<
     public TokenE fromPersistence(TokenEntity entity) {
         return new TokenE(
                 entity.getToken(),
-                entity.getId(),
+                userEntityMapper.fromPersistence(entity.getUser()),
                 entity.getStatus(),
                 Instant.EPOCH
         );

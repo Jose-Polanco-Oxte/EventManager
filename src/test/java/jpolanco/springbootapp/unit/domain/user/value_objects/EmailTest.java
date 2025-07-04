@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.value_objects;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.Email;
+import jpolanco.springbootapp.user.domain.model.valueobjects.Email;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

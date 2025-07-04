@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.ChangesResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.PageResponse;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.SimpleResponse;

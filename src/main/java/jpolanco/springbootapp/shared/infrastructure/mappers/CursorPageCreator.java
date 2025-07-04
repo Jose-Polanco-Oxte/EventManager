@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.shared.infrastructure.mappers;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.Dto;
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.CursorPageResponse;

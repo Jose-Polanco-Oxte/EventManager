@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.shared.utils.cases;
 
 import jpolanco.springbootapp.shared.domain.EventNotification;
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.results.Result;
 
 import java.util.List;
 

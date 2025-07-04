@@ -1,12 +1,11 @@
 package jpolanco.springbootapp.unit.domain.user.value_objects;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.Roles;
+import jpolanco.springbootapp.user.domain.model.valueobjects.Roles;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -2,12 +2,11 @@ package jpolanco.springbootapp.user.infrastructure.adapters.output.persistence;
 
 
 import jakarta.persistence.*;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,7 +59,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -77,9 +76,6 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String qrFileName;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<TokenEntity> tokenEntities;
 
     public UserEntity(Long userId, UUID uuid, String firstName, String lastName, String email, String password, Set<RoleEntity> roles, UserStatus status, Instant createdAt, String qrFileName) {
         this.id = userId;

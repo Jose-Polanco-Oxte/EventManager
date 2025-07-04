@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 

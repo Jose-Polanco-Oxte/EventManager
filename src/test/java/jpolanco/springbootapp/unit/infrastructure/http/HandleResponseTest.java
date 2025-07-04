@@ -1,18 +1,18 @@
 package jpolanco.springbootapp.unit.infrastructure.http;
 
 import jpolanco.springbootapp.shared.infrastructure.dto.response.Changes;
-import jpolanco.springbootapp.shared.application.PageResult;
-import jpolanco.springbootapp.shared.domain.Report;
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.shared.domain.UpdateReport;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
+import jpolanco.springbootapp.shared.utils.results.Report;
+import jpolanco.springbootapp.shared.utils.results.Result;
+import jpolanco.springbootapp.shared.utils.results.reports.UpdateReport;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
 import jpolanco.springbootapp.shared.infrastructure.mappers.PageCreator;
-import jpolanco.springbootapp.shared.utils.SuperResult;
+import jpolanco.springbootapp.shared.utils.results.SuperResult;
 import jpolanco.springbootapp.unit.infrastructure.user.repositorry.TestUserFactory;
-import jpolanco.springbootapp.user.domain.domain_events.UserEmailChanged;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.domainevents.UserEmailChanged;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

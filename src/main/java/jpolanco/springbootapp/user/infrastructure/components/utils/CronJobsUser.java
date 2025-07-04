@@ -4,7 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.ports.output.JwtQueryRepository;
-import jpolanco.springbootapp.user.infrastructure.components.implementation.JwtManager;
+import jpolanco.springbootapp.user.infrastructure.components.providers.JwtManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

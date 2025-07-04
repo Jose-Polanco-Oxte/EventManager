@@ -13,7 +13,7 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepositoryMySQL roleRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         if (!roleRepository.existsByName("ADMIN")) {
             roleRepository.save("ADMIN");
         }

@@ -1,5 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
+import jpolanco.springbootapp.user.infrastructure.adapters.output.context.UserContext;
 import jpolanco.springbootapp.user.application.utils.TokenStatus;
 import jpolanco.springbootapp.user.application.ports.output.JwtCommandRepository;
 import jpolanco.springbootapp.user.application.utils.TokenE;
@@ -20,10 +21,16 @@ public class TokenCommandMySQL implements JwtCommandRepository {
     private final JpaTokenRepository jpaTokenRepository;
     private final TokenEntityMapper tokenEntityMapper;
     private final JpaUserRepository jpaUserRepository;
+//    private final UserAggregateContext context;
+    private final UserContext context;
 
     @Override
     public TokenE save(TokenE entity) {
-        var userEntity = jpaUserRepository.getReferenceById(entity.getUserId());
+        var userEntity = context.get(entity.getUser())
+                .orElse(jpaUserRepository.findById(entity.getUser().getId())
+                        .orElseThrow(() ->
+                                new UserIntegrity("User not found for ID: " + entity.getUser().getId())));
+
         var tokenEntity = tokenEntityMapper.fromDomain(entity, userEntity);
         TokenEntity savedToken = jpaTokenRepository.save(tokenEntity);
         return tokenEntityMapper.fromPersistence(savedToken);
@@ -55,8 +62,8 @@ public class TokenCommandMySQL implements JwtCommandRepository {
     public void saveAll(List<TokenE> tokens) {
         Set<TokenEntity> tokenEntities = tokens.stream()
                 .map(t -> {
-                    var userEntity = jpaUserRepository.findById(t.getUserId())
-                            .orElseThrow(() -> new UserIntegrity("User not found for ID: " + t.getUserId()));
+                    var userEntity = jpaUserRepository.findById(t.getUser().getId())
+                            .orElseThrow(() -> new UserIntegrity("User not found for ID: " + t.getUser().getId()));
                     return tokenEntityMapper.fromDomain(t, userEntity);
                 })
                 .collect(Collectors.toSet());

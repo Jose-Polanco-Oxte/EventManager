@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.unit.domain.user.update;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.domain.model.UserUpdater;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
-import jpolanco.springbootapp.shared.domain.UpdateReport;
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.results.reports.UpdateReport;
+import jpolanco.springbootapp.shared.utils.results.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
-import jpolanco.springbootapp.user.application.uc.base.*;
+import jpolanco.springbootapp.user.application.usecase.base.*;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllFieldsUserUpdate;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.UserCommandService;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +15,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserCommandServiceImpl implements UserCommandService {
-    private final UpdateUserUC updateUser;
-    private final DeleteUserUC deleteUserUC;
-    private final ReactivateUserUC reactivateUserUC;
-    private final DeactivateUserUC deactivateUserUC;
-    private final SuspendUserUC suspendUserUC;
+    private final UpdateUser updateUser;
+    private final DeleteUser deleteUser;
+    private final ReactivateUser reactivateUser;
+    private final DeactivateUser deactivateUser;
+    private final SuspendUser suspendUser;
     private final DomainEventsPublisher publisher;
 
     @Transactional
@@ -35,7 +35,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public Result<Void> deleteById(UUID userId, String reason) {
-        var result = deleteUserUC.deleteById(userId, reason);
+        var result = deleteUser.deleteById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -45,7 +45,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public Result<Void> reactivateById(UUID userId) {
-        var result = reactivateUserUC.reactivateById(userId);
+        var result = reactivateUser.reactivateById(userId);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -55,7 +55,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public Result<Void> deactivateById(UUID userId, String reason) {
-        var result = deactivateUserUC.deactivateById(userId, reason);
+        var result = deactivateUser.deactivateById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -65,7 +65,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     @Transactional
     @Override
     public Result<Void> suspendById(UUID userId, String reason) {
-        var result = suspendUserUC.suspendById(userId, reason);
+        var result = suspendUser.suspendById(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);

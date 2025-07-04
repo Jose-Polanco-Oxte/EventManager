@@ -1,8 +1,8 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 
 import java.util.Optional;
 import java.util.UUID;

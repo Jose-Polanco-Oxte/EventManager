@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.domain.user.value_objects;
 
-import jpolanco.springbootapp.shared.domain.Result;
-import jpolanco.springbootapp.user.domain.model.value_objects.EncodedPassword;
+import jpolanco.springbootapp.shared.utils.results.Result;
+import jpolanco.springbootapp.user.domain.model.valueobjects.EncodedPassword;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

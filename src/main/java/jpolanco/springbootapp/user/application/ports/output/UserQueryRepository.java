@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.application.ports.output;
 
 import jpolanco.springbootapp.shared.application.adapters.output.PageableRepository;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 
 import java.util.List;
 import java.util.Optional;

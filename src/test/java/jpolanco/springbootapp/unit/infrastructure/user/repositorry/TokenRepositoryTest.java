@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Sql(statements = {
-        "INSERT INTO roles (id) VALUES ('USER');",
-        "INSERT INTO roles (id) VALUES ('ADMIN');",
-        "INSERT INTO roles (id) VALUES ('ORGANIZER');"
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (1L, 'USER', 'Standard user', 'user');",
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (2L, 'ADMIN', 'System administrator', 'admin');",
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (3L, 'ORGANIZER', 'Event manager', 'organizer');",
 })
 public class TokenRepositoryTest {
 

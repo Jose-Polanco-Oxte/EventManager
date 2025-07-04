@@ -1,9 +1,10 @@
-package jpolanco.springbootapp.shared.infrastructure.mappers;
+package jpolanco.springbootapp.user.infrastructure.adapters.output.context;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.shared.infrastructure.context.ThreadLocalAggregateContext;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserThread extends ThreadLocalAggregateContext<User, UserEntity> {
+public class UserContext extends ThreadLocalAggregateContext<User, UserEntity> {
 }

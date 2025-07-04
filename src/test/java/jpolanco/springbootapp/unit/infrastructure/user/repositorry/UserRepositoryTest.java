@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @Sql(statements = {
-        "INSERT INTO roles (id) VALUES ('USER');",
-        "INSERT INTO roles (id) VALUES ('ADMIN');",
-        "INSERT INTO roles (id) VALUES ('ORGANIZER');"
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (1L, 'USER', 'Standard user', 'user');",
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (2L, 'ADMIN', 'System administrator', 'admin');",
+        "INSERT INTO roles (id, name, description, name_lower) VALUES (3L, 'ORGANIZER', 'Event manager', 'organizer');",
 })
 public class UserRepositoryTest {
 
@@ -112,7 +112,7 @@ public class UserRepositoryTest {
 
     @Test
     public void searchByEmailTest() {
-    jpaUserRepository.saveAll(users);
+        jpaUserRepository.saveAll(users);
         var foundUsers = jpaUserRepository.searchByEmail("a", PageRequest.of(0, 3));
 
         // Assertions to verify the found users by email
@@ -151,13 +151,13 @@ public class UserRepositoryTest {
     @Test
     public void findAllByCursorTest() {
         jpaUserRepository.saveAll(users);
-        var userId = users.get(1).getId();
+        var userId = users.getFirst().getId();
         var pageResult = jpaUserRepository.findByIdGreaterThan(userId, PageRequest.of(0, 2));
         // Assertions to verify the found users
         assertNotNull(pageResult);
         assertFalse(pageResult.isEmpty());
         assertEquals(2, pageResult.getContent().size());
         assertEquals(2, pageResult.getSize());
-        assertFalse(pageResult.hasNext());
+        assertTrue(pageResult.hasNext());
     }
 }

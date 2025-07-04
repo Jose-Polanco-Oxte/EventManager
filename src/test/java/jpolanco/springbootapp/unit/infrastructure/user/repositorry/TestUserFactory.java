@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.unit.infrastructure.user.repositorry;
 
-import jpolanco.springbootapp.shared.domain.Report;
-import jpolanco.springbootapp.shared.utils.SuperResult;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.shared.utils.results.Report;
+import jpolanco.springbootapp.shared.utils.results.SuperResult;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 
@@ -13,14 +13,13 @@ import java.util.Set;
 import java.util.UUID;
 
 public class TestUserFactory {
-    private static final RoleEntity roleUser = RoleEntity.builder().name("USER").build();
-    private static final RoleEntity roleAdmin = RoleEntity.builder().name("ADMIN").build();
-    private static final RoleEntity roleOrganizer = RoleEntity.builder().name("ORGANIZER").build();
+    private static final RoleEntity roleUser = RoleEntity.builder().id(1L).name("USER").build();
+    private static final RoleEntity roleAdmin = RoleEntity.builder().id(2L).name("ADMIN").build();
+    private static final RoleEntity roleOrganizer = RoleEntity.builder().id(3L).name("ORGANIZER").build();
     private static final Instant baseTime = Instant.parse("2025-07-01T12:00:00Z");
 
     public static UserEntity generateUser() {
         return UserEntity.builder()
-                .id(2L)
                 .uuid(UUID.randomUUID())
                 .email("alice@example.com")
                 .firstName("Alice")

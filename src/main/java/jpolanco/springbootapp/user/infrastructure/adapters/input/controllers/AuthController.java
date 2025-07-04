@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.Valid;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.LoginRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.RegisterRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserTokenResponse;

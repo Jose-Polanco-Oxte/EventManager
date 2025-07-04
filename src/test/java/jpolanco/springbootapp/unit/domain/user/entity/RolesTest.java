@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.unit.domain.user.entity;
 
-import jpolanco.springbootapp.user.domain.domain_events.UserAddedRoles;
-import jpolanco.springbootapp.user.domain.domain_events.UserRemovedRoles;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
+import jpolanco.springbootapp.user.domain.domainevents.UserAddedRoles;
+import jpolanco.springbootapp.user.domain.domainevents.UserRemovedRoles;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserRoles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

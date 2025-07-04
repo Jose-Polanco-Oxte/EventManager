@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.shared.application.adapters.output;
 
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
 
 public interface PageableRepository<E, ID> {
     /**

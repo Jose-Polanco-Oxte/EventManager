@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.shared.infrastructure.mappers;
+package jpolanco.springbootapp.shared.infrastructure.context;
 
 import java.util.Optional;
 

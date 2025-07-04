@@ -2,8 +2,8 @@ package jpolanco.springbootapp.shared.utils.cases;
 
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CursorPaginationRequest;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.PagePaginationRequest;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
 
 public interface PageCase<E, C> {
     /**

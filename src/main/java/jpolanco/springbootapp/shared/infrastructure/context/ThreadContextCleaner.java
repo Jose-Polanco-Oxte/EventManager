@@ -1,4 +1,4 @@
-package jpolanco.springbootapp.shared.infrastructure.mappers;
+package jpolanco.springbootapp.shared.infrastructure.context;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

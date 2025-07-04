@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.utils.benchmark;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapperImpl;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;

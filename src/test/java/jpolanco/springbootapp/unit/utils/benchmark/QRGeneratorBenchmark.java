@@ -1,6 +1,5 @@
 package jpolanco.springbootapp.unit.utils.benchmark;
 
-import jpolanco.springbootapp.user.infrastructure.components.implementation.Zxing;
 import jpolanco.springbootapp.user.infrastructure.components.utils.QRToSVG;
 
 public class QRGeneratorBenchmark {

@@ -5,16 +5,10 @@ import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.Jpa
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.jdbc.Sql;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@Sql(statements = {
-        "INSERT INTO roles (id) VALUES ('USER');",
-        "INSERT INTO roles (id) VALUES ('ADMIN');",
-        "INSERT INTO roles (id) VALUES ('ORGANIZER');"
-})
 public class RoleRepositoryTest {
 
     @Autowired
@@ -44,7 +38,7 @@ public class RoleRepositoryTest {
         );
 
         jpaRoleRepository.delete(role);
-        assertFalse(jpaRoleRepository.existsById(role.getName()));
+        assertFalse(jpaRoleRepository.existsById(role.getId()));
     }
 
     // Queries tests
@@ -56,7 +50,7 @@ public class RoleRepositoryTest {
                         .build()
         );
 
-        var foundRole = jpaRoleRepository.findById("TEST_ROLE");
+        var foundRole = jpaRoleRepository.findById(role.getId());
         assertTrue(foundRole.isPresent());
         assertEquals("TEST_ROLE", foundRole.get().getName());
     }

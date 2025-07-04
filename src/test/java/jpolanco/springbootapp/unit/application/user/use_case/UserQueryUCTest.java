@@ -2,13 +2,13 @@ package jpolanco.springbootapp.unit.application.user.use_case;
 
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CursorPaginationRequest;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.PagePaginationRequest;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
-import jpolanco.springbootapp.user.application.services.unique.GetUserByEmail;
-import jpolanco.springbootapp.user.application.services.unique.GetUserById;
-import jpolanco.springbootapp.user.application.services.unique.GetUsers;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.application.defaultservices.unique.GetUserByEmailDefault;
+import jpolanco.springbootapp.user.application.defaultservices.unique.GetUserByUUIDDefault;
+import jpolanco.springbootapp.user.application.defaultservices.unique.GetUsersDefault;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -52,15 +52,15 @@ public class UserQueryUCTest {
     private Long testLongId;
 
     // Use case to be tested
-    private GetUserById getUserById;
-    private GetUserByEmail getUserByEmail;
-    private GetUsers getUsers;
+    private GetUserByUUIDDefault getUserByUUIDDefault;
+    private GetUserByEmailDefault getUserByEmailDefault;
+    private GetUsersDefault getUsersDefault;
 
     @BeforeEach
     public void setUp() {
-        getUserById = new GetUserById(userQueryRepository);
-        getUserByEmail = new GetUserByEmail(userQueryRepository);
-        getUsers = new GetUsers(userQueryRepository);
+        getUserByUUIDDefault = new GetUserByUUIDDefault(userQueryRepository);
+        getUserByEmailDefault = new GetUserByEmailDefault(userQueryRepository);
+        getUsersDefault = new GetUsersDefault(userQueryRepository);
         // Common UUID for testing
         testId = UUID.randomUUID();
         // Common Long ID for testing
@@ -81,15 +81,15 @@ public class UserQueryUCTest {
                 .getSuccess());
 
         // Mocking the repository call
-        Mockito.when(userQueryRepository.findById(testLongId))
+        Mockito.when(userQueryRepository.findByUuid(testId))
                 .thenReturn(simulatedUser);
 
         // Calling the use case method
-        final Optional<User> result = getUserById.get(testId);
+        final Optional<User> result = getUserByUUIDDefault.get(testId);
 
         // Verifying the interaction with the repository
         assertEquals(expectedUser, result);
-        Mockito.verify(userQueryRepository, Mockito.times(1)).findById(testLongId);
+        Mockito.verify(userQueryRepository, Mockito.times(1)).findByUuid(testId);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class UserQueryUCTest {
                 .thenReturn(simulatedUser);
 
         // Calling the use case method
-        final Optional<User> result = getUserByEmail.get(testEmail);
+        final Optional<User> result = getUserByEmailDefault.get(testEmail);
 
         // Verifying the interaction with the repository
         assertEquals(expectedUser, result);
@@ -163,7 +163,7 @@ public class UserQueryUCTest {
             )).thenReturn(expectedPageResult);
 
             // Calling the use case method
-            PageResult<User> result = getUsers.getByPages(request);
+            PageResult<User> result = getUsersDefault.getByPages(request);
 
             // Verifying the interaction with the repository
             assertEquals(expectedPageResult, result, "PageResult should match expected");
@@ -206,7 +206,7 @@ public class UserQueryUCTest {
             )).thenReturn(expectedCursorPageResult);
 
             // Calling the use case method
-            CursorPageResult<User, UUID> result = getUsers.getByCursor(request);
+            CursorPageResult<User, UUID> result = getUsersDefault.getByCursor(request);
 
             // Verifying the interaction with the repository
             assertEquals(expectedCursorPageResult, result);

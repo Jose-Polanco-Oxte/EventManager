@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 
 import java.util.List;
 

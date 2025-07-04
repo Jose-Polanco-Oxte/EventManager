@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.domain.user.value_objects;
 
 import jpolanco.springbootapp.unit.utils.Unicode;
-import jpolanco.springbootapp.user.domain.model.value_objects.FullName;
+import jpolanco.springbootapp.user.domain.model.valueobjects.FullName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

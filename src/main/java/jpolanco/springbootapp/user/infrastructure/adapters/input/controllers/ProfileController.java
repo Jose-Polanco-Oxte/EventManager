@@ -3,7 +3,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 import jakarta.validation.Valid;
 import jpolanco.springbootapp.config.auth.MyUserDetails;
 import jpolanco.springbootapp.shared.infrastructure.dto.request.CommandReasonRequest;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.shared.infrastructure.dto.response.SimpleResponse;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;

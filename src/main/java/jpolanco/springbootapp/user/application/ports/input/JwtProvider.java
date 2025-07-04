@@ -1,6 +1,6 @@
 package jpolanco.springbootapp.user.application.ports.input;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 
 public interface JwtProvider {
     String generateAccessToken(User user);

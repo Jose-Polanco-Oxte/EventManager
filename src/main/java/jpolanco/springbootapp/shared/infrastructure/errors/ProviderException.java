@@ -1,7 +1,6 @@
 package jpolanco.springbootapp.shared.infrastructure.errors;
 
 public class ProviderException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
     private final int code;
     private final Throwable cause;
 

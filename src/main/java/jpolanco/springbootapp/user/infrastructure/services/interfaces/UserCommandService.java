@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.services.interfaces;
 
-import jpolanco.springbootapp.shared.domain.UpdateReport;
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.results.reports.UpdateReport;
+import jpolanco.springbootapp.shared.utils.results.Result;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.AllFieldsUserUpdate;
 
 import java.util.UUID;

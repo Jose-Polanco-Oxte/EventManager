@@ -5,9 +5,9 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jpolanco.springbootapp.config.errors.SecurityAuth;
 import jpolanco.springbootapp.shared.domain.utils.DomainError;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandlerException;
+import jpolanco.springbootapp.shared.infrastructure.errors.ResponseHandlerException;
 import jpolanco.springbootapp.shared.infrastructure.errors.BusinessRuleException;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.errors.UserIntegrity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +63,7 @@ public class GlobalAdviceController {
 
         errors.put("message", "Validation error occurred");
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            // Extraer el nombre del parámetro, como "page" o "size"
-            String path = violation.getPropertyPath().toString(); // e.g. "getEventsByPages.page"
+            String path = violation.getPropertyPath().toString();
             String[] parts = path.split("\\.");
             String field = parts[parts.length - 1];
 

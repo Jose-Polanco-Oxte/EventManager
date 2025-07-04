@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.unit.infrastructure.user.mappers;
 
 import jpolanco.springbootapp.unit.infrastructure.user.repositorry.TestUserFactory;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapperImpl;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
@@ -23,7 +23,6 @@ public class UserEntityMapperTest {
     private UserEntityMapperImpl userEntityMapperImpl;
     private User validUser;
     private UserEntity userEntity;
-    private Set<RoleEntity> roles;
 
     @BeforeEach
     void setUp() {

@@ -1,10 +1,11 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.output.mysql;
 
 import jpolanco.springbootapp.shared.infrastructure.components.PageAux;
-import jpolanco.springbootapp.shared.application.CursorPageResult;
-import jpolanco.springbootapp.shared.application.PageResult;
+import jpolanco.springbootapp.shared.application.pagination.CursorPageResult;
+import jpolanco.springbootapp.shared.application.pagination.PageResult;
+import jpolanco.springbootapp.user.infrastructure.adapters.output.context.UserContext;
 import jpolanco.springbootapp.user.application.ports.output.UserQueryRepository;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity.UserEntityMapper;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.repository.JpaUserRepository;
@@ -22,22 +23,31 @@ import java.util.UUID;
 public class UserQueryMySQL implements UserQueryRepository {
     private final JpaUserRepository jpaUserRepository;
     private final UserEntityMapper mapper;
+//    private final UserAggregateContext context;
+    private final UserContext context;
 
     @Override
     public Optional<User> findById(Long userId) {
-        return jpaUserRepository.findById(userId)
-                .map(mapper::fromPersistence);
+        var userEntity = jpaUserRepository.findById(userId);
+        var user = userEntity.map(mapper::fromPersistence);
+        user.ifPresent(u -> context.track(u, userEntity.get()));
+        return user;
     }
 
     @Override
     public Optional<User> findByUuid(UUID uuid) {
-        return jpaUserRepository.findByUuid(uuid)
-                .map(mapper::fromPersistence);
+        var userEntity = jpaUserRepository.findByUuid(uuid);
+        var user = userEntity.map(mapper::fromPersistence);
+        user.ifPresent(u -> context.track(u, userEntity.get()));
+        return user;
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpaUserRepository.findByEmail(email).map(mapper::fromPersistence);
+        var userEntity = jpaUserRepository.findByEmail(email);
+        var user = userEntity.map(mapper::fromPersistence);
+        user.ifPresent(u -> context.track(u, userEntity.get()));
+        return user;
     }
 
     @Override

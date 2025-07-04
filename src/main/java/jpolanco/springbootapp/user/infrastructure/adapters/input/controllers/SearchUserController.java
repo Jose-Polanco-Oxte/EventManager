@@ -1,7 +1,7 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.input.controllers;
 
 import jakarta.validation.constraints.Min;
-import jpolanco.springbootapp.shared.infrastructure.controllers.ResponseHandler;
+import jpolanco.springbootapp.shared.infrastructure.handlers.ResponseHandler;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
 import jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto.UserDtoCreator;
 import jpolanco.springbootapp.user.infrastructure.services.interfaces.SearchUserService;

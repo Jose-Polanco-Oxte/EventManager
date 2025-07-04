@@ -1,9 +1,9 @@
 package jpolanco.springbootapp.user.infrastructure.services.implementations;
 
-import jpolanco.springbootapp.shared.domain.UpdateReport;
-import jpolanco.springbootapp.shared.domain.Result;
+import jpolanco.springbootapp.shared.utils.results.reports.UpdateReport;
+import jpolanco.springbootapp.shared.utils.results.Result;
 import jpolanco.springbootapp.shared.infrastructure.publisher.DomainEventsPublisher;
-import jpolanco.springbootapp.user.application.uc.derived.*;
+import jpolanco.springbootapp.user.application.usecase.derived.*;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeEmailRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangeNameRequest;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.request.ChangePasswordRequest;
@@ -17,18 +17,18 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
-    private final UpdateProfileEmailUC updateProfileEmailUC;
-    private final UpdateProfilePasswordUC updateProfilePasswordUC;
-    private final UpdateProfileNameUC updateProfileNameUC;
-    private final DeleteProfileUC deleteProfileUC;
-    private final ReactivateProfileUC reactivateProfileUC;
-    private final DeactivateProfileUC deactivateProfileUC;
+    private final UpdateAccountEmail updateAccountEmail;
+    private final UpdateAccountPassword updateAccountPassword;
+    private final UpdateAccountName updateAccountName;
+    private final DeleteAccount deleteAccount;
+    private final ReactivateAccount reactivateAccount;
+    private final DeactivateAccount deactivateAccount;
     private final DomainEventsPublisher publisher;
 
     @Transactional
     @Override
     public Result<Void> changeEmail(UUID userId, ChangeEmailRequest request) {
-        var result = updateProfileEmailUC.setEmail(userId, request);
+        var result = updateAccountEmail.setEmail(userId, request);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -38,7 +38,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     @Override
     public UpdateReport changeName(UUID userId, ChangeNameRequest request) {
-        var result = updateProfileNameUC.setName(userId, request);
+        var result = updateAccountName.setName(userId, request);
         if (result.isFailure()) return result;
         var domainEvents = result.getNotifications();
         publisher.publishAll(domainEvents);
@@ -48,7 +48,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     @Override
     public Result<Void> delete(UUID userId, String reason) {
-        var result = deleteProfileUC.delete(userId, reason);
+        var result = deleteAccount.delete(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -58,7 +58,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     @Override
     public Result<Void> changePassword(UUID userId, ChangePasswordRequest dto) {
-        var result = updateProfilePasswordUC.setPassword(userId, dto);
+        var result = updateAccountPassword.setPassword(userId, dto);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -68,7 +68,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     @Override
     public Result<Void> deactivate(UUID userId, String reason) {
-        var result = deactivateProfileUC.deactivate(userId, reason);
+        var result = deactivateAccount.deactivate(userId, reason);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);
@@ -78,7 +78,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     @Override
     public Result<Void> reactivate(UUID userId) {
-        var result = reactivateProfileUC.reactivate(userId);
+        var result = reactivateAccount.reactivate(userId);
         if (result.isFailure()) return Result.failure(result.getError());
         var domainEvents = result.getValue();
         publisher.publishAll(domainEvents);

@@ -1,18 +1,20 @@
 package jpolanco.springbootapp.user.infrastructure.adapters.mappers.entity;
 
 import jpolanco.springbootapp.shared.infrastructure.mappers.TestableMapper;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 
-import jpolanco.springbootapp.user.domain.model.value_objects.UserRoles;
-import jpolanco.springbootapp.user.domain.model.value_objects.UserStatus;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserRoles;
+import jpolanco.springbootapp.user.domain.model.valueobjects.UserStatus;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.RoleEntity;
 import jpolanco.springbootapp.user.infrastructure.adapters.output.persistence.UserEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class UserEntityMapperImpl implements UserEntityMapper, TestableMapper<UserEntity, User> {
 
     @Override

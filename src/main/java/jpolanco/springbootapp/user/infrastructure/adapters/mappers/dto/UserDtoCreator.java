@@ -2,7 +2,7 @@ package jpolanco.springbootapp.user.infrastructure.adapters.mappers.dto;
 
 import jpolanco.springbootapp.shared.infrastructure.dto.interfaces.DtoCreator;
 import jpolanco.springbootapp.user.infrastructure.adapters.input.dto.response.UserResponse;
-import jpolanco.springbootapp.user.domain.model.value_objects.User;
+import jpolanco.springbootapp.user.domain.model.valueobjects.User;
 import org.springframework.stereotype.Component;
 
 @Component()
