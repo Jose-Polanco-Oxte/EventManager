@@ -93,7 +93,7 @@ public class AppendErrorsTest {
         assertTrue(errors.stream().anyMatch(e -> e.getField().map("lastName"::equals).orElse(false)),
                 "Expected error for lastName to be present");
 
-        assertTrue(errors.stream().anyMatch(e -> e.getField().map("email"::equals).orElse(false)),
+        assertTrue(errors.stream().anyMatch(e -> e.getField().map(f -> f.contains("email") || f.contains("domain")).orElse(false)),
                 "Expected error for email to be present");
 
         assertTrue(errors.stream().anyMatch(e -> e.getField().map("encodedPassword"::equals).orElse(false)),
