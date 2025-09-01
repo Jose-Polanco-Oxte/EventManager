@@ -1,6 +1,6 @@
 package jpolanco.applicationcore.user.infrastructure.adapters.output.mysql;
 
-import api.FilterableApi;
+import io.github.josepolanco.filterable.api.FilterableApi;
 import jpolanco.applicationcore.shared.application.pageable.Cursored;
 import jpolanco.applicationcore.shared.application.pageable.PageMapper;
 import jpolanco.applicationcore.shared.application.pageable.Paged;
@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static jpolanco.springextension.SpringSpecificationWrapper.from;
+import static io.github.josepolanco.filterable.spring.Wrapper.from;
 
 @Repository
 @RequiredArgsConstructor
