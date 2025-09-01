@@ -1,12 +1,12 @@
 package jpolanco.applicationcore.user.infrastructure.adapters.input.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import filters.CollectionFilter;
-import filters.Filter;
-import filters.operations.ComparableOperation;
-import filters.operations.InOperation;
-import filters.operations.TextCollectionOperation;
-import filters.operations.TextOperation;
+import io.github.josepolanco.filterable.filters.CollectionFilter;
+import io.github.josepolanco.filterable.filters.Filter;
+import io.github.josepolanco.filterable.filters.operations.ComparableOperation;
+import io.github.josepolanco.filterable.filters.operations.InOperation;
+import io.github.josepolanco.filterable.filters.operations.TextCollectionOperation;
+import io.github.josepolanco.filterable.filters.operations.TextOperation;
 import jakarta.validation.Valid;
 import jpolanco.domainmodel.user.UserStatusE;
 import org.springframework.validation.annotation.Validated;

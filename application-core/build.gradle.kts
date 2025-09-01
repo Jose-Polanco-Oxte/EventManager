@@ -35,8 +35,9 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    implementation("com.JPolanco:core:1.0.0-SNAPSHOT")
-    implementation("com.JPolanco:spring-extension:1.0.0-SNAPSHOT")
+    implementation("io.github.jose-polanco-oxte:filterable-api-core:1.0.1")
+    implementation("io.github.jose-polanco-oxte:filterable-api-spring-extension:1.0.1")
+
     implementation("com.google.zxing:javase:3.5.3")
     implementation("io.jsonwebtoken:jjwt:0.12.6")
     implementation("com.google.zxing:core:3.5.3")
